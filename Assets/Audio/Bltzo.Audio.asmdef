@@ -1,0 +1,16 @@
+{
+    "name": "SFXManager",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7a2704b9d91c87a41a1bb5504e331991"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
