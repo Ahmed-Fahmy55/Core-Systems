@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0fea7c87da23442a5c982b4d36cfba, type: 3}
   m_Name: UI
   m_EditorClassIdentifier: 
-  TrackName: 
+  TrackName: UI
   Parameter: UI
   MutedVolume: 0

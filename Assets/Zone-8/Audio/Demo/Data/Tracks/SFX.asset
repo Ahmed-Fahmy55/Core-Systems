@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0fea7c87da23442a5c982b4d36cfba, type: 3}
   m_Name: SFX
   m_EditorClassIdentifier: 
-  TrackName: 
+  TrackName: SFX
   Parameter: SFX
   MutedVolume: 0

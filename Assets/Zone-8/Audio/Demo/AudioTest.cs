@@ -31,4 +31,10 @@ public class AudioTest : MonoBehaviour
         sfxManager.StopAll();
         sfxClip.Play();
     }
+
+    [Button]
+    public void StopAll()
+    {
+        sfxManager.StopAll();
+    }
 }
