@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +42,11 @@ namespace Zone8.Audio
         [SerializeField] private int _maxFrequentSoundInstances = 30;
 
         private IObjectPool<SFXEmitter> _soundEmitterPool;
-        private readonly Dictionary<SFXClip, HashSet<SFXEmitter>> _activeSoundEmittersDic = new();
-        private readonly Dictionary<SFXClip, LinkedList<SFXEmitter>> _frequentSoundEmittersDic = new();
+        [ShowInInspector]
+        private readonly Dictionary<ETrack, Dictionary<SFXClip, HashSet<SFXEmitter>>> _activeSounds = new();
+
+        [ShowInInspector]
+        private readonly Dictionary<SFXClip, LinkedList<SFXEmitter>> _frequentSounds = new();
 
         private EventBinding<AudioPlayEvent> _audioPlayedBinding;
         private EventBinding<AudioControlEvent> _audioControldBinding;
@@ -74,62 +78,87 @@ namespace Zone8.Audio
         #region API
         public void Play(SFXClip clip, Vector3 position = new(), Action onEnd = null)
         {
-
             if (!CanPlaySound(clip))
             {
                 return;
             }
 
-            SFXEmitter soundEmitter = Get();
+            SFXEmitter soundEmitter = _soundEmitterPool.Get();
 
             soundEmitter.Initialize(clip, _soundEmitterPool);
             soundEmitter.transform.position = position;
             soundEmitter.transform.parent = transform;
             soundEmitter.Play(onEnd);
 
-            if (!_activeSoundEmittersDic.ContainsKey(clip))
+            // Add emitter to nested dictionary
+            if (!_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap))
             {
-                _activeSoundEmittersDic[clip] = new HashSet<SFXEmitter>();
+                clipMap = new Dictionary<SFXClip, HashSet<SFXEmitter>>();
+                _activeSounds[clip.ClipTrack] = clipMap;
             }
-            _activeSoundEmittersDic[clip].Add(soundEmitter);
-
-            if (!clip.FrequentSound) return;
-
-            if (!_frequentSoundEmittersDic.ContainsKey(clip))
+            if (!clipMap.TryGetValue(clip, out var emitterSet))
             {
-                _frequentSoundEmittersDic[clip] = new LinkedList<SFXEmitter>();
+                emitterSet = new HashSet<SFXEmitter>();
+                clipMap[clip] = emitterSet;
             }
-            _frequentSoundEmittersDic[clip].AddLast(soundEmitter);
+            emitterSet.Add(soundEmitter);
+
+            //  frequent sounds
+            if (clip.FrequentSound)
+            {
+                if (!_frequentSounds.ContainsKey(clip))
+                {
+                    _frequentSounds[clip] = new LinkedList<SFXEmitter>();
+                }
+                _frequentSounds[clip].AddLast(soundEmitter);
+            }
         }
 
         public void StopSound(SFXClip clip)
         {
-            if (_activeSoundEmittersDic.TryGetValue(clip, out var soundEmitters))
+            if (_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap) &&
+                clipMap.TryGetValue(clip, out var emitters))
             {
-                var emittersCopy = soundEmitters.ToList();
-
+                var emittersCopy = emitters.ToList();
                 foreach (var soundEmitter in emittersCopy)
                 {
                     soundEmitter.Stop();
                 }
+            }
+        }
 
-                _activeSoundEmittersDic.Remove(clip);
+        public void StopTrackSounds(ETrack track)
+        {
+            if (track == null)
+            {
+                Debug.LogWarning("Ambiance track is not defined.");
+                return;
+            }
 
-                if (clip.FrequentSound) _frequentSoundEmittersDic.Remove(clip);
+            if (!_activeSounds.TryGetValue(track, out var clipMap))
+            {
+                Debug.LogWarning($"No active sound emitters found for track: {track.name}");
+                return;
+            }
+
+            foreach (var clip in clipMap.Keys.ToList())
+            {
+                StopSound(clip);
             }
         }
 
         public void StopAll()
         {
-            var clips = _activeSoundEmittersDic.Keys.ToList();
-
-            foreach (var clip in clips)
+            foreach (var trackMap in _activeSounds.Values.ToList())
             {
-                StopSound(clip);
+                foreach (var clip in trackMap.Keys.ToList())
+                {
+                    StopSound(clip);
+                }
             }
 
-            _activeSoundEmittersDic.Clear();
-            _frequentSoundEmittersDic.Clear();
+            _activeSounds.Clear();
+            _frequentSounds.Clear();
         }
 
         public void ControlTrack(ETrack track, ETrackMode trackMode, float volume = 0.5f)
@@ -137,10 +166,12 @@ namespace Zone8.Audio
             switch (trackMode)
             {
                 case ETrackMode.Mute:
+                    if (_tracksSettings.IsTrackMuted(track)) return;
                     track.MutedVolume = _tracksSettings.GetTrackVolume(track);
                     _tracksSettings.SetTrackVolume(track, 0f);
                     break;
                 case ETrackMode.Unmute:
+                    if (!_tracksSettings.IsTrackMuted(track)) return;
                     _tracksSettings.SetTrackVolume(track, track.MutedVolume);
                     break;
                 case ETrackMode.SetVolume:
@@ -159,7 +190,7 @@ namespace Zone8.Audio
 
             if (!clip.FrequentSound) return true;
 
-            if (!_frequentSoundEmittersDic.TryGetValue(clip, out var emitters)) return true;
+            if (!_frequentSounds.TryGetValue(clip, out var emitters)) return true;
 
             if (emitters.Count >= _maxFrequentSoundInstances)
             {
@@ -181,11 +212,6 @@ namespace Zone8.Audio
         #endregion
 
         #region Private Methods
-        private SFXEmitter Get()
-        {
-            return _soundEmitterPool.Get();
-        }
-
         private void InitializePool()
         {
             _soundEmitterPool = new ObjectPool<SFXEmitter>(
@@ -211,25 +237,27 @@ namespace Zone8.Audio
 
         private void OnReturnedToPool(SFXEmitter soundEmitter)
         {
-            // Deactivate the emitter
-            if (_activeSoundEmittersDic.TryGetValue(soundEmitter.Clip, out var soundEmitters))
+            if (_activeSounds.TryGetValue(soundEmitter.Clip.ClipTrack, out var clipMap) &&
+                 clipMap.TryGetValue(soundEmitter.Clip, out var emitters))
             {
-                soundEmitters.Remove(soundEmitter);
-                if (soundEmitters.Count == 0)
+                emitters.Remove(soundEmitter);
+                if (emitters.Count == 0)
                 {
-                    _activeSoundEmittersDic.Remove(soundEmitter.Clip);
+                    clipMap.Remove(soundEmitter.Clip);
+                }
+                if (clipMap.Count == 0)
+                {
+                    _activeSounds.Remove(soundEmitter.Clip.ClipTrack);
                 }
             }
 
-            if (soundEmitter.Clip.FrequentSound)
+            if (soundEmitter.Clip.FrequentSound &&
+                _frequentSounds.TryGetValue(soundEmitter.Clip, out var list))
             {
-                if (_frequentSoundEmittersDic.TryGetValue(soundEmitter.Clip, out var emitters))
+                list.Remove(soundEmitter);
+                if (list.Count == 0)
                 {
-                    emitters.Remove(soundEmitter);
-                    if (emitters.Count == 0)
-                    {
-                        _frequentSoundEmittersDic.Remove(soundEmitter.Clip);
-                    }
+                    _frequentSounds.Remove(soundEmitter.Clip);
                 }
             }
 
@@ -249,44 +277,49 @@ namespace Zone8.Audio
             Play(data.Clip, data.Position, data.OnEnd);
         }
 
-        private void OnAudioControl(AudioControlEvent @event)
+        private void OnAudioControl(AudioControlEvent data)
         {
-            if (!_activeSoundEmittersDic.TryGetValue(@event.Clip, out var soundEmitters))
+            if (_activeSounds.TryGetValue(data.Clip.ClipTrack, out var clipMap) &&
+                 clipMap.TryGetValue(data.Clip, out var soundEmitters))
             {
-                Debug.LogWarning($"No active sound emitters found for clip: {@event.Clip.name}");
-                return;
-            }
+                var emittersToControl = new List<SFXEmitter>(soundEmitters);
 
-            // Create a temporary list to avoid modifying the collection during iteration
-            var emittersToControl = new List<SFXEmitter>(soundEmitters);
-
-            foreach (var soundEmitter in emittersToControl)
-            {
-                switch (@event.Control)
+                foreach (var soundEmitter in emittersToControl)
                 {
-                    case EAudioControl.Pause:
-                        soundEmitter.Pause();
-                        break;
+                    switch (data.Control)
+                    {
+                        case EAudioControl.Pause:
+                            soundEmitter.Pause();
+                            break;
 
-                    case EAudioControl.Resume:
-                        soundEmitter.Resume();
-                        break;
+                        case EAudioControl.Resume:
+                            soundEmitter.Resume();
+                            break;
 
-                    case EAudioControl.Stop:
-                        soundEmitter.Stop();
-                        break;
+                        case EAudioControl.Stop:
+                            soundEmitter.Stop();
+                            break;
 
-                    default:
-                        Debug.LogWarning($"Unhandled sound control: {@event.Control}");
-                        break;
+                        default:
+                            Debug.LogWarning($"Unhandled sound control: {data.Control}");
+                            break;
+                    }
+                }
+
+                if (data.Control == EAudioControl.Stop)
+                {
+                    clipMap.Remove(data.Clip);
+                    if (clipMap.Count == 0)
+                    {
+                        _activeSounds.Remove(data.Clip.ClipTrack);
+                    }
+
+                    if (data.Clip.FrequentSound) _frequentSounds.Remove(data.Clip);
                 }
             }
-
-            // If the control is Stop, remove the clip from the active dictionary
-            if (@event.Control == EAudioControl.Stop)
+            else
             {
-                _activeSoundEmittersDic.Remove(@event.Clip);
-                if (@event.Clip.FrequentSound) _frequentSoundEmittersDic.Remove(@event.Clip);
+                Debug.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
             }
         }
         #endregion

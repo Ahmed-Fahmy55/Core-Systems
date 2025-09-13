@@ -400,8 +400,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea7fa44b3de042a49b2b0eede56e1020, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxClip: {fileID: 11400000, guid: 1c82ff709ec4bc047820053a04d74b90, type: 2}
-  playtime: 1
+  _sfxClip: {fileID: 11400000, guid: 1c82ff709ec4bc047820053a04d74b90, type: 2}
+  _track: {fileID: 11400000, guid: d288adccc7b7f024a9eda5737056e6f8, type: 2}
+  _trackVolume: 0.5
+  _playtime: 1
 --- !u!1001 &2556795619956190475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -419,12 +421,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 6ce3262774361cf469cca4a53489bb24, type: 2}
     - target: {fileID: 2539972946018981160, guid: d5f7436cbe0384542bb503961cba6f67, type: 3}
+      propertyPath: _maxPoolSize
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2539972946018981160, guid: d5f7436cbe0384542bb503961cba6f67, type: 3}
       propertyPath: _tracksSettings
       value: 
       objectReference: {fileID: 11400000, guid: 6ce3262774361cf469cca4a53489bb24, type: 2}
     - target: {fileID: 2539972946018981160, guid: d5f7436cbe0384542bb503961cba6f67, type: 3}
       propertyPath: _collectionCheck
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6649744225449158291, guid: d5f7436cbe0384542bb503961cba6f67, type: 3}
       propertyPath: m_LocalPosition.x

@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0fea7c87da23442a5c982b4d36cfba, type: 3}
   m_Name: Master
   m_EditorClassIdentifier: 
-  TrackName: Master
-  Parameter: Master
+  Track: {fileID: 24300002, guid: ff146b2ccc6c8a941837d3cfc534892a, type: 2}
   MutedVolume: 0

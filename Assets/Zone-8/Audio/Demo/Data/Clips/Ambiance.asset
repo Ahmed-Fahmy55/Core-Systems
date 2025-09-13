@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Clips:
   - {fileID: 8300000, guid: d33622a0475a99d418f68b017c8a2b56, type: 3}
-  MixerGroup: {fileID: -8366912927241876754, guid: ff146b2ccc6c8a941837d3cfc534892a, type: 2}
+  ClipTrack: {fileID: 11400000, guid: d288adccc7b7f024a9eda5737056e6f8, type: 2}
   Loop: 0
-  PlayOnAwake: 0
   FrequentSound: 0
   Mute: 0
   Volume: 1

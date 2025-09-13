@@ -1,7 +1,6 @@
 using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
-using UnityEngine.Audio;
 using Zone8.Events;
 
 namespace Zone8.Audio
@@ -17,16 +16,13 @@ namespace Zone8.Audio
         [TitleGroup("Audio Mixer", "Audio Mixer Settings", TitleAlignments.Centered, HorizontalLine = true)]
         [Tooltip("Audio mixer group for this clip.")]
         [GUIColor(0.9f, 0.8f, 1f)] // Light purple color
-        public AudioMixerGroup MixerGroup;
+        public ETrack ClipTrack;
 
         [TitleGroup("Playback Settings", "Playback Options", TitleAlignments.Centered, HorizontalLine = true)]
         [HorizontalGroup("Playback Settings/Row1", Width = 0.5f)]
         [GUIColor(0.8f, 1f, 0.8f)] // Light green color
         public bool Loop;
 
-        [HorizontalGroup("Playback Settings/Row1", Width = 0.5f), LabelWidth(100)]
-        [GUIColor(0.8f, 1f, 0.8f)]
-        public bool PlayOnAwake;
 
         [HorizontalGroup("Playback Settings/Row2", Width = 0.5f), LabelWidth(100)]
         [GUIColor(0.8f, 1f, 0.8f)]

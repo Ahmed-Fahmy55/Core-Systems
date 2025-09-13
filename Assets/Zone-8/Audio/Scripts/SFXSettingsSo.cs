@@ -33,8 +33,7 @@ namespace Zone8.Audio
                 return;
             }
 
-            if (!string.IsNullOrEmpty(track.Parameter))
-                TargetAudioMixer.SetFloat(track.Parameter, NormalizedToMixerVolume(volume));
+            TargetAudioMixer.SetFloat(track.Track.name, NormalizedToMixerVolume(volume));
         }
 
         public virtual float GetTrackVolume(ETrack track)
@@ -46,11 +45,15 @@ namespace Zone8.Audio
                 Debug.LogError($"Track {track} not found in SFXSettingsSo");
                 return volume;
             }
-
-            if (!string.IsNullOrEmpty(track.Parameter))
-                TargetAudioMixer.GetFloat(track.Parameter, out volume);
+            Debug.Log(track.Track.name);
+            TargetAudioMixer.GetFloat(track.Track.name, out volume);
 
             return MixerVolumeToNormalized(volume);
+        }
+
+        public bool IsTrackMuted(ETrack track)
+        {
+            return GetTrackVolume(track) <= k_minimalVolume;
         }
 
         public virtual float NormalizedToMixerVolume(float normalizedVolume)

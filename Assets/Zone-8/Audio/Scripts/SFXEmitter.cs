@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -60,9 +59,9 @@ namespace Zone8.Audio
 
         public void Stop()
         {
-            StopPlayingTask();
             _audioSource.Stop();
-            StartCoroutine(DelayedRelease());
+            StopPlayingTask();
+            _emitterPool.Release(this);
         }
 
         public void Pause()
@@ -86,25 +85,18 @@ namespace Zone8.Audio
 
         #region Private Methods
 
-        private IEnumerator DelayedRelease()
-        {
-            yield return null; // wait 1 frame
-            _emitterPool.Release(this);
-        }
-
         private void SetupAudioSource(SFXClip clip)
         {
             _audioSource.clip = GetRandomClip(clip);
-            _audioSource.outputAudioMixerGroup = clip.MixerGroup;
+            _audioSource.outputAudioMixerGroup = clip.ClipTrack.Track;
             _audioSource.loop = clip.Loop;
-            _audioSource.playOnAwake = clip.PlayOnAwake;
 
             _audioSource.mute = clip.Mute;
             _audioSource.bypassEffects = clip.BypassEffects;
             _audioSource.bypassListenerEffects = clip.BypassListenerEffects;
             _audioSource.bypassReverbZones = clip.BypassReverbZones;
 
-            _audioSource.volume = clip.Volume;
+            _audioSource.volume = clip.RandomizeVolume ? Randomize(clip.MinVolume, clip.MaxVolume) : clip.Volume;
             _audioSource.pitch = clip.RandomizePitch ? Randomize(clip.MinPitch, clip.MaxPitch) : clip.Pitch;
 
             _audioSource.panStereo = clip.PanStereo;
