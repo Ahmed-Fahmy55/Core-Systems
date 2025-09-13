@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Bltzo.Events
+namespace Zone8.Events
 {
     public static class EventBus<T> where T : IEvent
     {

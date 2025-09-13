@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bltzo.Events
+namespace Zone8.Events
 {
     public interface IEvent { }
 

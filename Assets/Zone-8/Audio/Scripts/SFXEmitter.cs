@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
     [RequireComponent(typeof(AudioSource))]
     public class SFXEmitter : MonoBehaviour

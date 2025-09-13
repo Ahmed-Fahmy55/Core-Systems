@@ -1,11 +1,11 @@
-using Bltzo.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zone8.Events;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
     public struct AudioPlayEvent : IEvent
     {

@@ -4,7 +4,7 @@ using Sirenix.OdinInspector.Editor;
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace Bltzo.Events.Editor
+namespace Zone8.Events.Editor
 {
     public class EventBusDebuggerWindow : OdinEditorWindow
     {

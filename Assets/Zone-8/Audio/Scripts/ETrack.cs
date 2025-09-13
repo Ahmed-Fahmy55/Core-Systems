@@ -1,10 +1,10 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
 
-    [CreateAssetMenu(menuName = "Bltzo/Enums/Audio/Track Definition")]
+    [CreateAssetMenu(menuName = "Zone8/Enums/Audio/Track Definition")]
     public class ETrack : ScriptableObject
     {
         public string TrackName;

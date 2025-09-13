@@ -7,7 +7,7 @@ using System.Reflection;
 /// It allows to get all types in the current AppDomain that implement from a specific Interface type.
 /// For more details, <see href="https://docs.unity3d.com/2023.3/Documentation/Manual/ScriptCompileOrderFolders.html">visit Unity Documentation</see>
 /// </summary>
-namespace Bltzo.Events
+namespace Zone8.Events
 {
     public static class PredefinedAssemblyUtil
     {

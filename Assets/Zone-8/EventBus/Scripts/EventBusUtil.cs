@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Bltzo.Events
+namespace Zone8.Events
 {
     /// <summary>
     /// Contains methods and properties related to event buses and event types in the Unity application.

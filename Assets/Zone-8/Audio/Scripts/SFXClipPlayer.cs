@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
     public class SFXClipPlayer : MonoBehaviour
     {

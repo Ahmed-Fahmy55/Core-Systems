@@ -1,6 +1,6 @@
-using Bltzo.Audio;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zone8.Audio;
 
 public class AudioTest : MonoBehaviour
 {
@@ -15,6 +15,7 @@ public class AudioTest : MonoBehaviour
     {
         sfxManager = FindAnyObjectByType<SFXManager>();
     }
+
     [Button]
     private void Play()
     {
@@ -23,6 +24,7 @@ public class AudioTest : MonoBehaviour
             sfxClip.Play();
         }
     }
+
     [Button]
     public void StopAllAndPlay()
     {

@@ -1,12 +1,12 @@
-using Bltzo.Events;
 using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 using UnityEngine.Audio;
+using Zone8.Events;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
-    [CreateAssetMenu(menuName = "Bltzo/Audio/SFX Clip")]
+    [CreateAssetMenu(menuName = "Zone8/Audio/SFX Clip")]
     public class SFXClip : ScriptableObject
     {
         [TitleGroup("Audio Clips", "Audio Settings", TitleAlignments.Centered, HorizontalLine = true)]

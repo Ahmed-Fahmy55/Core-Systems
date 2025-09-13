@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Bltzo.Audio
+namespace Zone8.Audio
 {
 
-    [CreateAssetMenu(menuName = "Bltzo/Audio/SFX Settings")]
+    [CreateAssetMenu(menuName = "Zone8/Audio/SFX Settings")]
     [InlineEditor]
     public class SFXSettingsSo : SerializedScriptableObject
     {
