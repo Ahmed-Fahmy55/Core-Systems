@@ -72,4 +72,18 @@ public class AudioTest : MonoBehaviour
     {
         sfxManager.StopTrackSounds(_track);
     }
+
+    [Button, HorizontalGroup("GroupControl")]
+    void StopAllAndPlay()
+    {
+        sfxManager.StopAll();
+        sfxManager.Play(_sfxClip);
+    }
+
+    [Button, HorizontalGroup("GroupControl")]
+    void StopAndPlay()
+    {
+        _sfxClip.Stop();
+        _sfxClip.Play();
+    }
 }

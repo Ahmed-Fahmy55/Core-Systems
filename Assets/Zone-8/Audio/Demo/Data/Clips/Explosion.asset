@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Explosion
   m_EditorClassIdentifier: 
   Clips:
-  - {fileID: 8300000, guid: d33622a0475a99d418f68b017c8a2b56, type: 3}
+  - {fileID: 8300000, guid: e89cfb4e16995fb41ae17bcee09a82eb, type: 3}
+  - {fileID: 8300000, guid: aa6fe0aa45915e847954222e07335457, type: 3}
   ClipTrack: {fileID: 11400000, guid: 54b8b5f8bd00d6142921eaa46341ed5e, type: 2}
   Loop: 0
-  FrequentSound: 0
+  FrequentSound: 1
   Mute: 0
   Volume: 1
   RandomizeVolume: 0

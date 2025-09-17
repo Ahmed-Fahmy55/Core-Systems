@@ -145,14 +145,12 @@ namespace Zone8.Audio
                 {
                     onEnd?.Invoke();
                 }
+                Stop();
+
             }
             catch (OperationCanceledException)
             {
                 Debug.Log("Sound playback canceled.");
-            }
-            finally
-            {
-                Stop();
             }
         }
 

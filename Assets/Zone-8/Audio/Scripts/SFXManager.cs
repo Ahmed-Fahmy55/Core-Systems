@@ -149,16 +149,22 @@ namespace Zone8.Audio
 
         public void StopAll()
         {
-            foreach (var trackMap in _activeSounds.Values.ToList())
+            // Collect emitters first so dictionary modifications don't break iteration
+            var emitters = new List<SFXEmitter>();
+
+            foreach (var trackMap in _activeSounds.Values)
             {
-                foreach (var clip in trackMap.Keys.ToList())
+                foreach (var emitterList in trackMap.Values)
                 {
-                    StopSound(clip);
+                    emitters.AddRange(emitterList);
                 }
             }
 
-            _activeSounds.Clear();
-            _frequentSounds.Clear();
+            // Now stop them safely
+            foreach (var emitter in emitters)
+            {
+                emitter.Stop();
+            }
         }
 
         public void ControlTrack(ETrack track, ETrackMode trackMode, float volume = 0.5f)
@@ -232,6 +238,7 @@ namespace Zone8.Audio
 
         private void OnTakeFromPool(SFXEmitter soundEmitter)
         {
+            Debug.Log("Taking sound emitter from pool");
             soundEmitter.gameObject.SetActive(true);
         }
 
@@ -262,7 +269,7 @@ namespace Zone8.Audio
             }
 
             soundEmitter.gameObject.SetActive(false);
-
+            Debug.Log("Returned sound emitter to pool");
         }
 
         private void OnDestroyPoolObject(SFXEmitter soundEmitter)
@@ -297,7 +304,7 @@ namespace Zone8.Audio
                             break;
 
                         case EAudioControl.Stop:
-                            soundEmitter.Stop();
+                            StopSound(soundEmitter.Clip);
                             break;
 
                         default:
