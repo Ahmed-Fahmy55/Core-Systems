@@ -1,0 +1,23 @@
+{
+    "name": "SceneManagement",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:84651a3751eca9349aac36a66bba901b",
+        "GUID:7a2704b9d91c87a41a1bb5504e331991",
+        "GUID:caca889fed6088d40b22c2d7e2909c31",
+        "GUID:6ae76b200a86cd945b2391d0df331e7c",
+        "GUID:a9fd2bee2ddb1ee4a9c9746ecabd8021",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:f8908af8cf9ddbc42a0f13a4e8a859b5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

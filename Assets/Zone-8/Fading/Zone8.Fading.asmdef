@@ -1,0 +1,17 @@
+{
+    "name": "Bltzo.Fading",
+    "rootNamespace": "",
+    "references": [
+        "GUID:04c93c097b17b3e429e63a09fda76ac7",
+        "GUID:5caad36e4e0d77a4eb4d4da1425aafb9"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

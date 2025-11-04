@@ -1,0 +1,31 @@
+{
+    "name": "Unity.BossRoom.ConnectionManagement",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Netcode.Runtime",
+        "Unity.Multiplayer.Samples.Utilities",
+        "Unity.BossRoom.UnityServices",
+        "Unity.BossRoom.Infrastructure",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.BossRoom.Utils",
+        "Unity.Networking.Transport",
+        "VContainer",
+        "Unity.Services.Multiplayer",
+        "Bltzo.Utilities",
+        "Bltzo.Screens",
+        "Events",
+        "Unity.TextMeshPro",
+        "Michsky.UI.Heat.Core",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
