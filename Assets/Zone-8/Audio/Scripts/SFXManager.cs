@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,12 +41,8 @@ namespace Zone8.Audio
         [SerializeField] private int _maxFrequentSoundInstances = 30;
 
         private IObjectPool<SFXEmitter> _soundEmitterPool;
-        [ShowInInspector]
         private readonly Dictionary<ETrack, Dictionary<SFXClip, HashSet<SFXEmitter>>> _activeSounds = new();
-
-        [ShowInInspector]
         private readonly Dictionary<SFXClip, LinkedList<SFXEmitter>> _frequentSounds = new();
-
         private EventBinding<AudioPlayEvent> _audioPlayedBinding;
         private EventBinding<AudioControlEvent> _audioControldBinding;
 
