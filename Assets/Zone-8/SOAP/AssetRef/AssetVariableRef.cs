@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace Bltzo.SOAP.AssetVariable
+namespace Zone8.SOAP.AssetVariable
 {
     public enum AssetSource
     {

@@ -8,7 +8,7 @@ namespace Zone8.Fading
     public class TransitionPlusFader : MonoBehaviour, IFader
     {
         [SerializeField] private TransitionAnimator _transitionAnimator;
-        [SerializeField] private bool _hideOnFadeOut;
+        [SerializeField] private bool _hideOnFadeIn;
 
         private void Awake()
         {
@@ -27,7 +27,7 @@ namespace Zone8.Fading
             Fade(true, duration, onComplete);
         }
 
-        private void Fade(bool invert, float duration = 0, Action onComplete = null)
+        private void Fade(bool isFadingOut, float duration = 0, Action onComplete = null)
         {
             if (_transitionAnimator == null)
             {
@@ -40,14 +40,14 @@ namespace Zone8.Fading
             {
                 _transitionAnimator.profile.duration = duration;
             }
-            _transitionAnimator.profile.invert = invert;
+            _transitionAnimator.profile.invert = isFadingOut;
 
             _transitionAnimator.onTransitionEnd.RemoveAllListeners();
             _transitionAnimator.onTransitionEnd.AddListener(() =>
             {
                 onComplete?.Invoke();
-                if (invert) _transitionAnimator.gameObject.SetActive(false);
-                if (!invert && _hideOnFadeOut) _transitionAnimator.gameObject.SetActive(false);
+                if (isFadingOut) _transitionAnimator.gameObject.SetActive(false);
+                if (!isFadingOut && _hideOnFadeIn) _transitionAnimator.gameObject.SetActive(false);
             });
 
             _transitionAnimator.Play();

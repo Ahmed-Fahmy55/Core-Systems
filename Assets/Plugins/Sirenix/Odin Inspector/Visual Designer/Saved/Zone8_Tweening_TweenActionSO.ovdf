@@ -1,0 +1,11 @@
+OVDF v1.0
+Zone8.Tweening.TweenActionSO, Bltzo.Tweening
+
+# tweenAction
++ [Sirenix.OdinInspector.HideLabelAttribute]
+
+# Tween
+Visibility: Hidden
+
+# Act(GameObject target)
+Visibility: Hidden

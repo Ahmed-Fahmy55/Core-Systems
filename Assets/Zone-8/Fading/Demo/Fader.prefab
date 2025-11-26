@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _transitionAnimator: {fileID: 431448973928684571}
-  _hideOnFadeOut: 0
+  _hideOnFadeIn: 0
 --- !u!1 &8963415462268655915
 GameObject:
   m_ObjectHideFlags: 0

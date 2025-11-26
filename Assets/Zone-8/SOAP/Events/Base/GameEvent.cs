@@ -33,7 +33,7 @@ namespace Zone8.SOAP.Events
         public static Unit Default => Default;
     }
 
-    [CreateAssetMenu(menuName = "Bltzo/SOAP/Events/Game Event")]
+    [CreateAssetMenu(menuName = "Zone8/SOAP/Events/Game Event")]
     public class GameEvent : GameEvent<Unit>
     {
         public void Raise()

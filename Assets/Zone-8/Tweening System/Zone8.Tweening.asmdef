@@ -1,0 +1,20 @@
+{
+    "name": "Bltzo.Tweening",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:a9fd2bee2ddb1ee4a9c9746ecabd8021",
+        "GUID:69cb6b8c93f1db947aaa5c045743e892",
+        "GUID:ede057d2b531ba744a7e008603264c35",
+        "GUID:e06b885279800a1418367773d9ae8367"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,18 @@
+OVDF v1.0
+Zone8.Tweening.TweenActionExecuter, Bltzo.Tweening
+
+# $V6xPhbc5MUpZmM4fwrVGT6
+Position: $root:5
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Test"
+	BoldTitle = True
+
+# Act
+Position: $V6xPhbc5MUpZmM4fwrVGT6:0
++ [Sirenix.OdinInspector.ButtonAttribute]
+
+# Restart
+Position: $V6xPhbc5MUpZmM4fwrVGT6:2
+
+# PlayBack
+Position: $V6xPhbc5MUpZmM4fwrVGT6:1

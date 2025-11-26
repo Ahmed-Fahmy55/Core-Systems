@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Zone8.SOAP.ScriptableVariable
 {
-    [CreateAssetMenu(menuName = "Bltzo/SOAP/Scriptable Variable/Bool")]
+    [CreateAssetMenu(menuName = "Zone8/SOAP/Scriptable Variable/Bool")]
     public class BoolSV : ScriptableVariable<bool>
     {
     }
