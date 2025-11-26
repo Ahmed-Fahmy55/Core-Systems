@@ -126,13 +126,13 @@ namespace Zone8.Audio
         {
             if (track == null)
             {
-                Debug.LogWarning("Ambiance track is not defined.");
+                Logger.LogWarning("Ambiance track is not defined.");
                 return;
             }
 
             if (!_activeSounds.TryGetValue(track, out var clipMap))
             {
-                Debug.LogWarning($"No active sound emitters found for track: {track.name}");
+                Logger.LogWarning($"No active sound emitters found for track: {track.name}");
                 return;
             }
 
@@ -185,7 +185,7 @@ namespace Zone8.Audio
         {
             if (clip == null)
             {
-                Debug.LogWarning("No clip data found.");
+                Logger.LogWarning("No clip data found.");
                 return false;
             }
 
@@ -202,7 +202,7 @@ namespace Zone8.Audio
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Failed to stop sound emitter: {ex.Message}");
+                    Logger.LogWarning($"Failed to stop sound emitter: {ex.Message}");
                 }
                 return false;
             }
@@ -233,7 +233,6 @@ namespace Zone8.Audio
 
         private void OnTakeFromPool(SFXEmitter soundEmitter)
         {
-            Debug.Log("Taking sound emitter from pool");
             soundEmitter.gameObject.SetActive(true);
         }
 
@@ -264,7 +263,7 @@ namespace Zone8.Audio
             }
 
             soundEmitter.gameObject.SetActive(false);
-            Debug.Log("Returned sound emitter to pool");
+            Logger.Log("Returned sound emitter to pool");
         }
 
         private void OnDestroyPoolObject(SFXEmitter soundEmitter)
@@ -303,7 +302,7 @@ namespace Zone8.Audio
                             break;
 
                         default:
-                            Debug.LogWarning($"Unhandled sound control: {data.Control}");
+                            Logger.LogWarning($"Unhandled sound control: {data.Control}");
                             break;
                     }
                 }
@@ -321,7 +320,7 @@ namespace Zone8.Audio
             }
             else
             {
-                Debug.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
+                Logger.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
             }
         }
         #endregion

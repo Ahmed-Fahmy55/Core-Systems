@@ -22,7 +22,9 @@ namespace Zone8.Audio
 
         public virtual void SetTrackVolume(ETrack track, float volume)
         {
-            if (volume <= 0f)
+            volume = Mathf.Clamp01(volume);
+
+            if (volume == 0f)
             {
                 volume = k_minimalVolume;
             }
