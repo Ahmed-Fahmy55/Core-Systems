@@ -45,9 +45,7 @@ namespace Zone8.Audio
                 Debug.LogError($"Track {track} not found in SFXSettingsSo");
                 return volume;
             }
-            Debug.Log(track.Track.name);
             TargetAudioMixer.GetFloat(track.Track.name, out volume);
-
             return MixerVolumeToNormalized(volume);
         }
 
