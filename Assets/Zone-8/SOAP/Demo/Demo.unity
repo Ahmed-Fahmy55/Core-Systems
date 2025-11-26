@@ -369,14 +369,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IntEvent: {fileID: 0}
   AssetVariableRef:
-    Source: 0
-    _directAsset: {fileID: 0}
+    Source: 1
+    _directAsset: {fileID: 2800000, guid: 2e787553cf46ae242b225039e2c0a1cf, type: 3}
     _addressableAsset:
-      m_AssetGUID: 
+      m_AssetGUID: 2e787553cf46ae242b225039e2c0a1cf
       m_SubObjectName: 
       m_SubObjectType: 
       m_SubObjectGUID: 
-      m_EditorAssetChanged: 0
+      m_EditorAssetChanged: 1
+  RuntimeSet: {fileID: 0}
+  ScriptableVariableRef:
+    UseConstant: 1
+    Sv: {fileID: 0}
+    ConstValue: 0
+  SpriteAsset: {fileID: 0}
 --- !u!4 &1733957780
 Transform:
   m_ObjectHideFlags: 0

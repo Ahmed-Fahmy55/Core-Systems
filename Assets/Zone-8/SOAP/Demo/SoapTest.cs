@@ -7,16 +7,16 @@ using Zone8.SOAP.ScriptableVariable;
 public class SoapTest : MonoBehaviour, IGameEventListener<int>
 {
     public GameEvent<int> IntEvent;
-    public AssetVariableRef<Sprite> AssetVariableRef;
+    public AssetVariableRef<Texture2D> AssetVariableRef;
 
     public RuntimeSet<int> RuntimeSet;
     public ScriptableVariableRef<int> ScriptableVariableRef;
 
-    public Sprite SpriteAsset;
+    public Texture2D SpriteAsset;
 
     private async void Start()
     {
-        RuntimeSet.Add(1);
+        RuntimeSet?.Add(1);
         var handle = AssetVariableRef.LoadAssetAsync();
         await handle.Task;
         if (handle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded) return;

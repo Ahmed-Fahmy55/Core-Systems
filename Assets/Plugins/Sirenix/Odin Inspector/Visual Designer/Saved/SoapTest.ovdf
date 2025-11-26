@@ -1,0 +1,10 @@
+OVDF v1.0
+SoapTest, SOAP
+
+# AssetVariableRef
++ [Sirenix.OdinInspector.HideLabelAttribute]
++ [Sirenix.OdinInspector.TitleAttribute]
+	Title = "Sprite"
+	TitleAlignment = Left
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #FFCA94FF
