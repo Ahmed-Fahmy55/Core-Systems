@@ -1,5 +1,4 @@
 using Eflatun.SceneReference;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,24 +9,17 @@ namespace Zone8.SceneManagement
     /// Represents a group of scenes that can be loaded and managed together.
     /// </summary>
     [Serializable]
-    [InlineProperty] // Makes the entire struct inline in the inspector
-    [HideLabel]      // Hides the default label for the struct
     public struct SceneGroup
     {
         /// <summary>
         /// The name of the scene group.
         /// </summary>
         /// 
-        [HorizontalGroup("Split")]
-        [BoxGroup("Split/Group Info", CenterLabel = true)]
-        [LabelText("Group Name")]
-        [Required, LabelWidth(100)]
         public ESceneGroup GroupName;
 
         /// <summary>
         /// The list of scenes included in this group.
         /// </summary>
-        [BoxGroup("Split/Scenes", CenterLabel = true)]
         public List<SceneData> Scenes;
 
         /// <summary>
@@ -59,38 +51,26 @@ namespace Zone8.SceneManagement
         /// <summary>
         /// The reference to the scene asset.
         /// </summary>
-        [Required("Put the scene group name asset or create one")]
-        [LabelText("Scene Reference"), LabelWidth(100)]
         public SceneReference Scene;
 
         /// <summary>
         /// The type of the scene (e.g., ActiveScene, MainMenu, etc.).
         /// </summary>
-        [LabelText("Scene Type"), LabelWidth(70)]
         public ESceneType SceneType;
 
         /// <summary>
         /// The name of the scene.
         /// </summary>
-        [TableColumnWidth(150, Resizable = false)]
-        [ReadOnly]
-        [LabelText("Scene Name")]
         public string Name => Scene.Name;
 
         /// <summary>
         /// The path of the scene.
         /// </summary>
-        [TableColumnWidth(300)]
-        [ReadOnly]
-        [LabelText("Scene Path")]
         public string Path => Scene.Path;
 
         /// <summary>
         /// Indicates whether the scene is addressable.
         /// </summary>
-        [TableColumnWidth(100)]
-        [ReadOnly]
-        [LabelText("Is Addressable")]
         public bool IsAddressable => Scene.State == SceneReferenceState.Addressable ? true : false;
     }
 

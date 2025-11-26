@@ -1,0 +1,21 @@
+OVDF v1.0
+Zone8.SceneManagement.SceneGroup, SceneManagement
+
+# $UUSmJpFWc7q5JHLRzsMu9h
+Position: $root:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $9M8qhwBXr1iahKHY6ir1Zu
+Position: $UUSmJpFWc7q5JHLRzsMu9h:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $Ukwas9FWnyrZ4X9C728gBP
+Position: $UUSmJpFWc7q5JHLRzsMu9h:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# Scenes
+Position: $Ukwas9FWnyrZ4X9C728gBP:0
+
+# GroupName
+Position: $9M8qhwBXr1iahKHY6ir1Zu:0
++ [Sirenix.OdinInspector.HideLabelAttribute]

@@ -194,6 +194,52 @@ MonoBehaviour:
   splashTexture: {fileID: 2800000, guid: 9cbb07cca3115403a9ee5ee3e734e27c, type: 3}
   sound: {fileID: 0}
   soundDelay: 0
+--- !u!28 &714491473
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 4
+  m_Width: 256
+  m_Height: 1
+  m_CompleteImageSize: 2044
+  m_MipsStripped: 0
+  m_TextureFormat: 4
+  m_MipCount: 9
+  m_IsReadable: 1
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 1
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 2044
+  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1028457418
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,63 +350,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!28 &1198129217
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
-  m_Width: 256
-  m_Height: 1
-  m_CompleteImageSize: 2044
-  m_MipsStripped: 0
-  m_TextureFormat: 4
-  m_MipCount: 9
-  m_IsReadable: 1
-  m_IsPreProcessed: 0
-  m_IgnoreMipmapLimit: 1
-  m_MipmapLimitGroupName: 
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_VTOnly: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_LightmapFormat: 0
-  m_ColorSpace: 1
-  m_PlatformBlob: 
-  image data: 2044
-  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!21 &1782634001
 Material:
   serializedVersion: 8
@@ -385,7 +391,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _GradientTex:
-        m_Texture: {fileID: 1198129217}
+        m_Texture: {fileID: 714491473}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -482,6 +488,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -503,6 +511,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -543,7 +552,35 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 520284859}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: defaultScene
+      value: 
+      objectReference: {fileID: 11400000, guid: 98edd0b09c32de6469efc131e8d232a1, type: 2}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _maxIdleTimeInSeconds
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: loadDefaultSceneOnStart
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[0].GroupName
+      value: 
+      objectReference: {fileID: 11400000, guid: d5e2360a8da63df459d9f518abcc7f4c, type: 2}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[1].GroupName
+      value: 
+      objectReference: {fileID: 11400000, guid: 98edd0b09c32de6469efc131e8d232a1, type: 2}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: _sceneGroups.Array.data[0].Scenes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[1].Scenes.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
@@ -556,20 +593,40 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[0].Scene.guid
-      value: 43cdc48d6fccf314caa4885d8d74ae09
+      value: c08e59db899085349a1401762c034c18
       objectReference: {fileID: 0}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[1].Scene.guid
-      value: 43cdc48d6fccf314caa4885d8d74ae09
+      value: 3a3c5b991403bf242b92f8c2c99650ff
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[2].Scene.guid
+      value: 00000000000000000000000000000000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[3].Scene.guid
+      value: 00000000000000000000000000000000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[1].Scenes.Array.data[0].Scene.guid
+      value: ffe4c0d0622f1d644b6a6b2c661699b0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[1].Scenes.Array.data[1].Scene.guid
+      value: 00000000000000000000000000000000
       objectReference: {fileID: 0}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[0].Scene.asset
       value: 
-      objectReference: {fileID: 102900000, guid: 43cdc48d6fccf314caa4885d8d74ae09, type: 3}
+      objectReference: {fileID: 102900000, guid: c08e59db899085349a1401762c034c18, type: 3}
     - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: _sceneGroups.Array.data[0].Scenes.Array.data[1].Scene.asset
       value: 
-      objectReference: {fileID: 102900000, guid: 43cdc48d6fccf314caa4885d8d74ae09, type: 3}
+      objectReference: {fileID: 102900000, guid: 3a3c5b991403bf242b92f8c2c99650ff, type: 3}
+    - target: {fileID: 2810635263520617209, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: _sceneGroups.Array.data[1].Scenes.Array.data[0].Scene.asset
+      value: 
+      objectReference: {fileID: 102900000, guid: ffe4c0d0622f1d644b6a6b2c661699b0, type: 3}
     - target: {fileID: 6323589588120388128, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: m_Texture
       value: 
@@ -578,6 +635,34 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 1782634001}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.973138
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.56945276
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.41415522
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5742517
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.4176531
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1365.7618
+      objectReference: {fileID: 0}
+    - target: {fileID: 7899853465737201628, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 677.22864
+      objectReference: {fileID: 0}
     - target: {fileID: 8788327886008448823, guid: 9896e9899beb9a343a8b184aaeacd71f, type: 3}
       propertyPath: m_Name
       value: SceneManagementManager

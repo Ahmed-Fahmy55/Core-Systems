@@ -5,9 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Zone-8/Scene Management/Demo/Persistant.unity
+    guid: e5a5d916241325f439d3b24c31109481
+  - enabled: 1
+    path: Assets/Zone-8/Scene Management/Demo/Demo.unity
+    guid: c08e59db899085349a1401762c034c18
+  - enabled: 1
+    path: Assets/Zone-8/Scene Management/Demo/Default.unity
+    guid: ffe4c0d0622f1d644b6a6b2c661699b0
+  - enabled: 1
+    path: Assets/Zone-8/Tweening System/Demo/Scenes/Ui Demo.unity
+    guid: 3a3c5b991403bf242b92f8c2c99650ff
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9545832e0075c2d4bb279fa3bbd29e59, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}

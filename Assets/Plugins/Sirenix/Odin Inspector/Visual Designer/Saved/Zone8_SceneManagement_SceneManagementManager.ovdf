@@ -1,0 +1,105 @@
+OVDF v1.0
+Zone8.SceneManagement.SceneManagementManager, SceneManagement
+
+# $A672U1ofwoghvD5qCdiMai
+Position: $root:21
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Test"
+
+# $4iE6VKfY9ufYr3FHXHFbsA
+Position: $root:1
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+	GroupName = "Addressables Settings"
+	ShowLabel = True
+	CenterLabel = True
+
+# $3TTswX3pmyUPBznZLPPWe5
+Position: $4iE6VKfY9ufYr3FHXHFbsA:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $5uCh9epebxA6vD2tWbUtAV
+Position: $3TTswX3pmyUPBznZLPPWe5:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $M6ttJ6QbBzm4isCgLVqyhv
+Position: $3TTswX3pmyUPBznZLPPWe5:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+	Size = Auto
+
+# $Aze8fUHQGSaXNYq74psBhC
+Position: $root:2
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+	GroupName = "Scenes"
+	CenterLabel = True
+	ShowLabel = True
+
+# $C5ZfJSFvddjX2PSLBJWSAd
+Position: $Aze8fUHQGSaXNYq74psBhC:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $7pnyUcF2yLeCevg6xd1Wut
+Position: $C5ZfJSFvddjX2PSLBJWSAd:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $BKrTRRrsHBDQdS4SfSDq4G
+Position: $C5ZfJSFvddjX2PSLBJWSAd:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $VNsq7Cus7Gu7RWP7dK9yJK
+Position: $Aze8fUHQGSaXNYq74psBhC:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $LmzuTA7vaEpxyTMdU37HfM
+Position: $VNsq7Cus7Gu7RWP7dK9yJK:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $Qnfi8YApGi3XFuSpoNYK34
+Position: $VNsq7Cus7Gu7RWP7dK9yJK:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+	Size = Auto
+
+# LoadDefaultScene
+Position: $A672U1ofwoghvD5qCdiMai:2
+* [Sirenix.OdinInspector.ButtonAttribute]
+	Icon = AlignMiddle
+
+# Load(ESceneGroup groupName, string[] relatedBundles, IProgress<float> loadProgressor, IAddressableProgressor downloadingProgressor)
+Position: $A672U1ofwoghvD5qCdiMai:0
+* [Sirenix.OdinInspector.ButtonAttribute]
+	Style = CompactBox
+
+# _keepPersistantScene
+Position: $root:0
+
+# _progressCheckInterval
+Position: $M6ttJ6QbBzm4isCgLVqyhv:0
+* [UnityEngine.RangeAttribute]
+	max = 5
+	min = 0.1
++ [Sirenix.OdinInspector.LabelWidthAttribute]
+	Width = 160
+
+# _maxRetries
+Position: $4iE6VKfY9ufYr3FHXHFbsA:1
+
+# _maxIdleTimeInSeconds
+Position: $5uCh9epebxA6vD2tWbUtAV:0
++ [Sirenix.OdinInspector.LabelWidthAttribute]
+	Width = 160
+
+# _sceneGroups
+Position: $root:3
+
+# defaultScene
+Position: $LmzuTA7vaEpxyTMdU37HfM:0
+
+# loadDefaultSceneOnStart
+Position: $Qnfi8YApGi3XFuSpoNYK34:0
++ [Sirenix.OdinInspector.LabelWidthAttribute]
+	Width = 170
+
+# _fadInDuration
+Position: $7pnyUcF2yLeCevg6xd1Wut:0
+
+# _fadeOutDuration
+Position: $BKrTRRrsHBDQdS4SfSDq4G:0

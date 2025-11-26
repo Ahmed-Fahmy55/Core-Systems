@@ -18,6 +18,7 @@ namespace Bltzo.Utilities
             _scrollRect = GetComponent<ScrollRect>();
             _scrollRect.onValueChanged.AddListener(OnScrollValueChanged);
         }
+
         private void Start()
         {
             // Wait for UI layout to be fully calculated
