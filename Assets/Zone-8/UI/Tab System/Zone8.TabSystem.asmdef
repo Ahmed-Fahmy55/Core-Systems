@@ -1,0 +1,16 @@
+{
+    "name": "TabsSwitcher",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a9fd2bee2ddb1ee4a9c9746ecabd8021"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
