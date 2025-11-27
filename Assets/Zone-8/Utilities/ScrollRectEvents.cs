@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Bltzo.Utilities
+namespace Zone8.Utilities
 {
     [RequireComponent(typeof(ScrollRect))]
     public class ScrollRectEvents : MonoBehaviour

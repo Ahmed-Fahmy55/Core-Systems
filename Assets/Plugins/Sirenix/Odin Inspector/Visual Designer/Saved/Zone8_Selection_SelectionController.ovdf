@@ -1,0 +1,35 @@
+OVDF v1.0
+Zone8.Selection.SelectionController, Bltzo.Selection
+
+# $6GeWbqRGFFCpBzEec9HL8L
+Position: $root:4
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $A9qFprLeja11ZsPqCC6RM8
+Position: $6GeWbqRGFFCpBzEec9HL8L:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $HLCV1noivdmbBVFk49h6ah
+Position: $6GeWbqRGFFCpBzEec9HL8L:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+	Size = Auto
+
+# NoItemSelected
+Visibility: Hidden
+
+# _defaultSelectable
+Visibility: Shown
+
+# <Selectables>k__BackingField
+Visibility: Shown
+
+# _allowMultiSelect
+Position: $A9qFprLeja11ZsPqCC6RM8:0
+
+# _autoSubmitOnFirstSelection
+Position: $HLCV1noivdmbBVFk49h6ah:0
++ [Sirenix.OdinInspector.LabelWidthAttribute]
+	Width = 185
+
+# _resetSelectionOnComplete
+Position: $root:5
