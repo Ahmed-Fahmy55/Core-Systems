@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Zone8.Screens
 {
-    public class FadeScreen : Screen
+    public class FadeScreen : ScreenBase
     {
 
         [SerializeField] private IFader _fader;

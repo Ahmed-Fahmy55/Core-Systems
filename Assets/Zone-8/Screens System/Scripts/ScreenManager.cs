@@ -4,23 +4,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace Zone8.Screens
 {
     public class ScreenManager : SerializedMonoBehaviour
     {
-        public event Action<Screen, string> ScreenChanged;
+        // Events
+        public event Action<ScreenBase, string> ScreenChanged;
 
-        [SerializeField] private Dictionary<EScreen, Screen> _screenInstances;
+        // Serialized Fields
+        [SerializeField] private Dictionary<EScreen, ScreenBase> _screenInstances;
         [SerializeField] private EScreen _startScreen;
         [SerializeField] private float _startScreenDelay = 2;
+        [SerializeField] private bool _queueScreenRequests;
 
-        private Screen _currentScreen;
-
-        // Buffer queue for screen requests
+        // Private Fields
+        private ScreenBase _currentScreen;
         private readonly Queue<ScreenRequest> _screenRequestQueue = new Queue<ScreenRequest>();
         private bool _isProcessingQueue = false;
 
+        // Unity Lifecycle
         private IEnumerator Start()
         {
             if (_startScreen != null)
@@ -30,21 +32,24 @@ namespace Zone8.Screens
             }
         }
 
+        // Public Methods
         /// <summary>
         /// Buffers the screen show request and processes them in order.
         /// </summary>
         public void ShowScreen(EScreen screen, Action OnActiveScreenHide = null, Action OnNewScreenShow = null)
         {
-            _screenRequestQueue.Enqueue(new ScreenRequest
+            if (screen == null)
             {
-                Screen = screen,
-                OnActiveScreenHide = OnActiveScreenHide,
-                OnNewScreenShow = OnNewScreenShow
-            });
+                Logger.LogError($"Screen with name {screen} not found.");
+                return;
+            }
+
+            TryQueueRequest(screen, OnActiveScreenHide, OnNewScreenShow);
 
             if (!_isProcessingQueue)
                 _ = ProcessQueue();
         }
+
 
         public void ShowScreen(string screen, Action OnActiveScreenHide = null, Action OnNewScreenShow = null)
         {
@@ -54,15 +59,65 @@ namespace Zone8.Screens
                 Logger.LogError($"Screen with name {screen} not found.");
                 return;
             }
-            _screenRequestQueue.Enqueue(new ScreenRequest
-            {
-                Screen = targetScreen,
-                OnActiveScreenHide = OnActiveScreenHide,
-                OnNewScreenShow = OnNewScreenShow
-            });
+
+            TryQueueRequest(targetScreen, OnActiveScreenHide, OnNewScreenShow);
 
             if (!_isProcessingQueue)
                 _ = ProcessQueue();
+        }
+
+        public void ShowScreenSO(EScreen screen)
+        {
+            if (screen == null)
+            {
+                Logger.LogError("Screen ScriptableObject is null.");
+                return;
+            }
+
+            ShowScreen(screen);
+        }
+
+        /// <summary>
+        /// Hides the specified screen if it is active.
+        /// </summary>
+        public async Awaitable HideScreen(EScreen screen)
+        {
+            if (screen == null || !_screenInstances.TryGetValue(screen, out var screenInstance))
+            {
+                Logger.LogError($"Screen instance not found for {screen?.ScreenName ?? "null"}.");
+                return;
+            }
+
+            if (_currentScreen == screenInstance)
+            {
+                _currentScreen = null;
+                await screenInstance.Hide();
+            }
+        }
+
+
+        public void HideScreenSO(EScreen screen)
+        {
+            if (screen == null)
+            {
+                Logger.LogError("Screen ScriptableObject is null.");
+                return;
+            }
+
+            _ = HideScreen(screen);
+        }
+
+        // Private Methods
+        private void TryQueueRequest(EScreen screen, Action OnActiveScreenHide, Action OnNewScreenShow)
+        {
+            if (_isProcessingQueue && !_queueScreenRequests) return;
+
+            _screenRequestQueue.Enqueue(new ScreenRequest
+            {
+                Screen = screen,
+                OnActiveScreenHide = OnActiveScreenHide,
+                OnNewScreenShow = OnNewScreenShow
+            });
         }
 
         private EScreen GetScreenByName(string screen)
@@ -77,17 +132,27 @@ namespace Zone8.Screens
         private async Awaitable ProcessQueue()
         {
             _isProcessingQueue = true;
-            while (_screenRequestQueue.Count > 0)
+            try
             {
-                var request = _screenRequestQueue.Dequeue();
-                await ShowScreenInternal(request.Screen, request.OnActiveScreenHide, request.OnNewScreenShow);
+                while (_screenRequestQueue.Count > 0)
+                {
+                    var request = _screenRequestQueue.Dequeue();
+                    await ShowScreenInternal(request.Screen, request.OnActiveScreenHide, request.OnNewScreenShow);
+                }
             }
-            _isProcessingQueue = false;
+            catch (Exception ex)
+            {
+                Logger.LogError($"Exception in ProcessQueue: {ex}");
+            }
+            finally
+            {
+                _isProcessingQueue = false;
+            }
         }
 
         private async Awaitable ShowScreenInternal(EScreen screen, Action OnActiveScreenHide, Action OnNewScreenShow)
         {
-            if (screen == null || !_screenInstances.TryGetValue(screen, out Screen screenInstance))
+            if (screen == null || !_screenInstances.TryGetValue(screen, out ScreenBase screenInstance))
             {
                 Logger.LogError($"Screen instance not found for {screen?.ScreenName ?? "null"}. Please ensure it is registered in the ScreenManager.");
                 return;
@@ -125,46 +190,7 @@ namespace Zone8.Screens
             }
         }
 
-        /// <summary>
-        /// Hides the specified screen if it is active.
-        /// </summary>
-        public async Awaitable HideScreen(EScreen screen)
-        {
-            if (screen == null || !_screenInstances.TryGetValue(screen, out var screenInstance))
-            {
-                Logger.LogError($"Screen instance not found for {screen?.ScreenName ?? "null"}.");
-                return;
-            }
-
-            if (_currentScreen == screenInstance)
-            {
-                _currentScreen = null;
-                await screenInstance.Hide();
-            }
-        }
-
-        public void ShowScreenSO(EScreen screen)
-        {
-            if (screen == null)
-            {
-                Logger.LogError("Screen ScriptableObject is null.");
-                return;
-            }
-
-            ShowScreen(screen);
-        }
-
-        public void HideScreenSO(EScreen screen)
-        {
-            if (screen == null)
-            {
-                Logger.LogError("Screen ScriptableObject is null.");
-                return;
-            }
-
-            _ = HideScreen(screen);
-        }
-
+        // Nested Types
         private class ScreenRequest
         {
             public EScreen Screen;

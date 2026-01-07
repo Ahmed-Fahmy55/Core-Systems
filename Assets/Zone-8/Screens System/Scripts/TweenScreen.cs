@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Zone8.Screens
 {
     [RequireComponent(typeof(SequenceActionExecuter))]
-    public class TweenScreen : Screen
+    public class TweenScreen : ScreenBase
     {
         private SequenceActionExecuter _actionExecuter;
         private SequenceActionExecuter ActionExecuter => _actionExecuter ??= GetComponent<SequenceActionExecuter>();

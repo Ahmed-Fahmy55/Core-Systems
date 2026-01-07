@@ -4,8 +4,16 @@ using UnityEngine.Events;
 
 namespace Zone8.Screens
 {
+
+    public interface IScreen
+    {
+        Awaitable Show();
+        Awaitable Hide();
+        void EnableInteraction(bool enable);
+    }
+
     [RequireComponent(typeof(CanvasGroup))]
-    public abstract class Screen : MonoBehaviour
+    public abstract class ScreenBase : MonoBehaviour, IScreen
     {
         [field: SerializeField] public bool HideCurrent { get; private set; } = true;
         [field: SerializeField] public bool AutoHide { get; private set; }
@@ -32,7 +40,7 @@ namespace Zone8.Screens
             await StartShowEffect();
             IsVisible = true;
             transform.SetAsLastSibling();
-            SetInteraction(true);
+            EnableInteraction(true);
             ScreenShowed?.Invoke();
 
         }
@@ -46,18 +54,18 @@ namespace Zone8.Screens
             {
                 await Awaitable.WaitForSecondsAsync(_hideDelay);
             }
-            SetInteraction(false);
+            EnableInteraction(false);
             await StartHideEffect();
             IsVisible = false;
-            ScreenHidden?.Invoke();
             gameObject.SetActive(false);
+            ScreenHidden?.Invoke();
         }
 
         /// <summary>
         /// Enables or disables interaction with the screen.
         /// </summary>
         /// <param name="enable">True to enable interaction, false to disable.</param>
-        public void SetInteraction(bool enable)
+        public void EnableInteraction(bool enable)
         {
             CanvasGroup.blocksRaycasts = enable;
         }

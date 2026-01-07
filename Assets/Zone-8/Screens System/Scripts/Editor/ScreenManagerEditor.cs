@@ -41,7 +41,7 @@ public class ScreenManagerEditor : OdinEditor
         foreach (DictionaryEntry entry in dict)
         {
             var eScreen = entry.Key as EScreen;
-            var screen = entry.Value as Zone8.Screens.Screen;
+            var screen = entry.Value as Zone8.Screens.ScreenBase;
 
             EditorGUILayout.BeginHorizontal();
 
