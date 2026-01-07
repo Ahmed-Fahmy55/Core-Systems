@@ -23,10 +23,10 @@ MonoBehaviour:
     SerializationNodes:
     - Name: tweenAction
       Entry: 7
-      Data: 0|Bltzo.Tweening.ScaleTweenAction, Bltzo.Tweening
+      Data: 0|Zone8.Tweening.ScaleTweenAction, Bltzo.Tweening
     - Name: <Duration>k__BackingField
       Entry: 4
-      Data: 2
+      Data: 1
     - Name: <Delay>k__BackingField
       Entry: 4
       Data: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
       Data: 
     - Name: <Ease>k__BackingField
       Entry: 3
-      Data: 13
+      Data: 0
     - Name: <UpdateType>k__BackingField
       Entry: 3
       Data: 0

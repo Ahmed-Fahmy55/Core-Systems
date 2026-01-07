@@ -1,0 +1,18 @@
+{
+    "name": "Zone8.Screens.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5f51601ffaefbd24785ab46510ad87f4"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
