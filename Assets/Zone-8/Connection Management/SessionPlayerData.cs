@@ -17,7 +17,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             set => _clientID = value;
         }
 
-        public NetworkString TeamName;
+        public NetworkString PlayerName;
 
         public int PlayerIndex;
         private bool _isConnected;
@@ -27,7 +27,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
         {
             _isConnected = isConnected;
             _clientID = clientID;
-            TeamName = "";
+            PlayerName = "";
             PlayerIndex = -1;
         }
 
@@ -35,7 +35,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
 
         public void Reinitialize()
         {
-            TeamName = "";
+            PlayerName = "";
             PlayerIndex = -1;
         }
 
@@ -43,7 +43,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
         {
             serializer.SerializeValue(ref _isConnected);
             serializer.SerializeValue(ref _clientID);
-            serializer.SerializeValue(ref TeamName);
+            serializer.SerializeValue(ref PlayerName);
             serializer.SerializeValue(ref PlayerIndex);
         }
     }
