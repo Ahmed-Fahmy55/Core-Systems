@@ -131,6 +131,12 @@ MonoBehaviour:
     - a2a1a07b92f92dc45b82488f1387e9bc
     - 149db583d75d0bb48967a93af7c96bcf
     - 3562af65772e1d848bfbd9c8ca8580f4
+    - 9f8eef2a028947c49a03101748862c51
+    - aa3dc305dd00dad49bbc1ff3996b055d
+    - a73a691127ad93941b89586292291dab
+    - 335ba7f7c23bd1b4d8c03d0d54b215f3
+    - 0db42ef2705229b44b814a84c7ad0f97
+    - 9da17527168dac642850910fefc50c75
     values:
     - guid: 00000000000000001000000000000000
       iColor: 0
@@ -261,7 +267,7 @@ MonoBehaviour:
       iColor: 9
       autoIcon: 
       customIcon: 
-      autoIconDirty: 1
+      autoIconDirty: 0
     - guid: 9856a0299372954449b6dec106a97df3
       iColor: 1
       autoIcon: cs Script Icon
@@ -499,12 +505,12 @@ MonoBehaviour:
       autoIconDirty: 0
     - guid: 924e4e8ad3925074abb7b551b9a14bfc
       iColor: 0
-      autoIcon: cs Script Icon
+      autoIcon: 
       customIcon: 
       autoIconDirty: 0
     - guid: 0c583d85b4a1c46489ce308a8de92ee4
-      iColor: 0
-      autoIcon: cs Script Icon
+      iColor: 10
+      autoIcon: 
       customIcon: 
       autoIconDirty: 0
     - guid: 20db38e0aa8844b4faf35d5c32d8f8a6
@@ -715,5 +721,35 @@ MonoBehaviour:
     - guid: 3562af65772e1d848bfbd9c8ca8580f4
       iColor: 0
       autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 9f8eef2a028947c49a03101748862c51
+      iColor: 10
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: aa3dc305dd00dad49bbc1ff3996b055d
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: a73a691127ad93941b89586292291dab
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 335ba7f7c23bd1b4d8c03d0d54b215f3
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 0db42ef2705229b44b814a84c7ad0f97
+      iColor: 4
+      autoIcon: cs Script Icon
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 9da17527168dac642850910fefc50c75
+      iColor: 5
+      autoIcon: cs Script Icon
       customIcon: 
       autoIconDirty: 0
