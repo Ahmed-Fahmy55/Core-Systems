@@ -23,7 +23,7 @@ namespace Michsky.UI.Heat
 
         // Helpers
         [HideInInspector] public bool isPlayedOnce = false;
-        List<BoxContainerItem> cachedItems = new List<BoxContainerItem>();
+        public List<BoxContainerItem> cachedItems = new List<BoxContainerItem>();
 
         public enum UpdateMode { DeltaTime, UnscaledTime }
 
