@@ -1,5 +1,6 @@
-using Zone8.SOAP.ScriptableVariable;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using Zone8.SOAP.ScriptableVariable;
 
 namespace Zone8.SceneManagement
 {
@@ -15,14 +16,6 @@ namespace Zone8.SceneManagement
             _sceneManager = FindAnyObjectByType<SceneManagementManager>();
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Comma))
-            {
-                Load();
-            }
-        }
-
         private void Start()
         {
             if (_loadOnStart)
@@ -31,6 +24,7 @@ namespace Zone8.SceneManagement
             }
         }
 
+        [Button]
         public void Load()
         {
             if (!_sceneToLoad.IsNull) _sceneManager.Load(_sceneToLoad.Value);

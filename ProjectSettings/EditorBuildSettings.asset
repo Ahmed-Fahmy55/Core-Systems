@@ -6,17 +6,23 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Project/Scripts/Scene Management/Demo/Persistant.unity
+    path: Assets/_Project/Scripts/Core/Scene Management/Demo/Persistant.unity
     guid: e5a5d916241325f439d3b24c31109481
   - enabled: 1
-    path: Assets/_Project/Scripts/Scene Management/Demo/Demo.unity
+    path: Assets/_Project/Scripts/Core/Scene Management/Demo/Demo.unity
     guid: c08e59db899085349a1401762c034c18
   - enabled: 1
-    path: Assets/_Project/Scripts/Scene Management/Demo/Default.unity
+    path: Assets/_Project/Scripts/Core/Scene Management/Demo/Default.unity
     guid: ffe4c0d0622f1d644b6a6b2c661699b0
   - enabled: 1
-    path: Assets/_Project/Scripts/Tweening System/Demo/Scenes/Ui Demo.unity
+    path: Assets/_Project/Scripts/Core/Tweening System/Demo/Scenes/Ui Demo.unity
     guid: 3a3c5b991403bf242b92f8c2c99650ff
+  - enabled: 1
+    path: Assets/_Project/Scripts/Core/Scene Management/Demo/Demo.unity
+    guid: 7ca7def7bd09fe44b8847d06175e9fd9
+  - enabled: 1
+    path: Assets/_Project/Scripts/Core/Scene Management/Demo/Demo 1.unity
+    guid: a488ce6087a13c542bae54fbe4d0fed5
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9545832e0075c2d4bb279fa3bbd29e59, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}

@@ -1,9 +1,9 @@
-using Zone8.Events;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Zone8.Events;
 
 namespace Zone8.SceneManagement
 {
@@ -11,26 +11,30 @@ namespace Zone8.SceneManagement
     /// Base class for managing scene loading, dependencies, and bundles.
     /// Provides functionality for loading, unloading, and tracking progress of scene groups.
     /// </summary>
-    public abstract class SceneManagementBase : MonoBehaviour, IProgress<float>
+    public abstract class SceneManagementBase : SerializedMonoBehaviour, IProgress<float>
     {
         #region Members
 
         [Header("Settings")]
         [Tooltip("If true it keeps the first scene as persistant scene")]
-        [SerializeField] private bool _keepPersistantScene = true;
+        [SerializeField] protected bool _keepPersistantScene = true;
 
         [Tooltip("The time to wait before updating progress")]
-        [SerializeField, Range(.05f, 10)] private float _progressCheckInterval = 1;
+        [SerializeField, Range(.05f, 10)] protected float _progressCheckInterval = 1;
 
         [Tooltip("Maximum number of retry attempts before failing")]
-        [SerializeField, Range(1, 10)] private int _maxRetries = 2;
+        [SerializeField, Range(1, 10)] protected int _maxRetries = 2;
 
         [Tooltip("Maximum time to wait before failing if no progress is made")]
-        [SerializeField] private float _maxIdleTimeInSeconds = 30;
+        [SerializeField] protected float _maxIdleTimeInSeconds = 30;
 
         [Space]
         [Tooltip("List of scene groups available for loading")]
-        [SerializeField] private List<SceneGroup> _sceneGroups;
+        [SerializeField] protected List<SceneGroup> _sceneGroups;
+
+
+
+        protected IAddressableProgressor _addressableProgressor;
 
         /// <summary>
         /// Handles downloading of scene dependencies and bundles.
@@ -61,6 +65,7 @@ namespace Zone8.SceneManagement
         {
             _sceneDownloadHandler = new SceneDownloadHandler(_progressCheckInterval, _maxRetries, _maxIdleTimeInSeconds);
             _sceneLoadHandler = new SceneLoadHandler(_keepPersistantScene);
+            _addressableProgressor = GetComponentInChildren<IAddressableProgressor>(true);
         }
 
         #region API Methods
@@ -85,6 +90,16 @@ namespace Zone8.SceneManagement
                 _sceneGroups.Remove(group);
         }
 
+        public void ClearHandles()
+        {
+            _sceneDownloadHandler.ReleaseHandles();
+        }
+
+        public void ClearHandle(string lable)
+        {
+            _sceneDownloadHandler.ReleaseHandle(lable);
+        }
+
         /// <summary>
         /// Initiates the loading of a specified scene group.
         /// </summary>
@@ -93,7 +108,7 @@ namespace Zone8.SceneManagement
         /// <param name="loadProgressor">Progress reporter for scene loading.</param>
         /// <param name="downloadingProgressor">Progress reporter for bundle downloading.</param>
         [Button("Load SceneGroup")]
-        public void Load(ESceneGroup groupName, string[] relatedBundles = null,
+        public virtual void Load(ESceneGroup groupName, string[] relatedBundles = null,
             IProgress<float> loadProgressor = null, IAddressableProgressor downloadingProgressor = null)
         {
             if (_isLoading) return;
@@ -104,8 +119,8 @@ namespace Zone8.SceneManagement
                 return;
             }
 
-            if (loadProgressor == null)
-                loadProgressor = this;
+            loadProgressor = loadProgressor == null ? this : loadProgressor;
+            downloadingProgressor = downloadingProgressor == null ? _addressableProgressor : downloadingProgressor;
 
             LoadSceneGroup(targetSceneGroup, relatedBundles, loadProgressor, downloadingProgressor);
         }
@@ -120,13 +135,15 @@ namespace Zone8.SceneManagement
         public virtual async Awaitable<bool> DownloadBundles(string[] relatedBundles,
             IAddressableProgressor progressor)
         {
+            progressor = progressor == null ? _addressableProgressor : progressor;
+
             if (relatedBundles != null && relatedBundles.Length > 0)
             {
                 foreach (string bundle in relatedBundles)
                 {
                     if (!await _sceneDownloadHandler.DownloadBundle(bundle, progressor))
                     {
-                        EventBus<SceneDownloadingEvent>.Raise(new SceneDownloadingEvent()
+                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
                         {
                             Description = $"Failed downloading bundles",
                             Progressor = progressor,
@@ -137,11 +154,11 @@ namespace Zone8.SceneManagement
                 }
             }
 
-            EventBus<SceneDownloadingEvent>.Raise(new SceneDownloadingEvent()
+            EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
             {
                 Description = $"Downloaded all bundles",
-                Progressor = progressor,
                 State = EDwonloadingState.Finished,
+                Progressor = progressor,
             });
             return true;
         }
@@ -169,27 +186,43 @@ namespace Zone8.SceneManagement
         {
             _isLoading = true;
 
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
+            {
+                SceneGroup = group,
+                LoadStatues = ESceneLoadStatus.Started,
+            });
+
+            await StartLoadingEffect();
             if (!await DownloadSceneGroupDependencies(group, dependancyProgressor))
             {
+                await EndLoadingEffect();
                 _isLoading = false;
                 return;
             }
 
             if (!await DownloadBundles(relatedBundles, dependancyProgressor))
             {
+                await EndLoadingEffect();
                 _isLoading = false;
                 return;
             }
 
-            await StartLoadingEffect();
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
+            {
+                SceneGroup = group,
+                LoadStatues = ESceneLoadStatus.Loading
+            });
+
             await _sceneLoadHandler.UnloadScenes();
+            ClearHandles();
+            await Resources.UnloadUnusedAssets();
             await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgresseor);
             await EndLoadingEffect();
 
             EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
             {
                 SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.FinishedFadeinEffect
+                LoadStatues = ESceneLoadStatus.Completed
             });
 
             _currentSceneGroup = group.GroupName;
@@ -208,7 +241,7 @@ namespace Zone8.SceneManagement
             {
                 if (!await _sceneDownloadHandler.DownloadsSceneGroupDependencies(group, progressor))
                 {
-                    EventBus<SceneDownloadingEvent>.Raise(new SceneDownloadingEvent()
+                    EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
                     {
                         Description = $"Failed to download dependencies for {group.GroupName.name} Scene",
                         State = EDwonloadingState.Failiure,
@@ -218,7 +251,7 @@ namespace Zone8.SceneManagement
                 }
             }
 
-            EventBus<SceneDownloadingEvent>.Raise(new SceneDownloadingEvent()
+            EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
             {
                 Description = $"Successfully downloaded dependencies for {group.GroupName.name} Scene",
                 State = EDwonloadingState.Finished,
@@ -226,6 +259,14 @@ namespace Zone8.SceneManagement
             });
             return true;
         }
+
+#if UNITY_EDITOR
+        [Button]
+        private void ClearCach()
+        {
+            Caching.ClearCache();
+        }
+#endif
 
         /// <summary>
         /// Checks if a SceneGroup is registered.

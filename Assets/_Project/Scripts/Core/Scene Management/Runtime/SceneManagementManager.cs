@@ -1,12 +1,10 @@
-using Zone8.Fading;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zone8.Fading;
 
 namespace Zone8.SceneManagement
 {
-    /// <summary>
-    /// The Facade for scene management interactions
-    /// </summary>
+
     public class SceneManagementManager : SceneManagementBase
     {
         [SerializeField] private ESceneGroup defaultScene;
@@ -16,17 +14,22 @@ namespace Zone8.SceneManagement
 
         private IFader _fader;
 
-
         protected override void Awake()
         {
             base.Awake();
             _fader = GetComponentInChildren<IFader>();
+            if (_fader == null)
+            {
+                Logger.LogError("No IFader component found in children of SceneManagementManager. Please add one to enable fading effects.");
+            }
         }
 
         private void Start()
         {
             if (loadDefaultSceneOnStart) LoadDefaultScene();
         }
+
+
         [Button]
         public void LoadDefaultScene()
         {
@@ -42,7 +45,7 @@ namespace Zone8.SceneManagement
         public override async Awaitable EndLoadingEffect()
         {
             _fader.FadeOut(_fadeOutDuration);
-            await Awaitable.WaitForSecondsAsync(_fadInDuration);
+            await Awaitable.WaitForSecondsAsync(_fadeOutDuration);
         }
 
         public override void Report(float loadingProgress)

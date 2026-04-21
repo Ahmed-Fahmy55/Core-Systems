@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Zone8.SceneManagement
@@ -6,7 +7,7 @@ namespace Zone8.SceneManagement
     public class ESceneGroup : ScriptableObject
     {
         public string DisplayName;
-        public string[] DependencyBundles;
+        public List<string> DependencyBundles;
     }
 }
 

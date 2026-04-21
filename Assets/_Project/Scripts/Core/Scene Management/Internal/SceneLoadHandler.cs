@@ -1,4 +1,3 @@
-using Zone8.Events;
 using Eflatun.SceneReference;
 using System;
 using System.Collections.Generic;
@@ -8,32 +7,10 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
+using Zone8.Events;
 
 namespace Zone8.SceneManagement
 {
-    // Event triggered when a scene group is loaded or unloaded
-    public struct SceneGroupLoadEvent : IEvent
-    {
-        public IProgress<float> Progressor; // Progress reporter for the event
-        public SceneGroup SceneGroup; // The scene group involved in the event
-        public ESceneLoadStatus LoadStatues; // The status of the load/unload process
-    }
-
-    // Event triggered when an individual scene is loaded or unloaded
-    public struct SceneLoadEvent : IEvent
-    {
-        public IProgress<float> Progressor; // Progress reporter for the event
-        public SceneData SceneData; // The data of the scene loaded
-        public ESceneLoadStatus LoadStatues; // The status of the load/unload process
-    }
-
-    // Enum representing the various statuses during scene loading/unloading
-    public enum ESceneLoadStatus
-    {
-        None, Started, Loading, Unloading, FinishedLoading, FinishedUnloading, FinishedFadeinEffect, Error,
-    }
-
-
     /// <summary>
     /// Handles the loading and unloading of scenes, including both regular and addressable scenes.
     /// Manages scene groups and raises events to notify about the progress and status of scene operations.
@@ -144,19 +121,11 @@ namespace Zone8.SceneManagement
                 SceneManager.SetActiveScene(activeScene);
             }
 
-            Scene tempScene = SceneManager.GetSceneByName("TempEmptyScene");
+            Scene tempScene = SceneManager.GetSceneByName(k_tempEmptySceneName);
             if (tempScene.IsValid() && tempScene.isLoaded)
             {
                 await SceneManager.UnloadSceneAsync(tempScene);
             }
-
-            // Notify that the scene group loading has finished
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.FinishedLoading,
-                Progressor = progressor
-            });
         }
 
         /// <summary>
