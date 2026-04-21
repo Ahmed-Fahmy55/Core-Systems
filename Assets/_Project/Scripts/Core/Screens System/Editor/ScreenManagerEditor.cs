@@ -41,7 +41,7 @@ public class ScreenManagerEditor : OdinEditor
         foreach (DictionaryEntry entry in dict)
         {
             var eScreen = entry.Key as EScreen;
-            var screen = entry.Value as Zone8.Screens.ScreenBase;
+            var screen = entry.Value as Zone8.Screens.Screen;
 
             EditorGUILayout.BeginHorizontal();
 
@@ -68,7 +68,7 @@ public class ScreenManagerEditor : OdinEditor
             }
             if (GUILayout.Button("Hide", GUILayout.Width(60)))
             {
-                manager.HideScreenSO(eScreen);
+                manager.HideScreen(eScreen);
             }
             GUI.enabled = true;
 

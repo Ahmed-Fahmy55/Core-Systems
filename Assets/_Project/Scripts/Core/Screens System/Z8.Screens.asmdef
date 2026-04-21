@@ -1,5 +1,5 @@
 {
-    "name": "Bltzo.Screens",
+    "name": "Z8.Screens",
     "rootNamespace": "",
     "references": [
         "GUID:7a2704b9d91c87a41a1bb5504e331991",
@@ -8,7 +8,8 @@
         "GUID:99c25e4e3cf98de42ab383a7361e5b85",
         "GUID:6ae76b200a86cd945b2391d0df331e7c",
         "GUID:1491147abca9d7d4bb7105af628b223e",
-        "GUID:ede057d2b531ba744a7e008603264c35"
+        "GUID:f8908af8cf9ddbc42a0f13a4e8a859b5",
+        "GUID:4f817335683a515449ebf073e93dc228"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

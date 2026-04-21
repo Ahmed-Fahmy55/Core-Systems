@@ -9,8 +9,6 @@ namespace Zone8.SceneManagement
     {
         [SerializeField] private ESceneGroup defaultScene;
         [SerializeField] private bool loadDefaultSceneOnStart;
-        [SerializeField] private float _fadInDuration = 1;
-        [SerializeField] private float _fadeOutDuration = 1;
 
         private IFader _fader;
 
@@ -38,14 +36,12 @@ namespace Zone8.SceneManagement
 
         public override async Awaitable StartLoadingEffect()
         {
-            _fader.FadeIn(_fadInDuration);
-            await Awaitable.WaitForSecondsAsync(_fadInDuration);
+            await _fader.FadeIn();
         }
 
         public override async Awaitable EndLoadingEffect()
         {
-            _fader.FadeOut(_fadeOutDuration);
-            await Awaitable.WaitForSecondsAsync(_fadeOutDuration);
+            await _fader.FadeOut();
         }
 
         public override void Report(float loadingProgress)
