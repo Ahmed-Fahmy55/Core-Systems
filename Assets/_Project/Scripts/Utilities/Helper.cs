@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public static class Zone8Helper
+public static class Helper
 {
     /// <summary>
     /// Downloads an image from the given URL asynchronously and returns the resulting Sprite.
