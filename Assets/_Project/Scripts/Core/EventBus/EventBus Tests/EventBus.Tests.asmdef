@@ -1,10 +1,10 @@
 {
-    "name": "Screens.Tests",
+    "name": "EventBus.Tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Bltzo.Screens"
+        "Events"
     ],
     "includePlatforms": [
         "Editor"
