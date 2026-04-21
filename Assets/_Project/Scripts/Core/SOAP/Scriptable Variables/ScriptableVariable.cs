@@ -9,7 +9,7 @@ namespace Zone8.SOAP.ScriptableVariable
 {
 
     [InlineEditor]
-    public class ScriptableVariable<T> : ScriptableObject
+    public class ScriptableVariable<T> : ScriptableObject, INullable
     {
         public event Action<T> OnValueChanged;
 
@@ -29,7 +29,19 @@ namespace Zone8.SOAP.ScriptableVariable
                 OnValueChanged?.Invoke(_value);
             }
         }
+
+        public bool IsNull
+        {
+            get
+            {
+                if (typeof(T).IsValueType && Nullable.GetUnderlyingType(typeof(T)) == null)
+                    return false;
+
+                return _value == null;
+            }
+        }
     }
+
 
     [Serializable]
     public struct ScriptableVariableRef<T> : INullable
@@ -52,8 +64,10 @@ namespace Zone8.SOAP.ScriptableVariable
             {
                 if (UseConstant)
                     return ConstValue;
+
                 else if (Sv != null)
                     return Sv.Value;
+
                 return default(T);
             }
             set
@@ -65,7 +79,21 @@ namespace Zone8.SOAP.ScriptableVariable
             }
         }
 
-        public bool IsNull { get => (Sv == null) && ConstValue == null; }
+        public bool IsNull
+        {
+            get
+            {
+                if (UseConstant)
+                {
+                    if (typeof(T).IsValueType && Nullable.GetUnderlyingType(typeof(T)) == null)
+                        return false;
+
+                    return ConstValue == null;
+                }
+
+                return Sv.IsNull;
+            }
+        }
     }
 
 }

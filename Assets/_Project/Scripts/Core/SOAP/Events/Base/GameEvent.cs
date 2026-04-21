@@ -5,7 +5,7 @@ namespace Zone8.SOAP.Events
 {
     public abstract class GameEvent<T> : ScriptableObject
     {
-        private readonly List<IGameEventListener<T>> eventListeners = new();
+        private readonly List<IEventListener<T>> eventListeners = new();
 
         public void Raise(T item)
         {
@@ -15,13 +15,13 @@ namespace Zone8.SOAP.Events
             }
         }
 
-        public void RegisterListener(IGameEventListener<T> listener)
+        public void RegisterListener(IEventListener<T> listener)
         {
             if (!eventListeners.Contains(listener))
                 eventListeners.Add(listener);
         }
 
-        public void UnregisterListener(IGameEventListener<T> listener)
+        public void UnregisterListener(IEventListener<T> listener)
         {
             if (eventListeners.Contains(listener))
                 eventListeners.Remove(listener);
@@ -33,7 +33,7 @@ namespace Zone8.SOAP.Events
         public static Unit Default => Default;
     }
 
-    [CreateAssetMenu(menuName = "Zone8/SOAP/Events/Game Event")]
+    [CreateAssetMenu(menuName = "SOAP/Events/Game Event")]
     public class GameEvent : GameEvent<Unit>
     {
         public void Raise()

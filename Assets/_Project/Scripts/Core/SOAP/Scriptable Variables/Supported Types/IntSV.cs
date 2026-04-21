@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Zone8.SOAP.ScriptableVariable
 {
-    [CreateAssetMenu(menuName = "Zone8/SOAP/Scriptable Variable/Int", fileName = "New Int")]
+    [CreateAssetMenu(menuName = "SOAP/Scriptable Variable/Int")]
     public class IntSV : ScriptableVariable<int>
     {
     }

@@ -10,18 +10,33 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         protected override void HideTarget()
         {
-            _target.enabled = false;
+            if (_targetComponent == null)
+            {
+                Logger.LogError($"No target component of type name : {gameObject.name}", this);
+                return;
+            }
+            _targetComponent.enabled = false;
         }
 
-        protected override bool IsVariableHasValue()
+        public override void ResetTargetValue()
         {
-            return _variable != null && _variable.Value != null;
+            if (_targetComponent == null)
+            {
+                Logger.LogError($"No target component of type name : {gameObject.name}", this);
+                return;
+            }
+            _targetComponent.sprite = _initialValue;
+        }
+
+        protected override Sprite SetIntialValue()
+        {
+            return _targetComponent.sprite;
         }
 
         protected override void UpdateTargetValue(Sprite newValue)
         {
-            if (_target != null)
-                _target.sprite = newValue;
+            if (newValue != null)
+                _targetComponent.sprite = newValue;
         }
     }
 }

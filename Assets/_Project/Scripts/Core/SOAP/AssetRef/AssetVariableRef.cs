@@ -40,12 +40,8 @@ namespace Zone8.SOAP.AssetVariable
             _ => null
         };
 
-        public bool IsNull => Source switch
-        {
-            AssetSource.Direct => _directAsset == null,
-            AssetSource.Addressable => _addressableAsset == null,
-            _ => true
-        };
+        public bool IsNull => Asset == null;
+
 
         /// <summary>
         /// Asynchronously loads the addressable asset if necessary.
@@ -73,11 +69,7 @@ namespace Zone8.SOAP.AssetVariable
 
                     // Otherwise, load and cache
                     _handle = _addressableAsset.LoadAssetAsync();
-                    _handle.Value.Completed += op =>
-                    {
-                        if (op.Status == AsyncOperationStatus.Succeeded)
-                            _loadedAsset = op.Result;
-                    };
+                    _handle.Value.Completed += OnAssetLoaded;
 
                     return _handle.Value;
 
@@ -92,12 +84,23 @@ namespace Zone8.SOAP.AssetVariable
         /// </summary>
         public void ReleaseAsset()
         {
-            if (Source == AssetSource.Addressable && _handle.HasValue && _handle.Value.IsValid())
+            if (Source == AssetSource.Addressable && _addressableAsset != null && _addressableAsset.Asset != null)
             {
                 _addressableAsset.ReleaseAsset();
-                _handle = null;
                 _loadedAsset = null;
             }
+
+            if (_handle.HasValue && _handle.Value.IsValid())
+            {
+                Addressables.Release(_handle.Value);
+                _handle = null;
+            }
+        }
+
+        private void OnAssetLoaded(AsyncOperationHandle<T> handle)
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+                _loadedAsset = handle.Result;
         }
 
         /// <summary>

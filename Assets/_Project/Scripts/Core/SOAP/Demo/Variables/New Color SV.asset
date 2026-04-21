@@ -9,6 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1bf4699db0b91548bf9cf97a5d76bd9, type: 3}
-  m_Name: New Int Event
-  m_EditorClassIdentifier: 
+  m_Script: {fileID: 11500000, guid: 7d6bf59332ccbf949aba730641a381f2, type: 3}
+  m_Name: New Color SV
+  m_EditorClassIdentifier: SOAP::Zone8.SOAP.ScriptableVariable.ColorSV
+  _value: {r: 1, g: 0, b: 0, a: 0.9019608}

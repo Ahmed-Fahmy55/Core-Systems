@@ -6,9 +6,19 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
     [RequireComponent(typeof(TMP_Text))]
     public class SVIntTextUpdater : SVTextUpdater<int>
     {
-        protected override bool IsVariableHasValue()
+        public override void ResetTargetValue()
         {
-            return true; // Int always has a value, so we return true here.
+            _targetComponent.text = _initialValue.ToString();
+        }
+
+        protected override int SetIntialValue()
+        {
+            if (string.IsNullOrEmpty(_targetComponent.text))
+                return 0;
+
+            int value = 0;
+            int.TryParse(_targetComponent.text, out value);
+            return value;
         }
     }
 }

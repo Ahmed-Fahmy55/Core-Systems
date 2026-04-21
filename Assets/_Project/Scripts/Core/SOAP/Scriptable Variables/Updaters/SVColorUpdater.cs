@@ -7,21 +7,25 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
     [RequireComponent(typeof(Image))]
     public class SVColorUpdater : SVUpdaterBase<Color, Image>
     {
-
-        protected override bool IsVariableHasValue()
-        {
-            return _variable != null && _variable.Value != null && _variable.Value != Color.clear;
-        }
-
         protected override void HideTarget()
         {
-            _target.enabled = false;
+            _targetComponent.enabled = false;
+        }
+
+        public override void ResetTargetValue()
+        {
+            _targetComponent.color = _initialValue;
+        }
+
+        protected override Color SetIntialValue()
+        {
+            return _targetComponent.color;
         }
 
         protected override void UpdateTargetValue(Color newValue)
         {
-            if (_target != null)
-                _target.color = newValue;
+            if (newValue != Color.clear)
+                _targetComponent.color = newValue;
         }
     }
 }
