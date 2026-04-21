@@ -20,6 +20,20 @@ namespace Zone8.Audio
         public EAudioControl Control;
     }
 
+    public struct AudioTrackEvent : IEvent
+    {
+        public ETrack Track;
+        public ETrackMode TrackMode;
+        public float Volume;
+
+        public AudioTrackEvent(ETrack track, ETrackMode trackMode, float volume)
+        {
+            Track = track;
+            TrackMode = trackMode;
+            Volume = volume;
+        }
+    }
+
     public enum EAudioControl
     {
         Pause,
@@ -29,7 +43,7 @@ namespace Zone8.Audio
 
     public enum ETrackMode
     {
-        Mute, Unmute, SetVolume
+        Mute, Unmute, SetVolume, Stop
     }
 
     public class SFXManager : MonoBehaviour
@@ -43,29 +57,36 @@ namespace Zone8.Audio
         private IObjectPool<SFXEmitter> _soundEmitterPool;
         private readonly Dictionary<ETrack, Dictionary<SFXClip, HashSet<SFXEmitter>>> _activeSounds = new();
         private readonly Dictionary<SFXClip, LinkedList<SFXEmitter>> _frequentSounds = new();
-        private EventBinding<AudioPlayEvent> _audioPlayedBinding;
-        private EventBinding<AudioControlEvent> _audioControldBinding;
+
+        private EventBinding<AudioPlayEvent> _audioPlayBinding;
+        private EventBinding<AudioControlEvent> _audioControBinding;
+        private EventBinding<AudioTrackEvent> _audioTrackBinding;
+
 
 
         #region Unity Methods
         private void Awake()
         {
-            _audioPlayedBinding = new EventBinding<AudioPlayEvent>(OnAudioPlayed);
-            _audioControldBinding = new EventBinding<AudioControlEvent>(OnAudioControl);
+            _audioPlayBinding = new EventBinding<AudioPlayEvent>(OnAudioPlayed);
+            _audioControBinding = new EventBinding<AudioControlEvent>(OnAudioControl);
+            _audioTrackBinding = new EventBinding<AudioTrackEvent>(OnControlTrack);
+
             InitializePool();
 
         }
 
         private void OnEnable()
         {
-            EventBus<AudioPlayEvent>.Register(_audioPlayedBinding);
-            EventBus<AudioControlEvent>.Register(_audioControldBinding);
+            EventBus<AudioPlayEvent>.Register(_audioPlayBinding);
+            EventBus<AudioControlEvent>.Register(_audioControBinding);
+            EventBus<AudioTrackEvent>.Register(_audioTrackBinding);
         }
 
         private void OnDisable()
         {
-            EventBus<AudioPlayEvent>.Deregister(_audioPlayedBinding);
-            EventBus<AudioControlEvent>.Deregister(_audioControldBinding);
+            EventBus<AudioPlayEvent>.Deregister(_audioPlayBinding);
+            EventBus<AudioControlEvent>.Deregister(_audioControBinding);
+            EventBus<AudioTrackEvent>.Deregister(_audioTrackBinding);
         }
         #endregion
 
@@ -126,13 +147,13 @@ namespace Zone8.Audio
         {
             if (track == null)
             {
-                Logger.LogWarning("Ambiance track is not defined.");
+                Debug.LogWarning("Ambiance track is not defined.");
                 return;
             }
 
             if (!_activeSounds.TryGetValue(track, out var clipMap))
             {
-                Logger.LogWarning($"No active sound emitters found for track: {track.name}");
+                Debug.LogWarning($"No active sound emitters found for track: {track.name}");
                 return;
             }
 
@@ -162,7 +183,7 @@ namespace Zone8.Audio
             }
         }
 
-        public void ControlTrack(ETrack track, ETrackMode trackMode, float volume = 0.5f)
+        public void ControlTrack(ETrack track, ETrackMode trackMode, float volume = default)
         {
             switch (trackMode)
             {
@@ -181,11 +202,38 @@ namespace Zone8.Audio
             }
         }
 
+        public void OnControlTrack(AudioTrackEvent data)
+        {
+            switch (data.TrackMode)
+            {
+                case ETrackMode.Mute:
+                    if (_tracksSettings.IsTrackMuted(data.Track)) return;
+                    data.Track.MutedVolume = _tracksSettings.GetTrackVolume(data.Track);
+                    _tracksSettings.SetTrackVolume(data.Track, 0f);
+                    break;
+                case ETrackMode.Unmute:
+                    if (!_tracksSettings.IsTrackMuted(data.Track)) return;
+                    _tracksSettings.SetTrackVolume(data.Track, data.Track.MutedVolume);
+                    break;
+                case ETrackMode.SetVolume:
+                    _tracksSettings.SetTrackVolume(data.Track, data.Volume);
+                    break;
+                case ETrackMode.Stop:
+                    StopTrackSounds(data.Track);
+                    break;
+            }
+        }
+
+        public float GetTrackVolume(ETrack track)
+        {
+            return _tracksSettings.GetTrackVolume(track);
+        }
+
         public bool CanPlaySound(SFXClip clip)
         {
             if (clip == null)
             {
-                Logger.LogWarning("No clip data found.");
+                Debug.LogWarning("No clip data found.");
                 return false;
             }
 
@@ -202,7 +250,7 @@ namespace Zone8.Audio
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning($"Failed to stop sound emitter: {ex.Message}");
+                    Debug.LogWarning($"Failed to stop sound emitter: {ex.Message}");
                 }
                 return false;
             }
@@ -263,7 +311,6 @@ namespace Zone8.Audio
             }
 
             soundEmitter.gameObject.SetActive(false);
-            Logger.Log("Returned sound emitter to pool");
         }
 
         private void OnDestroyPoolObject(SFXEmitter soundEmitter)
@@ -302,7 +349,7 @@ namespace Zone8.Audio
                             break;
 
                         default:
-                            Logger.LogWarning($"Unhandled sound control: {data.Control}");
+                            Debug.LogWarning($"Unhandled sound control: {data.Control}");
                             break;
                     }
                 }
@@ -320,12 +367,14 @@ namespace Zone8.Audio
             }
             else
             {
-                Logger.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
+                Debug.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
             }
         }
+
         #endregion
     }
 }
+
 
 
 

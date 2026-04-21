@@ -1,12 +1,14 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zone8.Events;
 
 namespace Zone8.Audio
 {
     public class SFXClipPlayer : MonoBehaviour
     {
-        [SerializeField] private SFXClip clip;
+        [SerializeField] private SFXClip _clip;
         [SerializeField] private bool _playOnStart = true;
+        [SerializeField] private bool _stopTrackBeforePlay;
 
 
         private void Start()
@@ -20,18 +22,27 @@ namespace Zone8.Audio
         [Button]
         public void PlayClip()
         {
-            if (clip != null)
+            if (_clip == null) return;
+
+            if (_stopTrackBeforePlay)
             {
-                clip.Play();
+                EventBus<AudioTrackEvent>.Raise(new AudioTrackEvent
+                {
+                    Track = _clip.ClipTrack,
+                    TrackMode = ETrackMode.Stop
+                });
             }
+
+            _clip.Play();
+
         }
 
         [Button]
         public void StopClip()
         {
-            if (clip != null)
+            if (_clip != null)
             {
-                clip.Stop();
+                _clip.Stop();
             }
         }
     }

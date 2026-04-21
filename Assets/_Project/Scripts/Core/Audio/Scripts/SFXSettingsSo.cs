@@ -22,9 +22,7 @@ namespace Zone8.Audio
 
         public virtual void SetTrackVolume(ETrack track, float volume)
         {
-            volume = Mathf.Clamp01(volume);
-
-            if (volume == 0f)
+            if (volume <= 0f)
             {
                 volume = k_minimalVolume;
             }
@@ -47,7 +45,9 @@ namespace Zone8.Audio
                 Debug.LogError($"Track {track} not found in SFXSettingsSo");
                 return volume;
             }
+
             TargetAudioMixer.GetFloat(track.Track.name, out volume);
+
             return MixerVolumeToNormalized(volume);
         }
 

@@ -61,7 +61,6 @@ namespace Zone8.Audio
         {
             _audioSource.Stop();
             StopPlayingTask();
-            _playingTask = null;
             _emitterPool.Release(this);
         }
 
@@ -171,6 +170,7 @@ namespace Zone8.Audio
             return UnityEngine.Random.Range(min, max);
         }
         #endregion
+
 
     }
 }
