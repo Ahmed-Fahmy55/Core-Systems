@@ -16,18 +16,18 @@ namespace Zone8.Fading
         }
 
         [Button]
-        public void FadeIn(float duration = 0, Action onComplete = null)
+        public async Awaitable FadeIn(Action onComplete = null)
         {
-            Fade(false, duration, onComplete);
+            await Fade(false, onComplete);
         }
 
         [Button]
-        public void FadeOut(float duration = 0, Action onComplete = null)
+        public async Awaitable FadeOut(Action onComplete = null)
         {
-            Fade(true, duration, onComplete);
+            await Fade(true, onComplete);
         }
 
-        private void Fade(bool isFadingOut, float duration = 0, Action onComplete = null)
+        private async Awaitable Fade(bool isFadingOut, Action onComplete = null)
         {
             if (_transitionAnimator == null)
             {
@@ -35,22 +35,24 @@ namespace Zone8.Fading
                 return;
             }
             _transitionAnimator.gameObject.SetActive(true);
-
-            if (duration > 0)
-            {
-                _transitionAnimator.profile.duration = duration;
-            }
             _transitionAnimator.profile.invert = isFadingOut;
 
+            bool _isfinished = false;
             _transitionAnimator.onTransitionEnd.RemoveAllListeners();
             _transitionAnimator.onTransitionEnd.AddListener(() =>
             {
-                onComplete?.Invoke();
-                if (isFadingOut) _transitionAnimator.gameObject.SetActive(false);
-                if (!isFadingOut && _hideOnFadeIn) _transitionAnimator.gameObject.SetActive(false);
+                _isfinished = true;
             });
 
             _transitionAnimator.Play();
+
+            while (!_isfinished)
+            {
+                await Awaitable.NextFrameAsync();
+            }
+            onComplete?.Invoke();
+            if (isFadingOut) _transitionAnimator.gameObject.SetActive(false);
+            if (!isFadingOut && _hideOnFadeIn) _transitionAnimator.gameObject.SetActive(false);
 
         }
     }
