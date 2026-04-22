@@ -1440,8 +1440,6 @@ MonoBehaviour:
       SceneType: 0
   defaultScene: {fileID: 11400000, guid: d5e2360a8da63df459d9f518abcc7f4c, type: 2}
   loadDefaultSceneOnStart: 0
-  _fadInDuration: 1
-  _fadeOutDuration: 1
 --- !u!1 &8980131008787262923
 GameObject:
   m_ObjectHideFlags: 0

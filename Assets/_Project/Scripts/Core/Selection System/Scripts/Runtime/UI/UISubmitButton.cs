@@ -37,7 +37,7 @@ namespace Zone8.Selection
             SubscribeToSelectionEvents();
         }
 
-        public void SubmitSelection()
+        private void SubmitSelection()
         {
             if (_selectionController != null)
             {

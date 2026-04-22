@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 namespace Zone8.Selection
 {
-    public abstract class SelectableBase : MonoBehaviour, ISelectable, IPointerClickHandler
+    public abstract class UISelectableBase : MonoBehaviour, ISelectable, IPointerClickHandler
     {
         public UnityAction<ISelectable> ItemSelected { get; set; }
         public UnityAction<ISelectable> ItemDeselected { get; set; }

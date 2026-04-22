@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Zone8.Selection
 {
-    public class SelectableButton : SelectableBase
+    public class SelectableButton : UISelectableBase
     {
         Button _button;
 
