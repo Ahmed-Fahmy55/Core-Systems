@@ -10,59 +10,28 @@ namespace Zone8.Tweening
     {
         enum EActionType { Color, Fade, Scale, Text, FontSize }
 
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion
-
-        /////////////////////////////////////////////////////
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
 
         [BoxGroup("TMP Settings", Order = 1)]
-        [SerializeField] EActionType actionType;
+        [SerializeField] EActionType _actionType;
 
         [BoxGroup("TMP Settings", Order = 1)]
         [ShowIf("@actionType == EActionType.Color ")]
-        [SerializeField] Color toColor;
+        [SerializeField] Color _toColor;
 
         [BoxGroup("TMP Settings", Order = 1)]
         [ShowIf("@actionType == EActionType.Fade || actionType == EActionType.FontSize")]
-        [SerializeField] float toValue;
+        [SerializeField] float _toValue;
 
         [BoxGroup("TMP Settings", Order = 1)]
         [ShowIf("@actionType == EActionType.Text")]
-        [SerializeField] string toText;
+        [SerializeField] string _toText;
 
         [BoxGroup("TMP Settings", Order = 1)]
         [ShowIf("@actionType == EActionType.Scale")]
-        [SerializeField] Vector3 toScaleValue;
+        [SerializeField] Vector3 _toScaleValue;
+
 
         public Tween Act(GameObject target)
         {
@@ -79,43 +48,32 @@ namespace Zone8.Tweening
             }
             Tween tween;
 
-            switch (actionType)
+            switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = tmp.DOColor(toColor, Duration);
+                    tween = tmp.DOColor(_toColor, CoreSettings.Duration);
                     break;
                 case EActionType.Fade:
-                    tween = tmp.DOFade(toValue, Duration);
+                    tween = tmp.DOFade(_toValue, CoreSettings.Duration);
                     break;
                 case EActionType.Scale:
-                    tween = tmp.DOScale(toScaleValue, Duration);
+                    tween = tmp.DOScale(_toScaleValue, CoreSettings.Duration);
                     break;
                 case EActionType.Text:
-                    tween = tmp.DoText(toText, Duration);
+                    tween = tmp.DoText(_toText, CoreSettings.Duration);
                     break;
                 case EActionType.FontSize:
-                    tween = tmp.DOFontSize(toValue, Duration);
+                    tween = tmp.DOFontSize(_toValue, CoreSettings.Duration);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(
-                    nameof(actionType),
-                    actionType,
+                    nameof(_actionType),
+                    _actionType,
                     "Unhandled actionType value"
                );
             }
 
-            tween.SetDelay(Delay).SetUpdate(UpdateType).SetAutoKill(AutoKill);
-
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
+            CoreSettings.Apply(tween);
 
             return tween;
 

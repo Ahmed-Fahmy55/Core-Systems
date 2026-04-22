@@ -10,53 +10,20 @@ namespace Zone8.Tweening
     {
         public enum EActionType { Color, Fade, Fill, GradientColor }
 
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion
-
-
-        ////////////////////////////////////////////////////////////
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Image Settings", Order = 1)]
-        [SerializeField] EActionType actionType;
+        [SerializeField] EActionType _actionType;
 
-        [BoxGroup("Image Settings", Order = 1), ShowIf(nameof(actionType), EActionType.Color)]
-        [SerializeField] Color ColorTo;
+        [BoxGroup("Image Settings", Order = 1), ShowIf(nameof(_actionType), EActionType.Color)]
+        [SerializeField] Color _toColor;
 
-        [BoxGroup("Image Settings", Order = 1), ShowIf("@actionType == EActionType.Fade || actionType == EActionType.Fill")]
-        [SerializeField] float toValue;
+        [BoxGroup("Image Settings", Order = 1), ShowIf("@_actionType == EActionType.Fade || _actionType == EActionType.Fill")]
+        [SerializeField] float _toValue;
 
-        [BoxGroup("Image Settings", Order = 1), ShowIf(nameof(actionType), EActionType.GradientColor)]
+        [BoxGroup("Image Settings", Order = 1), ShowIf(nameof(_actionType), EActionType.GradientColor)]
         [InfoBox("Changes the target's color via the given gradient.\r\nNOTE: Only uses the colors of the gradient, not the alphas.\r\nNOTE: Creates a Sequence, not a Tweener.")]
-        [SerializeField] Gradient GradientTo;
+        [SerializeField] Gradient _toGradient;
 
 
         public Tween Act(GameObject target)
@@ -73,40 +40,29 @@ namespace Zone8.Tweening
             }
             Tween tween;
 
-            switch (actionType)
+            switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = image.DOColor(ColorTo, Duration);
+                    tween = image.DOColor(_toColor, CoreSettings.Duration);
                     break;
                 case EActionType.Fade:
-                    tween = image.DOFade(toValue, Duration);
+                    tween = image.DOFade(_toValue, CoreSettings.Duration);
                     break;
                 case EActionType.Fill:
-                    tween = image.DOFillAmount(toValue, Duration);
+                    tween = image.DOFillAmount(_toValue, CoreSettings.Duration);
                     break;
                 case EActionType.GradientColor:
-                    tween = image.DOGradientColor(GradientTo, Duration);
+                    tween = image.DOGradientColor(_toGradient, CoreSettings.Duration);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(
-                    nameof(actionType),
-                    actionType,
+                    nameof(_actionType),
+                    _actionType,
                     "Unhandled EActionType value"
                );
             }
 
-            tween.SetDelay(Delay).SetUpdate(UpdateType).SetAutoKill(AutoKill);
-
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
+            CoreSettings.Apply(tween);
 
             return tween;
         }

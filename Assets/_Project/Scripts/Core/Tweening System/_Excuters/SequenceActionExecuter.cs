@@ -1,177 +1,123 @@
 using DG.Tweening;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Zone8.Tweening
 {
-    [System.Serializable]
-    public struct AppendData
+
+    public enum SequenceMode { Append, Join }
+
+    [Serializable]
+    public struct SequenceData
     {
-        [TableColumnWidth(200)]
-        public GameObject target;
-
-        [TableColumnWidth(200)]
-        public TweenActionSO tweenAction;
-
-        public Tween CreateTween()
-        {
-            return tweenAction?.Act(target);
-        }
-    }
-
-    [System.Serializable]
-    public struct InsertData
-    {
-        [TableColumnWidth(200)]
-        public GameObject target;
-
-        [TableColumnWidth(200)]
+        [EnumToggleButtons, HideLabel]
+        public SequenceMode Mode;
+        public GameObject Target;
         public TweenActionSO Action;
 
-        [TableColumnWidth(200)]
-        public int Index;
+    }
 
-        public Tween CreateTween()
-        {
-            return Action?.Act(target);
-        }
+    [Serializable]
+    public struct InsertData
+    {
+        [Tooltip("The absolute time (in seconds) from the start of the sequence")]
+        public float StartTime;
+        public GameObject Target;
+        public TweenActionSO Action;
     }
 
     public class SequenceActionExecuter : MonoBehaviour
     {
-        [FoldoutGroup("Tween Settings")]
-        [TableList(ShowIndexLabels = true, AlwaysExpanded = true)]
-        public List<AppendData> AppendTweens = new List<AppendData>();
+        [ListDrawerSettings(ShowIndexLabels = true, ElementColor = "GetElementColor")]
+        public List<SequenceData> SequenceTweens = new List<SequenceData>();
 
-        [FoldoutGroup("Tween Settings")]
-        [TableList(ShowIndexLabels = true, AlwaysExpanded = true)]
+        [ListDrawerSettings(ShowIndexLabels = true)]
         public List<InsertData> InsertTweens = new List<InsertData>();
 
-        #region CoreSettings
+        [SerializeField] private bool _playOnStart = true;
+        [SerializeField] private bool _restartOnPlay = true;
+        [SerializeField] bool _overrideSequenceSettings = false;
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool PlayOnEnable { get; set; } = false;
+        [HideLabel, ShowIf(nameof(_overrideSequenceSettings))]
+        [SerializeField] CoreTweenSettings sequenceSettings;
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool RestartOnPlay { get; set; } = true;
+        public Sequence Sequence { get; private set; }
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool IsRelative { get; set; }
-        #endregion
-
-
-        private Sequence _sequence;
-
-
-        private void Awake()
+        private void Start()
         {
-            Init();
+            BuildSequence();
+            if (_playOnStart) Play();
         }
 
-        private void OnEnable()
+        [Button(ButtonSizes.Large), GUIColor(0, 1, 0)]
+        public void Play()
         {
-            if (PlayOnEnable)
-            {
-                Play();
-            }
+            if (Sequence == null || !Sequence.IsActive()) BuildSequence();
+
+            if (_restartOnPlay) Sequence.Restart();
+            else Sequence.Play();
+
         }
 
-        [FoldoutGroup("Execution Controls")]
-        [Button("Play Back")]
-        [GUIColor(0.6f, 0.6f, 1f)]
-        public Sequence PlayBack()
+        [Button(ButtonSizes.Large), GUIColor(0, 1, 0)]
+        public void PlayBack()
         {
-            if (_sequence == null) return null;
-            _sequence.PlayBackwards();
-            return _sequence;
+            if (Sequence == null || !Sequence.IsActive()) BuildSequence();
+            Sequence.Complete();
+            Sequence.PlayBackwards();
         }
 
-        [FoldoutGroup("Execution Controls")]
-        [Button("Play ")]
-        [GUIColor(0.6f, 0.6f, 1f)]
-        public Sequence Play()
+        [Button, GUIColor(1, 0.5f, 0)]
+        public void BuildSequence()
         {
-            if (_sequence == null)
+            if (Sequence != null) Sequence.Kill();
+
+            Sequence = DOTween.Sequence();
+
+            sequenceSettings.Apply(Sequence);
+
+            foreach (var data in SequenceTweens)
             {
-                Logger.LogError("Failed to initialize sequence.");
-                return null;
-            }
-
-            if (RestartOnPlay)
-            {
-                _sequence.Restart();
-
-            }
-            else
-            {
-                _sequence.Play();
-            }
-            return _sequence;
-        }
-
-
-        private void Init()
-        {
-            _sequence = DOTween.Sequence();
-            _sequence
-                .SetUpdate(UpdateType)
-                .SetAutoKill(AutoKill)
-                .SetRelative(IsRelative);
-
-            if (CustomEase)
-            {
-                _sequence.SetEase(EaseCurve);
-            }
-            else
-            {
-                _sequence.SetEase(Ease);
-            }
-
-            if (Loop) _sequence.SetLoops(LoopCount, LoopType);
-
-            foreach (var tweenData in AppendTweens)
-            {
-                var tween = tweenData.CreateTween();
-                if (tween != null)
+                if (data.Action == null || data.Target == null)
                 {
-                    _sequence.Append(tween);
+                    Logger.LogWarning("Null tween action or target in AppendTweens, skipping entry.");
+                    continue;
                 }
+
+                Tween t = data.Action.Act(data.Target);
+
+                if (data.Mode == SequenceMode.Join)
+                    Sequence.Join(t);
+                else
+                    Sequence.Append(t);
             }
 
-            foreach (var tweenData in InsertTweens)
+            foreach (var data in InsertTweens)
             {
-                var tween = tweenData.CreateTween();
-                if (tween != null)
+                if (data.Action == null || data.Target == null)
                 {
-                    _sequence.Insert(tweenData.Index, tween);
+                    Logger.LogWarning("Null tween action or target in Insert tweens, skipping entry.");
+                    continue;
                 }
+                Sequence.Insert(data.StartTime, data.Action.Act(data.Target));
             }
-            _sequence.Pause();
+
+            Sequence.Pause();
         }
+
+        private Color GetElementColor(int index, Color defaultColor)
+        {
+            if (index < SequenceTweens.Count && SequenceTweens[index].Mode == SequenceMode.Join)
+                return new Color(0.2f, 0.5f, 1f, 0.2f); // Blue tint for Joined items
+            return defaultColor;
+        }
+
+        private void OnDestroy()
+        {
+            Sequence?.Kill();
+        }
+
     }
 }

@@ -21,6 +21,129 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: tweenAction
+    - Name: _tweenAction
+      Entry: 7
+      Data: 0|Zone8.Tweening.MaterialTweenAction, Z8.Tweening
+    - Name: <CoreSettings>k__BackingField
+      Entry: 7
+      Data: Zone8.Tweening.CoreTweenSettings, Z8.Tweening
+    - Name: Duration
+      Entry: 4
+      Data: 0
+    - Name: Delay
+      Entry: 4
+      Data: 0
+    - Name: CustomEase
+      Entry: 5
+      Data: false
+    - Name: EaseCurve
       Entry: 6
+      Data: 
+    - Name: Ease
+      Entry: 3
+      Data: 0
+    - Name: Loop
+      Entry: 5
+      Data: false
+    - Name: LoopCount
+      Entry: 3
+      Data: 0
+    - Name: LoopType
+      Entry: 3
+      Data: 0
+    - Name: IsIndependentUpdate
+      Entry: 5
+      Data: false
+    - Name: IsRelative
+      Entry: 5
+      Data: false
+    - Name: UpdateType
+      Entry: 3
+      Data: 0
+    - Name: AutoKill
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _actionType
+      Entry: 3
+      Data: 2
+    - Name: _materialIndex
+      Entry: 3
+      Data: 0
+    - Name: _targetProperty
+      Entry: 6
+      Data: 
+    - Name: _isTMP
+      Entry: 5
+      Data: false
+    - Name: _toColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _toValue
+      Entry: 4
+      Data: 0
+    - Name: _toGradient
+      Entry: 6
+      Data: 
+    - Name: _toOffset
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _toTiling
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _toVector
+      Entry: 7
+      Data: UnityEngine.Vector4, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 

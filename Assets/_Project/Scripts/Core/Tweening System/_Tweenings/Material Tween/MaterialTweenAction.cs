@@ -13,72 +13,44 @@ namespace Zone8.Tweening
             Color, Fade, Float, Gradient, Offset, Tiling, Vector
         }
 
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion }
-
-        /////////////////////////////////////////////////////
-        [BoxGroup("Material Settings")]
-        [SerializeField] int materialIndex;
-        [SerializeField] EActionType actionType;
+        [SerializeField] EActionType _actionType;
 
         [BoxGroup("Material Settings")]
-        [SerializeField] string targetProperty;
+        [SerializeField] int _materialIndex;
 
         [BoxGroup("Material Settings")]
-        [SerializeField] bool isTMP;
+        [SerializeField] string _targetProperty;
 
         [BoxGroup("Material Settings")]
-        [ShowIf(nameof(actionType), EActionType.Color)]
-        [SerializeField] Color toColor;
+        [SerializeField] bool _isTMP;
 
         [BoxGroup("Material Settings")]
-        [ShowIf("@actionType == EActionType.Fade || actionType == EActionType.Float")]
-        [SerializeField] float toValue;
+        [ShowIf(nameof(_actionType), EActionType.Color)]
+        [SerializeField] Color _toColor;
 
         [BoxGroup("Material Settings")]
-        [ShowIf(nameof(actionType), EActionType.Gradient)]
-        [SerializeField] Gradient toGradient;
+        [ShowIf("@_actionType == EActionType.Fade || _actionType == EActionType.Float")]
+        [SerializeField] float _toValue;
 
         [BoxGroup("Material Settings")]
-        [ShowIf(nameof(actionType), EActionType.Offset)]
-        [SerializeField] Vector2 toOffset;
+        [ShowIf(nameof(_actionType), EActionType.Gradient)]
+        [SerializeField] Gradient _toGradient;
 
         [BoxGroup("Material Settings")]
-        [ShowIf(nameof(actionType), EActionType.Tiling)]
-        [SerializeField] Vector2 toTiling;
+        [ShowIf(nameof(_actionType), EActionType.Offset)]
+        [SerializeField] Vector2 _toOffset;
 
         [BoxGroup("Material Settings")]
-        [ShowIf(nameof(actionType), EActionType.Vector)]
-        [SerializeField] Vector4 toVector;
+        [ShowIf(nameof(_actionType), EActionType.Tiling)]
+        [SerializeField] Vector2 _toTiling;
+
+        [BoxGroup("Material Settings")]
+        [ShowIf(nameof(_actionType), EActionType.Vector)]
+        [SerializeField] Vector4 _toVector;
+
 
         public Tween Act(GameObject target)
         {
@@ -89,7 +61,7 @@ namespace Zone8.Tweening
             }
 
             Material material = null;
-            if (isTMP)
+            if (_isTMP)
             {
                 if (target.TryGetComponent<TextMeshProUGUI>(out var text) == false)
                 {
@@ -106,7 +78,7 @@ namespace Zone8.Tweening
                     return null;
                 }
 
-                material = renderer.materials[materialIndex];
+                material = renderer.materials[_materialIndex];
             }
 
             if (material == null)
@@ -117,51 +89,39 @@ namespace Zone8.Tweening
 
             Tween tween;
 
-            switch (actionType)
+            switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = material.DOColor(toColor, targetProperty, Duration);
+                    tween = material.DOColor(_toColor, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Fade:
-                    tween = material.DOFade(toValue, targetProperty, Duration);
+                    tween = material.DOFade(_toValue, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Float:
-                    tween = material.DOFloat(toValue, targetProperty, Duration);
+                    tween = material.DOFloat(_toValue, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Gradient:
-                    tween = material.DOGradientColor(toGradient, targetProperty, Duration);
+                    tween = material.DOGradientColor(_toGradient, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Offset:
-                    tween = material.DOOffset(toOffset, targetProperty, Duration);
+                    tween = material.DOOffset(_toOffset, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Tiling:
-                    tween = material.DOTiling(toTiling, targetProperty, Duration);
+                    tween = material.DOTiling(_toTiling, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Vector:
-                    tween = material.DOVector(toVector, targetProperty, Duration);
+                    tween = material.DOVector(_toVector, _targetProperty, CoreSettings.Duration);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException(
-                    nameof(actionType),
-                    actionType,
+                    nameof(_actionType),
+                    _actionType,
                     "Unhandled EActionType value"
                );
             }
 
-            tween.SetDelay(Delay).SetUpdate(UpdateType).SetAutoKill(AutoKill);
-
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
-
+            CoreSettings.Apply(tween);
             return tween;
         }
     }

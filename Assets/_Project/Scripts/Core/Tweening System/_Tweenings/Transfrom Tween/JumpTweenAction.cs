@@ -6,61 +6,27 @@ namespace Zone8.Tweening
 {
     public struct JumpTweenAction : ITweenAction
     {
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion
-
-        /////////////////////////////////////////////////////
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Jump Settings", Order = 1)]
-        [SerializeField] private bool isLocal;
+        [SerializeField] private bool _isLocal;
 
         [BoxGroup("Jump Settings", Order = 1)]
-        [Tooltip("If true the end value will be calculated as start value + the given value")]
-        [SerializeField] bool isValueRelative;
-
-        [BoxGroup("Jump Settings", Order = 1)]
-        [SerializeField] Vector3 value;
+        [SerializeField] Vector3 _value;
 
         [BoxGroup("Jump Settings", Order = 1)]
         [Tooltip(" Power of the jump (the max height of the jump is represented by this plus the final Y offset.")]
-        [SerializeField] float jumpPower;
+        [SerializeField] float _jumpPower;
 
         [BoxGroup("Jump Settings", Order = 1)]
         [Tooltip("Total number of jumps.")]
-        [SerializeField] int jumpNumbs;
+        [SerializeField] int _jumpNumbs;
 
         [BoxGroup("Jump Settings", Order = 1)]
         [Tooltip("If TRUE the tween will smoothly snap all values to integers..")]
-        [SerializeField] bool snapping;
+        [SerializeField] bool _snapping;
+
 
         public Tween Act(GameObject target)
         {
@@ -71,27 +37,16 @@ namespace Zone8.Tweening
             }
 
             Tween tween;
-            if (isLocal)
+            if (_isLocal)
             {
-                tween = target.transform.DOLocalJump(value, jumpPower, jumpNumbs, Duration, snapping);
+                tween = target.transform.DOLocalJump(_value, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
             }
             else
             {
-                tween = target.transform.DOJump(value, jumpPower, jumpNumbs, Duration, snapping);
+                tween = target.transform.DOJump(_value, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
             }
 
-            tween.SetDelay(Delay).SetUpdate(UpdateType).SetAutoKill(AutoKill).SetRelative(isValueRelative);
-
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
+            CoreSettings.Apply(tween);
 
             return tween;
         }

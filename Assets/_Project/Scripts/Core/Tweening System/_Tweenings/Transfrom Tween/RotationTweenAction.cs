@@ -9,40 +9,8 @@ namespace Zone8.Tweening
     [Serializable]
     public struct RotationTweenAction : ITweenAction
     {
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
 
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion
-
-        /////////////////////////////////////////////////////
-
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Rotation Settings", Order = 1)]
         [Tooltip("Rotates the target so that it will look towards the given position")]
@@ -50,10 +18,6 @@ namespace Zone8.Tweening
 
         [BoxGroup("Rotation Settings", Order = 1), HideIf(nameof(isLookAt))]
         [SerializeField] private bool isLocal;
-
-        [BoxGroup("Rotation Settings", Order = 1)]
-        [Tooltip("If true the end value will be calculated as start value + the given value")]
-        [SerializeField] bool isValueRelative;
 
         [BoxGroup("Rotation Settings", Order = 1)]
         [SerializeField] Vector3 value;
@@ -82,32 +46,21 @@ namespace Zone8.Tweening
             Tween tween;
             if (isLookAt)
             {
-                tween = target.transform.DOLookAt(value, Duration, axisConstraint, up);
+                tween = target.transform.DOLookAt(value, CoreSettings.Duration, axisConstraint, up);
             }
             else
             {
                 if (isLocal)
                 {
-                    tween = target.transform.DOLocalRotate(value, Duration, rotateMode);
+                    tween = target.transform.DOLocalRotate(value, CoreSettings.Duration, rotateMode);
                 }
                 else
                 {
-                    tween = target.transform.DORotate(value, Duration, rotateMode);
+                    tween = target.transform.DORotate(value, CoreSettings.Duration, rotateMode);
                 }
             }
 
-            tween.SetDelay(Delay).SetUpdate(UpdateType).SetAutoKill(AutoKill).SetRelative(isValueRelative);
-
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
+            CoreSettings.Apply(tween);
 
             return tween;
         }

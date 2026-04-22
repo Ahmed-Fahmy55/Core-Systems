@@ -1,0 +1,54 @@
+OVDF v1.0
+Zone8.Tweening.SequenceActionExecuter, Z8.Tweening
+
+# $WXKgv4HoCYgko39t5G9KPB
+Position: $root:0
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Sequence Data"
+
+# $3vhE7BrKH5Efbyf6ZXM1Sw
+Position: $WXKgv4HoCYgko39t5G9KPB:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $GkWsBJg2yJwwYPjo7diu4Z
+Position: $3vhE7BrKH5Efbyf6ZXM1Sw:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $K5je8YVRrGH8nfhdDP8Pd8
+Position: $3vhE7BrKH5Efbyf6ZXM1Sw:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $SUanHGFpHfNZMJEG2hKYfw
+Position: $root:1
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Settings"
+
+# $2PhRfSNt1DLFJBzaoDS7Ne
+Position: $SUanHGFpHfNZMJEG2hKYfw:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute]
+
+# $WhcXFDqKaox8G5xeQbVg4u
+Position: $2PhRfSNt1DLFJBzaoDS7Ne:0
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# $JEJ9cXPk8qCovk2eYiP13a
+Position: $2PhRfSNt1DLFJBzaoDS7Ne:1
++ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
+
+# SequenceTweens
+Position: $GkWsBJg2yJwwYPjo7diu4Z:0
+
+# InsertTweens
+Position: $K5je8YVRrGH8nfhdDP8Pd8:0
+
+# _playOnStart
+Position: $WhcXFDqKaox8G5xeQbVg4u:0
+
+# _restartOnPlay
+Position: $JEJ9cXPk8qCovk2eYiP13a:0
+
+# _overrideSequenceSettings
+Position: $SUanHGFpHfNZMJEG2hKYfw:1
+
+# sequenceSettings
+Position: $SUanHGFpHfNZMJEG2hKYfw:2

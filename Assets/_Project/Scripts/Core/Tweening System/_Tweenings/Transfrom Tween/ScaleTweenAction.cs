@@ -9,42 +9,11 @@ namespace Zone8.Tweening
     [Serializable]
     public struct ScaleTweenAction : ITweenAction
     {
-        #region CoreSettings
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Duration { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public float Delay { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool Loop { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public int LoopCount { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(Loop))]
-        public LoopType LoopType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool CustomEase { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), ShowIf(nameof(CustomEase))]
-        public AnimationCurve EaseCurve { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings"), HideIf(nameof(CustomEase))]
-        public Ease Ease { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public UpdateType UpdateType { get; set; }
-
-        [field: SerializeField, BoxGroup("Core Settings")]
-        public bool AutoKill { get; set; }
-        #endregion
-
-        /////////////////////////////////////////////////////
+        [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Scale Settings", Order = 1)]
-        [SerializeField] Vector3 value;
+        [SerializeField] Vector3 _value;
+
 
         public Tween Act(GameObject target)
         {
@@ -55,20 +24,10 @@ namespace Zone8.Tweening
             }
 
             Tween tween;
-            tween = target.transform.DOScale(value, Duration)
-                .SetDelay(Delay)
-                .SetUpdate(UpdateType)
-                .SetAutoKill(AutoKill);
+            tween = target.transform.DOScale(_value, CoreSettings.Duration);
 
-            if (CustomEase)
-            {
-                tween.SetEase(EaseCurve);
-            }
-            else
-            {
-                tween.SetEase(Ease);
-            }
-            if (Loop) tween.SetLoops(LoopCount, LoopType);
+            CoreSettings.Apply(tween);
+
             return tween;
         }
     }

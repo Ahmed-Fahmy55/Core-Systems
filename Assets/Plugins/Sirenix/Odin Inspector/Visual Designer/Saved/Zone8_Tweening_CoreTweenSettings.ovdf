@@ -1,0 +1,14 @@
+OVDF v1.0
+Zone8.Tweening.CoreTweenSettings, Z8.Tweening
+
+# Duration
+Visibility: Shown
+
+# IsIndependentUpdate
+Position: "Technical/Final":1
+
+# IsRelative
+Position: "Technical/Flags":1
+
+# AutoKill
+Position: "Technical/Flags":0
