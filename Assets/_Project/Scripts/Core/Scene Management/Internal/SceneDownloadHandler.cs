@@ -202,16 +202,30 @@ namespace Zone8.SceneManagement
                         // BUG FIX: Store the handle to maintain ref-count
                         if (_managedHandles.ContainsKey(address)) Addressables.Release(_managedHandles[address]);
                         _managedHandles[address] = handle;
+
+                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
+                        {
+                            Description = $"Success donwloading bundle: {address}",
+                            State = EDwonloadingState.Finished,
+                            Progressor = progressor,
+                        });
                     }
                     else
                     {
                         // Clean up failed handle so we can retry
                         Addressables.Release(handle);
+
+                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
+                        {
+                            Description = $"Failed downloading bundle: {address}",
+                            Progressor = progressor,
+                            State = EDwonloadingState.Failiure,
+                        });
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[SceneDownloadHandler] {ex.Message}");
+                    Logger.LogError($"[SceneDownloadHandler] {ex.Message}");
                     if (handle.IsValid()) Addressables.Release(handle);
                 }
             }

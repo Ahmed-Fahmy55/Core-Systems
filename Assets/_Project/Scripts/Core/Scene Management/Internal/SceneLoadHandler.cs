@@ -56,7 +56,7 @@ namespace Zone8.SceneManagement
             EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
             {
                 SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Started,
+                LoadStatues = ESceneLoadStatus.Loading,
                 Progressor = progressor
             });
 
@@ -72,7 +72,7 @@ namespace Zone8.SceneManagement
                 EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
                 {
                     SceneData = sceneData,
-                    LoadStatues = ESceneLoadStatus.Started,
+                    LoadStatues = ESceneLoadStatus.Loading,
                     Progressor = progressor
                 });
 
@@ -80,7 +80,7 @@ namespace Zone8.SceneManagement
                 {
                     var operation = SceneManager.LoadSceneAsync(sceneData.Path, LoadSceneMode.Additive);
                     operationGroup.Operations.Add(operation);
-                    operation.completed += handle => OnSceneLoad(sceneData, progressor);
+                    operation.completed += handle => OnSceneLoad(handle, sceneData, progressor);
                 }
                 else if (sceneData.Scene.State == SceneReferenceState.Addressable)
                 {
@@ -91,6 +91,7 @@ namespace Zone8.SceneManagement
             }
 
             // Wait for all scenes to finish loading
+            //TODO Optimise progress algorithm to not rely on a fixed weight distribution between regular and addressable scenes
             float loadingScenesProgress = 0;
             while (!operationGroup.IsDone || !_loadedGroupHandles.IsDone)
             {
@@ -126,6 +127,13 @@ namespace Zone8.SceneManagement
             {
                 await SceneManager.UnloadSceneAsync(tempScene);
             }
+
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
+            {
+                SceneGroup = group,
+                LoadStatues = ESceneLoadStatus.Completed,
+                Progressor = progressor
+            });
         }
 
         /// <summary>
@@ -134,6 +142,10 @@ namespace Zone8.SceneManagement
         /// <returns>An awaitable task that completes when all scenes are unloaded.</returns>
         public async Awaitable UnloadScenes()
         {
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
+            {
+                LoadStatues = ESceneLoadStatus.Unloading,
+            });
 
             var scenes = new List<string>();
             int sceneCount = SceneManager.sceneCount;
@@ -184,18 +196,10 @@ namespace Zone8.SceneManagement
             // Wait until all unload operations are complete
             while (!operationGroup.IsDone || !unloadHandleGroup.IsDone)
             {
-                await Awaitable.WaitForSecondsAsync(.1f); // Delay to prevent a tight loop
+                await Awaitable.EndOfFrameAsync();
             }
 
-            // Clear all tracking lists
             _loadedGroupHandles.Handles.Clear();
-
-            // Notify that the scene unloading has finished
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = _activeSceneGroup,
-                LoadStatues = ESceneLoadStatus.FinishedUnloading
-            });
         }
 
         #endregion
@@ -215,7 +219,7 @@ namespace Zone8.SceneManagement
                 EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
                 {
                     SceneData = sceneName,
-                    LoadStatues = ESceneLoadStatus.FinishedLoading,
+                    LoadStatues = ESceneLoadStatus.Completed,
                     Progressor = progressor
                 });
             }
@@ -236,14 +240,28 @@ namespace Zone8.SceneManagement
         /// </summary>
         /// <param name="sceneName">The data of the loaded scene.</param>
         /// <param name="progressor">Optional progress reporter.</param>
-        private void OnSceneLoad(SceneData sceneName, IProgress<float> progressor)
+        private void OnSceneLoad(AsyncOperation handle, SceneData sceneName, IProgress<float> progressor)
         {
-            EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
+            if (handle.isDone)
             {
-                SceneData = sceneName,
-                LoadStatues = ESceneLoadStatus.FinishedLoading,
-                Progressor = progressor
-            });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
+                {
+                    SceneData = sceneName,
+                    LoadStatues = ESceneLoadStatus.Completed,
+                    Progressor = progressor
+                });
+            }
+            else
+            {
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
+                {
+                    SceneData = sceneName,
+                    LoadStatues = ESceneLoadStatus.Error,
+                    Progressor = progressor
+                });
+                Logger.LogError($"Failed to load scene: {sceneName.Path}");
+            }
+
         }
 
         #endregion

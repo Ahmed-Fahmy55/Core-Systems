@@ -137,35 +137,16 @@ namespace Zone8.SceneManagement
         {
             progressor = progressor == null ? _addressableProgressor : progressor;
 
-            if (relatedBundles != null && relatedBundles.Length > 0)
+            foreach (string bundle in relatedBundles)
             {
-                foreach (string bundle in relatedBundles)
+                if (!await _sceneDownloadHandler.DownloadBundle(bundle, progressor))
                 {
-                    if (!await _sceneDownloadHandler.DownloadBundle(bundle, progressor))
-                    {
-                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-                        {
-                            Description = $"Failed downloading bundles",
-                            Progressor = progressor,
-                            State = EDwonloadingState.Failiure,
-                        });
-                        return false;
-                    }
+                    return false;
                 }
             }
-
-            EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-            {
-                Description = $"Downloaded all bundles",
-                State = EDwonloadingState.Finished,
-                Progressor = progressor,
-            });
             return true;
         }
 
-        /// <summary>
-        /// Reloads the currently active scene group.
-        /// </summary>
         public virtual void ReloadCurrentSceneGroup()
         {
             Load(_currentSceneGroup);
@@ -174,103 +155,53 @@ namespace Zone8.SceneManagement
 
         #region Private Members
 
-        /// <summary>
-        /// Manages the scene group loading process.
-        /// </summary>
-        /// <param name="group">The scene group to load.</param>
-        /// <param name="relatedBundles">Optional array of related bundle names to load.</param>
-        /// <param name="sceneLoadProgresseor">Progress reporter for scene loading.</param>
-        /// <param name="dependancyProgressor">Progress reporter for bundle downloading.</param>
         protected virtual async void LoadSceneGroup(SceneGroup group, string[] relatedBundles, IProgress<float> sceneLoadProgresseor,
                                           IAddressableProgressor dependancyProgressor)
         {
             _isLoading = true;
 
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Started,
-            });
-
             await StartLoadingEffect();
-            if (!await DownloadSceneGroupDependencies(group, dependancyProgressor))
+
+            if (group.GetAddressablesScenesCount() != 0)
             {
-                await EndLoadingEffect();
-                _isLoading = false;
-                return;
+                if (!await DownloadSceneGroupDependencies(group, dependancyProgressor))
+                {
+                    await EndLoadingEffect();
+                    _isLoading = false;
+                    return;
+                }
             }
 
-            if (!await DownloadBundles(relatedBundles, dependancyProgressor))
+            if (relatedBundles != null && relatedBundles.Length > 0)
             {
-                await EndLoadingEffect();
-                _isLoading = false;
-                return;
+                if (!await DownloadBundles(relatedBundles, dependancyProgressor))
+                {
+                    await EndLoadingEffect();
+                    _isLoading = false;
+                    return;
+                }
             }
-
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Loading
-            });
 
             await _sceneLoadHandler.UnloadScenes();
             ClearHandles();
             await Resources.UnloadUnusedAssets();
+
             await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgresseor);
             await EndLoadingEffect();
-
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Completed
-            });
 
             _currentSceneGroup = group.GroupName;
             _isLoading = false;
         }
 
-        /// <summary>
-        /// Checks and downloads dependencies for a scene group.
-        /// </summary>
-        /// <param name="group">The scene group to check and download dependencies for.</param>
-        /// <param name="progressor">Progress reporter for the downloading process.</param>
-        /// <returns>A task that resolves to <c>true</c> if all dependencies are downloaded successfully; otherwise, <c>false</c>.</returns>
         protected virtual async Awaitable<bool> DownloadSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor)
         {
-            if (group.GetAddressablesScenesCount() != 0)
+            if (!await _sceneDownloadHandler.DownloadsSceneGroupDependencies(group, progressor))
             {
-                if (!await _sceneDownloadHandler.DownloadsSceneGroupDependencies(group, progressor))
-                {
-                    EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-                    {
-                        Description = $"Failed to download dependencies for {group.GroupName.name} Scene",
-                        State = EDwonloadingState.Failiure,
-                        Progressor = progressor,
-                    });
-                    return false;
-                }
+                return false;
             }
-
-            EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-            {
-                Description = $"Successfully downloaded dependencies for {group.GroupName.name} Scene",
-                State = EDwonloadingState.Finished,
-                Progressor = progressor,
-            });
             return true;
         }
 
-#if UNITY_EDITOR
-        [Button]
-        private void ClearCach()
-        {
-            Caching.ClearCache();
-        }
-#endif
-
-        /// <summary>
-        /// Checks if a SceneGroup is registered.
-        /// </summary>
         protected bool IsGroupRegistered(ESceneGroup group)
         {
             return _sceneGroups.Any(item => item.GroupName == group);
@@ -299,5 +230,14 @@ namespace Zone8.SceneManagement
         public abstract Awaitable EndLoadingEffect();
 
         #endregion
+
+
+#if UNITY_EDITOR
+        [Button]
+        private void ClearCach()
+        {
+            Caching.ClearCache();
+        }
+#endif
     }
 }

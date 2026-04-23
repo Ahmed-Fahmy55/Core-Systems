@@ -37,6 +37,7 @@ namespace Zone8.SceneManagement
 
     public enum ESceneLoadStatus
     {
-        None, Started, Loading, Unloading, Completed, Error, FinishedUnloading, FinishedLoading,
+        None, Loading, Unloading, Completed,
+        Error,
     }
 }

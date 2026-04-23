@@ -134,7 +134,6 @@ public static class Helper
     public static async Awaitable<(bool completed, T result)> RunWithTimeout<T>(
         Awaitable<T> task, int timeoutMs, Action<T> onComplete = null, CancellationToken token = default)
     {
-        // Create a linked token that triggers on either the external token OR the timeout
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
         cts.CancelAfter(timeoutMs);
 
