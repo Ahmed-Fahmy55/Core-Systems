@@ -1,42 +1,49 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace Zone8.UI.TabSystem
 {
     public abstract class TabBase : MonoBehaviour, ITab, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
+        [SerializeField] private string _tabID;
+        public virtual string TabID => _tabID;
 
-        protected HighlightTabsManager _tabsManager;
+        protected ITabManager _tabsManager;
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            _tabsManager = GetComponentInParent<HighlightTabsManager>();
-            if (_tabsManager != null) _tabsManager.AddTab(this);
-
+            _tabsManager = GetComponentInParent<ITabManager>();
+            if (_tabsManager != null)
+            {
+                _tabsManager.AddTab(this);
+            }
         }
 
         public virtual void Highlight() { }
         public virtual void Dehighlight() { }
 
         public abstract void ActivateContent();
-
         public abstract void DeactivateContent();
-
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _tabsManager.SwitchTab(this);
+            _tabsManager?.SwitchTab(this);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (_tabsManager.GetActiveTab() != (ITab)this) Highlight();
+            if (_tabsManager != null && _tabsManager.GetActiveTab() != (ITab)this)
+            {
+                Highlight();
+            }
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (_tabsManager.GetActiveTab() != (ITab)this) Dehighlight();
+            if (_tabsManager != null && _tabsManager.GetActiveTab() != (ITab)this)
+            {
+                Dehighlight();
+            }
         }
     }
 }
