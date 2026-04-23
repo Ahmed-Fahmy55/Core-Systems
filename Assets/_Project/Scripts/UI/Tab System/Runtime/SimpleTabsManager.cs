@@ -18,7 +18,7 @@ namespace Zone8.UI.TabSystem
         [SerializeField] private List<ITab> _tabs = new();
 
         [Title("Audio Feedback")]
-        [SerializeField] private SFXClip _switchSound;
+        [SerializeField] private SFXClipSo _switchSound;
         #endregion
 
         #region Private Variables

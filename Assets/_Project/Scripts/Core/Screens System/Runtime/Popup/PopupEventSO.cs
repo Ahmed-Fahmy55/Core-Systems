@@ -1,9 +1,9 @@
-﻿using Zone8.SOAP.Events;
-using UnityEngine;
+﻿using UnityEngine;
+using Zone8.SOAP.Events;
 
 namespace Zone8.Screens
 {
-    [CreateAssetMenu(fileName = "PopupEvent", menuName = "Bltzo/Screens/Popup Event")]
+    [CreateAssetMenu(fileName = "PopupEvent", menuName = "Screens/Popup Event")]
     public class PopupEventSO : GameEvent<PopupEventArgs>
     {
 

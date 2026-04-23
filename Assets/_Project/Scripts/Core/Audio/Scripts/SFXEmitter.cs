@@ -15,7 +15,7 @@ namespace Zone8.Audio
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isPaused = false;
 
-        public SFXClip Clip { get; private set; }
+        public SFXClipSo Clip { get; private set; }
 
 
         private void Awake()
@@ -28,7 +28,7 @@ namespace Zone8.Audio
         }
 
         #region API
-        public void Initialize(SFXClip clip, IObjectPool<SFXEmitter> emitterPool)
+        public void Initialize(SFXClipSo clip, IObjectPool<SFXEmitter> emitterPool)
         {
             if (clip == null)
             {
@@ -85,7 +85,7 @@ namespace Zone8.Audio
 
         #region Private Methods
 
-        private void SetupAudioSource(SFXClip clip)
+        private void SetupAudioSource(SFXClipSo clip)
         {
             _audioSource.clip = GetRandomClip(clip);
             _audioSource.outputAudioMixerGroup = clip.ClipTrack.Track;
@@ -154,7 +154,7 @@ namespace Zone8.Audio
             }
         }
 
-        private AudioClip GetRandomClip(SFXClip data)
+        private AudioClip GetRandomClip(SFXClipSo data)
         {
             if (data.Clips == null || data.Clips.Length == 0)
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Zone8.SceneManagement
 {
-    [CreateAssetMenu(menuName = "Zone8/Enums/SceneGroup")]
+    [CreateAssetMenu(menuName = "Enums/SceneGroup")]
     public class ESceneGroup : ScriptableObject
     {
         public string DisplayName;

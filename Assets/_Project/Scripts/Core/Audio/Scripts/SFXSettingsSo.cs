@@ -7,7 +7,7 @@ using UnityEngine.Audio;
 namespace Zone8.Audio
 {
 
-    [CreateAssetMenu(menuName = "Zone8/Audio/SFX Settings")]
+    [CreateAssetMenu(menuName = "Audio/SFX Settings")]
     [InlineEditor]
     public class SFXSettingsSo : SerializedScriptableObject
     {

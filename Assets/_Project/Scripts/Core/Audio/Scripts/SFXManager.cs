@@ -9,14 +9,14 @@ namespace Zone8.Audio
 {
     public struct AudioPlayEvent : IEvent
     {
-        public SFXClip Clip;
+        public SFXClipSo Clip;
         public Vector3 Position;
         public Action OnEnd;
     }
 
     public struct AudioControlEvent : IEvent
     {
-        public SFXClip Clip;
+        public SFXClipSo Clip;
         public EAudioControl Control;
     }
 
@@ -55,8 +55,8 @@ namespace Zone8.Audio
         [SerializeField] private int _maxFrequentSoundInstances = 30;
 
         private IObjectPool<SFXEmitter> _soundEmitterPool;
-        private readonly Dictionary<ETrack, Dictionary<SFXClip, HashSet<SFXEmitter>>> _activeSounds = new();
-        private readonly Dictionary<SFXClip, LinkedList<SFXEmitter>> _frequentSounds = new();
+        private readonly Dictionary<ETrack, Dictionary<SFXClipSo, HashSet<SFXEmitter>>> _activeSounds = new();
+        private readonly Dictionary<SFXClipSo, LinkedList<SFXEmitter>> _frequentSounds = new();
 
         private EventBinding<AudioPlayEvent> _audioPlayBinding;
         private EventBinding<AudioControlEvent> _audioControBinding;
@@ -92,7 +92,7 @@ namespace Zone8.Audio
 
 
         #region API
-        public void Play(SFXClip clip, Vector3 position = new(), Action onEnd = null)
+        public void Play(SFXClipSo clip, Vector3 position = new(), Action onEnd = null)
         {
             if (!CanPlaySound(clip))
             {
@@ -109,7 +109,7 @@ namespace Zone8.Audio
             // Add emitter to nested dictionary
             if (!_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap))
             {
-                clipMap = new Dictionary<SFXClip, HashSet<SFXEmitter>>();
+                clipMap = new Dictionary<SFXClipSo, HashSet<SFXEmitter>>();
                 _activeSounds[clip.ClipTrack] = clipMap;
             }
             if (!clipMap.TryGetValue(clip, out var emitterSet))
@@ -130,7 +130,7 @@ namespace Zone8.Audio
             }
         }
 
-        public void StopSound(SFXClip clip)
+        public void StopSound(SFXClipSo clip)
         {
             if (_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap) &&
                 clipMap.TryGetValue(clip, out var emitters))
@@ -229,7 +229,7 @@ namespace Zone8.Audio
             return _tracksSettings.GetTrackVolume(track);
         }
 
-        public bool CanPlaySound(SFXClip clip)
+        public bool CanPlaySound(SFXClipSo clip)
         {
             if (clip == null)
             {

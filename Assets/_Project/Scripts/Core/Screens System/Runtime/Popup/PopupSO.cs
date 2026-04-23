@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Zone8.Screens
 {
-    [CreateAssetMenu(fileName = "Popup", menuName = "Bltzo/Screens/Popup")]
+    [CreateAssetMenu(fileName = "Popup", menuName = "Screens/Popup")]
     public class PopupSO : ScriptableObject
     {
         public string Name;

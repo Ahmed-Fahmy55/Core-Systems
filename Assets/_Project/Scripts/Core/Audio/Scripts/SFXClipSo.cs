@@ -5,8 +5,8 @@ using Zone8.Events;
 
 namespace Zone8.Audio
 {
-    [CreateAssetMenu(menuName = "Zone8/Audio/SFX Clip")]
-    public class SFXClip : ScriptableObject
+    [CreateAssetMenu(menuName = "Audio/SFX Clip")]
+    public class SFXClipSo : ScriptableObject
     {
         [TitleGroup("Audio Clips", "Audio Settings", TitleAlignments.Centered, HorizontalLine = true)]
         [Tooltip("List of audio clips to play.")]

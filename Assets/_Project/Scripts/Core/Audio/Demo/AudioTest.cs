@@ -4,7 +4,7 @@ using Zone8.Audio;
 
 public class AudioTest : MonoBehaviour
 {
-    [SerializeField] private SFXClip _sfxClip;
+    [SerializeField] private SFXClipSo _sfxClip;
     [SerializeField] ETrack _track;
     [SerializeField] float _trackVolume = 0.5f;
     [SerializeField] private int _playtime = 5;

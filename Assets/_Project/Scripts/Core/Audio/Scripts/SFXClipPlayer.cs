@@ -6,7 +6,7 @@ namespace Zone8.Audio
 {
     public class SFXClipPlayer : MonoBehaviour
     {
-        [SerializeField] private SFXClip _clip;
+        [SerializeField] private SFXClipSo _clip;
         [SerializeField] private bool _playOnStart = true;
         [SerializeField] private bool _stopTrackBeforePlay;
 
