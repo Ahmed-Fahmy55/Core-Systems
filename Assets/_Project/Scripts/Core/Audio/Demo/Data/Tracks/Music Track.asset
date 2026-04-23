@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e0fea7c87da23442a5c982b4d36cfba, type: 3}
-  m_Name: SFX
+  m_Name: Music Track
   m_EditorClassIdentifier: 
-  Track: {fileID: -6006138394700776813, guid: ff146b2ccc6c8a941837d3cfc534892a, type: 2}
+  Track: {fileID: -8366912927241876754, guid: ff146b2ccc6c8a941837d3cfc534892a, type: 2}
+  ExposedParameterName: Music
   MutedVolume: 0

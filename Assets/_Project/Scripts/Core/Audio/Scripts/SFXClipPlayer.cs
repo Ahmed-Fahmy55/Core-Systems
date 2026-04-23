@@ -26,7 +26,7 @@ namespace Zone8.Audio
 
             if (_stopTrackBeforePlay)
             {
-                EventBus<AudioTrackEvent>.Raise(new AudioTrackEvent
+                EventBus<TrackControlEvent>.Raise(new TrackControlEvent
                 {
                     Track = _clip.ClipTrack,
                     TrackMode = ETrackMode.Stop

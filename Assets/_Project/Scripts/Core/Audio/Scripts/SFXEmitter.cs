@@ -10,11 +10,11 @@ namespace Zone8.Audio
     public class SFXEmitter : MonoBehaviour
     {
         private AudioSource _audioSource;
-        private Task _playingTask;
         private IObjectPool<SFXEmitter> _emitterPool;
         private CancellationTokenSource _cancellationTokenSource;
-        private bool _isPaused = false;
+        private bool _isPoolReleased;
 
+        public bool IsPaused { get; private set; }
         public SFXClipSo Clip { get; private set; }
 
 
@@ -25,6 +25,10 @@ namespace Zone8.Audio
             {
                 _audioSource = gameObject.AddComponent<AudioSource>();
             }
+        }
+        private void OnDestroy()
+        {
+            StopPlayingTask();
         }
 
         #region API
@@ -37,28 +41,26 @@ namespace Zone8.Audio
             }
 
             this._emitterPool = emitterPool;
+            _isPoolReleased = false;
             Clip = clip;
             SetupAudioSource(clip);
         }
 
-
-
         public void Play(Action onEnd = null)
         {
-            if (_playingTask != null && !_playingTask.IsCompleted)
-            {
-                StopPlayingTask();
-            }
+            StopPlayingTask();
 
             _cancellationTokenSource = new CancellationTokenSource();
             _audioSource.Play();
 
-            _playingTask = WaitForSoundToEnd(onEnd);
+            _ = WaitForSoundToEnd(onEnd);
 
         }
 
         public void Stop()
         {
+            if (_isPoolReleased) return;
+            _isPoolReleased = true;
             _audioSource.Stop();
             StopPlayingTask();
             _emitterPool.Release(this);
@@ -69,7 +71,7 @@ namespace Zone8.Audio
             if (_audioSource.isPlaying)
             {
                 _audioSource.Pause();
-                _isPaused = true;
+                IsPaused = true;
             }
         }
 
@@ -78,7 +80,7 @@ namespace Zone8.Audio
             if (!_audioSource.isPlaying)
             {
                 _audioSource.UnPause();
-                _isPaused = false;
+                IsPaused = false;
             }
         }
         #endregion
@@ -124,16 +126,15 @@ namespace Zone8.Audio
             }
         }
 
-        private async Task WaitForSoundToEnd(Action onEnd)
+        private async Awaitable WaitForSoundToEnd(Action onEnd)
         {
             try
             {
                 var token = _cancellationTokenSource?.Token;
 
-                while ((_audioSource.isPlaying || _isPaused) && token?.IsCancellationRequested == false)
+                while ((_audioSource.isPlaying || IsPaused) && token?.IsCancellationRequested == false)
                 {
-                    // Await the next frame to prevent blocking the main thread
-                    await Task.Yield();
+                    await Awaitable.EndOfFrameAsync();
                 }
 
                 if (token?.IsCancellationRequested == true)
@@ -141,16 +142,16 @@ namespace Zone8.Audio
                     return;
                 }
 
-                if (!_isPaused && onEnd != null)
+                if (!IsPaused && onEnd != null)
                 {
                     onEnd?.Invoke();
                 }
                 Stop();
 
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Debug.Log("Sound playback canceled.");
+                Logger.Log("Sound playback canceled." + e);
             }
         }
 

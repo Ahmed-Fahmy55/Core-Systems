@@ -22,31 +22,29 @@ namespace Zone8.Audio
 
         public virtual void SetTrackVolume(ETrack track, float volume)
         {
-            if (volume <= 0f)
-            {
-                volume = k_minimalVolume;
-            }
+            if (volume <= 0f) volume = k_minimalVolume;
 
             if (!Tracks.Contains(track))
             {
-                Debug.LogError($"Track {track} not found in SFXSettingsSo");
+                Logger.LogError($"Track {track} not found in SFXSettingsSo");
                 return;
             }
 
-            TargetAudioMixer.SetFloat(track.Track.name, NormalizedToMixerVolume(volume));
+            bool success = TargetAudioMixer.SetFloat(track.ExposedParameterName, NormalizedToMixerVolume(volume));
+
+            if (!success)
+            {
+                Logger.LogWarning($"Failed to set volume. Is '{track.ExposedParameterName}' exposed in the Mixer?");
+            }
         }
 
         public virtual float GetTrackVolume(ETrack track)
         {
             float volume = 1f;
 
-            if (!Tracks.Contains(track))
-            {
-                Debug.LogError($"Track {track} not found in SFXSettingsSo");
-                return volume;
-            }
+            if (!Tracks.Contains(track)) return volume;
 
-            TargetAudioMixer.GetFloat(track.Track.name, out volume);
+            TargetAudioMixer.GetFloat(track.ExposedParameterName, out volume);
 
             return MixerVolumeToNormalized(volume);
         }

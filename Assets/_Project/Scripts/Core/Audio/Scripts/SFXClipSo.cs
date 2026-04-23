@@ -172,7 +172,7 @@ namespace Zone8.Audio
             EventBus<AudioControlEvent>.Raise(new AudioControlEvent
             {
                 Clip = this,
-                Control = EAudioControl.Stop
+                Control = EControlMode.Stop
             });
         }
 
@@ -184,7 +184,7 @@ namespace Zone8.Audio
             EventBus<AudioControlEvent>.Raise(new AudioControlEvent
             {
                 Clip = this,
-                Control = EAudioControl.Pause
+                Control = EControlMode.Pause
             });
         }
 
@@ -196,7 +196,7 @@ namespace Zone8.Audio
             EventBus<AudioControlEvent>.Raise(new AudioControlEvent
             {
                 Clip = this,
-                Control = EAudioControl.Resume
+                Control = EControlMode.Resume
             });
         }
     }

@@ -9,6 +9,11 @@ namespace Zone8.Audio
     public class ETrack : ScriptableObject
     {
         public AudioMixerGroup Track;
+
+        [Title("Remote Control")]
+        [Tooltip("The exact name of the Exposed Parameter in the Audio Mixer.")]
+        public string ExposedParameterName;
+
         [ReadOnly]
         public float MutedVolume;
     }

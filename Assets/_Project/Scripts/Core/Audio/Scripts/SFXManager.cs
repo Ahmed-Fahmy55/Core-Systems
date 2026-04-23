@@ -17,16 +17,16 @@ namespace Zone8.Audio
     public struct AudioControlEvent : IEvent
     {
         public SFXClipSo Clip;
-        public EAudioControl Control;
+        public EControlMode Control;
     }
 
-    public struct AudioTrackEvent : IEvent
+    public struct TrackControlEvent : IEvent
     {
         public ETrack Track;
         public ETrackMode TrackMode;
         public float Volume;
 
-        public AudioTrackEvent(ETrack track, ETrackMode trackMode, float volume)
+        public TrackControlEvent(ETrack track, ETrackMode trackMode, float volume)
         {
             Track = track;
             TrackMode = trackMode;
@@ -34,7 +34,7 @@ namespace Zone8.Audio
         }
     }
 
-    public enum EAudioControl
+    public enum EControlMode
     {
         Pause,
         Resume,
@@ -51,7 +51,7 @@ namespace Zone8.Audio
         [SerializeField] private SFXSettingsSo _tracksSettings;
         [SerializeField] private SFXEmitter _soundEmitterPrefab;
         [SerializeField] private bool _collectionCheck = true;
-        [SerializeField] private int _maxPoolSize = 10;
+        [SerializeField] private int _defaultCapacity = 30;
         [SerializeField] private int _maxFrequentSoundInstances = 30;
 
         private IObjectPool<SFXEmitter> _soundEmitterPool;
@@ -60,7 +60,7 @@ namespace Zone8.Audio
 
         private EventBinding<AudioPlayEvent> _audioPlayBinding;
         private EventBinding<AudioControlEvent> _audioControBinding;
-        private EventBinding<AudioTrackEvent> _audioTrackBinding;
+        private EventBinding<TrackControlEvent> _audioTrackBinding;
 
 
 
@@ -69,25 +69,32 @@ namespace Zone8.Audio
         {
             _audioPlayBinding = new EventBinding<AudioPlayEvent>(OnAudioPlayed);
             _audioControBinding = new EventBinding<AudioControlEvent>(OnAudioControl);
-            _audioTrackBinding = new EventBinding<AudioTrackEvent>(OnControlTrack);
+            _audioTrackBinding = new EventBinding<TrackControlEvent>(OnTrackControl);
 
             InitializePool();
-
+            PreWarmPool(_defaultCapacity);
         }
 
         private void OnEnable()
         {
             EventBus<AudioPlayEvent>.Register(_audioPlayBinding);
             EventBus<AudioControlEvent>.Register(_audioControBinding);
-            EventBus<AudioTrackEvent>.Register(_audioTrackBinding);
+            EventBus<TrackControlEvent>.Register(_audioTrackBinding);
         }
 
         private void OnDisable()
         {
             EventBus<AudioPlayEvent>.Deregister(_audioPlayBinding);
             EventBus<AudioControlEvent>.Deregister(_audioControBinding);
-            EventBus<AudioTrackEvent>.Deregister(_audioTrackBinding);
+            EventBus<TrackControlEvent>.Deregister(_audioTrackBinding);
         }
+        private void OnDestroy()
+        {
+            StopAll();
+
+            _soundEmitterPool.Clear();
+        }
+
         #endregion
 
 
@@ -99,14 +106,25 @@ namespace Zone8.Audio
                 return;
             }
 
-            SFXEmitter soundEmitter = _soundEmitterPool.Get();
+            if (_activeSounds.TryGetValue(clip.ClipTrack, out var clipsDic) &&
+                clipsDic.TryGetValue(clip, out var emitters))
+            {
+                var pausedEmitter = emitters.FirstOrDefault(e => e.IsPaused);
 
+                if (pausedEmitter != null)
+                {
+                    pausedEmitter.transform.position = position;
+                    pausedEmitter.Resume();
+                    return;
+                }
+            }
+
+            SFXEmitter soundEmitter = _soundEmitterPool.Get();
             soundEmitter.Initialize(clip, _soundEmitterPool);
             soundEmitter.transform.position = position;
             soundEmitter.transform.parent = transform;
             soundEmitter.Play(onEnd);
 
-            // Add emitter to nested dictionary
             if (!_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap))
             {
                 clipMap = new Dictionary<SFXClipSo, HashSet<SFXEmitter>>();
@@ -119,7 +137,6 @@ namespace Zone8.Audio
             }
             emitterSet.Add(soundEmitter);
 
-            //  frequent sounds
             if (clip.FrequentSound)
             {
                 if (!_frequentSounds.ContainsKey(clip))
@@ -127,19 +144,6 @@ namespace Zone8.Audio
                     _frequentSounds[clip] = new LinkedList<SFXEmitter>();
                 }
                 _frequentSounds[clip].AddLast(soundEmitter);
-            }
-        }
-
-        public void StopSound(SFXClipSo clip)
-        {
-            if (_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap) &&
-                clipMap.TryGetValue(clip, out var emitters))
-            {
-                var emittersCopy = emitters.ToList();
-                foreach (var soundEmitter in emittersCopy)
-                {
-                    soundEmitter.Stop();
-                }
             }
         }
 
@@ -157,29 +161,67 @@ namespace Zone8.Audio
                 return;
             }
 
-            foreach (var clip in clipMap.Keys.ToList())
-            {
+            var pooledClips = ListPool<SFXClipSo>.Get();
+            pooledClips.AddRange(clipMap.Keys);
+
+            foreach (var clip in pooledClips)
                 StopSound(clip);
+
+            ListPool<SFXClipSo>.Release(pooledClips);
+        }
+
+        public void StopSound(SFXClipSo clip)
+        {
+            if (clip == null) return;
+
+            if (_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap) &&
+                clipMap.TryGetValue(clip, out var emitters))
+            {
+                var pooledList = ListPool<SFXEmitter>.Get();
+
+                try
+                {
+                    pooledList.AddRange(emitters);
+                    foreach (var soundEmitter in pooledList)
+                    {
+                        if (soundEmitter != null)
+                        {
+                            soundEmitter.Stop();
+                        }
+                    }
+                }
+                finally
+                {
+                    ListPool<SFXEmitter>.Release(pooledList);
+                }
             }
         }
 
         public void StopAll()
         {
-            // Collect emitters first so dictionary modifications don't break iteration
-            var emitters = new List<SFXEmitter>();
+            var pooledList = ListPool<SFXEmitter>.Get();
 
-            foreach (var trackMap in _activeSounds.Values)
+            try
             {
-                foreach (var emitterList in trackMap.Values)
+                foreach (var trackMap in _activeSounds.Values)
                 {
-                    emitters.AddRange(emitterList);
+                    foreach (var emitterSet in trackMap.Values)
+                    {
+                        pooledList.AddRange(emitterSet);
+                    }
+                }
+
+                foreach (var emitter in pooledList)
+                {
+                    if (emitter != null)
+                    {
+                        emitter.Stop();
+                    }
                 }
             }
-
-            // Now stop them safely
-            foreach (var emitter in emitters)
+            finally
             {
-                emitter.Stop();
+                ListPool<SFXEmitter>.Release(pooledList);
             }
         }
 
@@ -199,41 +241,22 @@ namespace Zone8.Audio
                 case ETrackMode.SetVolume:
                     _tracksSettings.SetTrackVolume(track, volume);
                     break;
-            }
-        }
-
-        public void OnControlTrack(AudioTrackEvent data)
-        {
-            switch (data.TrackMode)
-            {
-                case ETrackMode.Mute:
-                    if (_tracksSettings.IsTrackMuted(data.Track)) return;
-                    data.Track.MutedVolume = _tracksSettings.GetTrackVolume(data.Track);
-                    _tracksSettings.SetTrackVolume(data.Track, 0f);
-                    break;
-                case ETrackMode.Unmute:
-                    if (!_tracksSettings.IsTrackMuted(data.Track)) return;
-                    _tracksSettings.SetTrackVolume(data.Track, data.Track.MutedVolume);
-                    break;
-                case ETrackMode.SetVolume:
-                    _tracksSettings.SetTrackVolume(data.Track, data.Volume);
-                    break;
                 case ETrackMode.Stop:
-                    StopTrackSounds(data.Track);
+                    StopTrackSounds(track);
                     break;
             }
         }
 
-        public float GetTrackVolume(ETrack track)
-        {
-            return _tracksSettings.GetTrackVolume(track);
-        }
 
-        public bool CanPlaySound(SFXClipSo clip)
+        #endregion
+
+        #region Private Methods
+
+        private bool CanPlaySound(SFXClipSo clip)
         {
             if (clip == null)
             {
-                Debug.LogWarning("No clip data found.");
+                Logger.LogWarning("No clip data found.");
                 return false;
             }
 
@@ -258,9 +281,6 @@ namespace Zone8.Audio
             return true;
         }
 
-        #endregion
-
-        #region Private Methods
         private void InitializePool()
         {
             _soundEmitterPool = new ObjectPool<SFXEmitter>(
@@ -269,12 +289,12 @@ namespace Zone8.Audio
                 OnReturnedToPool,
                 OnDestroyPoolObject,
                 _collectionCheck,
-                _maxPoolSize);
+                defaultCapacity: _defaultCapacity);
         }
 
         private SFXEmitter CreateSoundEmitter()
         {
-            var soundEmitter = Instantiate(_soundEmitterPrefab);
+            var soundEmitter = Instantiate(_soundEmitterPrefab, transform);
             soundEmitter.gameObject.SetActive(false);
             return soundEmitter;
         }
@@ -286,8 +306,14 @@ namespace Zone8.Audio
 
         private void OnReturnedToPool(SFXEmitter soundEmitter)
         {
+            if (_activeSounds.Count == 0)
+            {
+                soundEmitter.gameObject.SetActive(false);
+                return;
+            }
+
             if (_activeSounds.TryGetValue(soundEmitter.Clip.ClipTrack, out var clipMap) &&
-                 clipMap.TryGetValue(soundEmitter.Clip, out var emitters))
+             clipMap.TryGetValue(soundEmitter.Clip, out var emitters))
             {
                 emitters.Remove(soundEmitter);
                 if (emitters.Count == 0)
@@ -315,46 +341,75 @@ namespace Zone8.Audio
 
         private void OnDestroyPoolObject(SFXEmitter soundEmitter)
         {
-            Destroy(soundEmitter.gameObject);
+            if (soundEmitter != null && soundEmitter.gameObject != null)
+            {
+                Destroy(soundEmitter.gameObject);
+            }
+        }
+
+        private void PreWarmPool(int count)
+        {
+            var tempPreWarmList = ListPool<SFXEmitter>.Get();
+
+            for (int i = 0; i < count; i++)
+            {
+                tempPreWarmList.Add(_soundEmitterPool.Get());
+            }
+
+            foreach (var emitter in tempPreWarmList)
+            {
+                _soundEmitterPool.Release(emitter);
+            }
+
+            ListPool<SFXEmitter>.Release(tempPreWarmList);
         }
         #endregion
 
         #region Callbacks
-        private void OnAudioPlayed(AudioPlayEvent data)
+
+        private void OnTrackControl(TrackControlEvent data)
         {
-            Play(data.Clip, data.Position, data.OnEnd);
+            ControlTrack(data.Track, data.TrackMode, data.Volume);
         }
 
         private void OnAudioControl(AudioControlEvent data)
         {
+            if (data.Clip == null) return;
+
             if (_activeSounds.TryGetValue(data.Clip.ClipTrack, out var clipMap) &&
-                 clipMap.TryGetValue(data.Clip, out var soundEmitters))
+                clipMap.TryGetValue(data.Clip, out var soundEmitters))
             {
-                var emittersToControl = new List<SFXEmitter>(soundEmitters);
+                var tempEmitters = ListPool<SFXEmitter>.Get();
+                tempEmitters.AddRange(soundEmitters);
 
-                foreach (var soundEmitter in emittersToControl)
+                try
                 {
-                    switch (data.Control)
+                    foreach (var soundEmitter in tempEmitters)
                     {
-                        case EAudioControl.Pause:
-                            soundEmitter.Pause();
-                            break;
+                        if (soundEmitter == null) continue;
 
-                        case EAudioControl.Resume:
-                            soundEmitter.Resume();
-                            break;
+                        switch (data.Control)
+                        {
+                            case EControlMode.Pause:
+                                soundEmitter.Pause();
+                                break;
 
-                        case EAudioControl.Stop:
-                            StopSound(soundEmitter.Clip);
-                            break;
+                            case EControlMode.Resume:
+                                soundEmitter.Resume();
+                                break;
 
-                        default:
-                            Debug.LogWarning($"Unhandled sound control: {data.Control}");
-                            break;
+                            case EControlMode.Stop:
+                                soundEmitter.Stop();
+                                break;
+                        }
                     }
                 }
+                finally
+                {
+                    ListPool<SFXEmitter>.Release(tempEmitters);
+                }
 
-                if (data.Control == EAudioControl.Stop)
+                if (data.Control == EControlMode.Stop)
                 {
                     clipMap.Remove(data.Clip);
                     if (clipMap.Count == 0)
@@ -362,13 +417,15 @@ namespace Zone8.Audio
                         _activeSounds.Remove(data.Clip.ClipTrack);
                     }
 
-                    if (data.Clip.FrequentSound) _frequentSounds.Remove(data.Clip);
+                    if (data.Clip.FrequentSound)
+                        _frequentSounds.Remove(data.Clip);
                 }
             }
-            else
-            {
-                Debug.LogWarning($"No active sound emitters found for clip: {data.Clip?.name}");
-            }
+        }
+
+        private void OnAudioPlayed(AudioPlayEvent data)
+        {
+            Play(data.Clip, data.Position, data.OnEnd);
         }
 
         #endregion
