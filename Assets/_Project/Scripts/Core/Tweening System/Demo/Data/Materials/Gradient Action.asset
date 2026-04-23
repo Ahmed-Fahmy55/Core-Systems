@@ -29,7 +29,7 @@ MonoBehaviour:
       Data: Zone8.Tweening.CoreTweenSettings, Z8.Tweening
     - Name: Duration
       Entry: 4
-      Data: 0
+      Data: 2
     - Name: Delay
       Entry: 4
       Data: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
       Data: _BaseColor
     - Name: _isTMP
       Entry: 5
-      Data: false
+      Data: true
     - Name: _toColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule

@@ -17,19 +17,19 @@ namespace Zone8.Tweening
         [SerializeField] EActionType _actionType;
 
         [BoxGroup("TMP Settings", Order = 1)]
-        [ShowIf("@actionType == EActionType.Color ")]
+        [ShowIf("@_actionType == EActionType.Color ")]
         [SerializeField] Color _toColor;
 
         [BoxGroup("TMP Settings", Order = 1)]
-        [ShowIf("@actionType == EActionType.Fade || actionType == EActionType.FontSize")]
+        [ShowIf("@_actionType == EActionType.Fade || _actionType == EActionType.FontSize")]
         [SerializeField] float _toValue;
 
         [BoxGroup("TMP Settings", Order = 1)]
-        [ShowIf("@actionType == EActionType.Text")]
+        [ShowIf("@_actionType == EActionType.Text")]
         [SerializeField] string _toText;
 
         [BoxGroup("TMP Settings", Order = 1)]
-        [ShowIf("@actionType == EActionType.Scale")]
+        [ShowIf("@_actionType == EActionType.Scale")]
         [SerializeField] Vector3 _toScaleValue;
 
 

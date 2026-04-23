@@ -14,10 +14,6 @@ Position: $WXKgv4HoCYgko39t5G9KPB:0
 Position: $3vhE7BrKH5Efbyf6ZXM1Sw:0
 + [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
 
-# $K5je8YVRrGH8nfhdDP8Pd8
-Position: $3vhE7BrKH5Efbyf6ZXM1Sw:1
-+ [Sirenix.OdinInspector.ColumnGroupAttribute+ColumnSubGroupAttribute]
-
 # $SUanHGFpHfNZMJEG2hKYfw
 Position: $root:1
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
@@ -37,9 +33,13 @@ Position: $2PhRfSNt1DLFJBzaoDS7Ne:1
 
 # SequenceTweens
 Position: $GkWsBJg2yJwwYPjo7diu4Z:0
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #DFF8B3FF
 
 # InsertTweens
-Position: $K5je8YVRrGH8nfhdDP8Pd8:0
+Position: $GkWsBJg2yJwwYPjo7diu4Z:1
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #A0E9FFFF
 
 # _playOnStart
 Position: $WhcXFDqKaox8G5xeQbVg4u:0

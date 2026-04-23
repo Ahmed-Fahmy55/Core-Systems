@@ -89,7 +89,7 @@ MonoBehaviour:
       Data: 
     - Name: _toValue
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: _toGradient
       Entry: 6
       Data: 

@@ -16,18 +16,19 @@ namespace Zone8.Tweening
         {
             if (_target == null) _target = gameObject;
 
-            if (playOnStart) _tween = Act();
+            if (playOnStart) Act();
         }
 
         [Button]
-        public Tween Act()
+        public void Act()
         {
-            return _tween = action?.Act(gameObject);
+            _tween = action?.Act(gameObject);
         }
 
         [Button]
         public void PlayBack()
         {
+            _tween.Complete();
             _tween?.PlayBackwards();
         }
 

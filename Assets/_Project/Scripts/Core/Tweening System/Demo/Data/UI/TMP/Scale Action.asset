@@ -21,43 +21,55 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: tweenAction
+    - Name: _tweenAction
       Entry: 7
-      Data: 0|Zone8.Tweening.TMPTweenAction, Bltzo.Tweening
-    - Name: <Duration>k__BackingField
+      Data: 0|Zone8.Tweening.TMPTweenAction, Z8.Tweening
+    - Name: <CoreSettings>k__BackingField
+      Entry: 7
+      Data: Zone8.Tweening.CoreTweenSettings, Z8.Tweening
+    - Name: Duration
       Entry: 4
       Data: 2
-    - Name: <Delay>k__BackingField
+    - Name: Delay
       Entry: 4
       Data: 0
-    - Name: <Loop>k__BackingField
-      Entry: 5
-      Data: true
-    - Name: <LoopCount>k__BackingField
-      Entry: 3
-      Data: -1
-    - Name: <LoopType>k__BackingField
-      Entry: 3
-      Data: 0
-    - Name: <CustomEase>k__BackingField
+    - Name: CustomEase
       Entry: 5
       Data: false
-    - Name: <EaseCurve>k__BackingField
+    - Name: EaseCurve
       Entry: 6
       Data: 
-    - Name: <Ease>k__BackingField
+    - Name: Ease
       Entry: 3
       Data: 0
-    - Name: <UpdateType>k__BackingField
+    - Name: Loop
+      Entry: 5
+      Data: true
+    - Name: LoopCount
+      Entry: 3
+      Data: -1
+    - Name: LoopType
       Entry: 3
       Data: 0
-    - Name: <AutoKill>k__BackingField
+    - Name: IsIndependentUpdate
       Entry: 5
       Data: false
-    - Name: actionType
+    - Name: IsRelative
+      Entry: 5
+      Data: false
+    - Name: UpdateType
+      Entry: 3
+      Data: 0
+    - Name: AutoKill
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: _actionType
       Entry: 3
       Data: 2
-    - Name: toColor
+    - Name: _toColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
@@ -75,24 +87,24 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: toValue
+    - Name: _toValue
       Entry: 4
       Data: 0
-    - Name: toText
+    - Name: _toText
       Entry: 6
       Data: 
-    - Name: toScaleValue
+    - Name: _toScaleValue
       Entry: 7
       Data: UnityEngine.Vector3, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 4
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 4
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
