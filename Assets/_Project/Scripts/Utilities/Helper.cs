@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -80,23 +79,6 @@ public static class Helper
                 return null;
             }
 
-        }
-    }
-
-    /// <summary>
-    /// A WebGL-safe delay that uses Unity's internal clock.
-    /// Works on all platforms without hanging.
-    /// </summary>
-    /// <param name="seconds">Duration in seconds.</param>
-    public static async Awaitable Delay(float seconds, CancellationToken token = default)
-    {
-        try
-        {
-            await Awaitable.WaitForSecondsAsync(seconds, token);
-        }
-        catch (OperationCanceledException)
-        {
-            // Handle cancellation if needed, or let it bubble up
         }
     }
 
@@ -194,5 +176,11 @@ public static class Helper
             array[k] = array[n];
             array[n] = value;
         }
+    }
+
+    public static void RefreshWith<T>(this List<T> list, IEnumerable<T> items)
+    {
+        list.Clear();
+        list.AddRange(items);
     }
 }

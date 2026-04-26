@@ -51,7 +51,7 @@ namespace Zone8.SceneManagement
 
         /// <summary>
         /// Call this when returning to the Main Menu or changing SceneGroups 
-        /// to finally release WebGL memory.
+        /// to finally release memory.
         /// </summary>
         public void ReleaseHandles()
         {

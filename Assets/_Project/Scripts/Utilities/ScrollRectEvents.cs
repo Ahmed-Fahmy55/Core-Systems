@@ -8,7 +8,7 @@ namespace Zone8.Utilities
     [RequireComponent(typeof(ScrollRect))]
     public class ScrollRectEvents : MonoBehaviour
     {
-        public UnityEvent _endReached;
+        public UnityEvent EndReached;
 
         private ScrollRect _scrollRect;
 
@@ -21,13 +21,11 @@ namespace Zone8.Utilities
 
         private void Start()
         {
-            // Wait for UI layout to be fully calculated
             StartCoroutine(CheckImmediateEnd());
         }
 
         private IEnumerator CheckImmediateEnd()
         {
-            // Wait one frame so layout elements finish sizing
             yield return null;
             Canvas.ForceUpdateCanvases();
 
@@ -37,7 +35,7 @@ namespace Zone8.Utilities
             // If content is same size or smaller → we're already "at the end"
             if (content <= viewport)
             {
-                _endReached?.Invoke();
+                EndReached?.Invoke();
             }
         }
 
@@ -45,7 +43,7 @@ namespace Zone8.Utilities
         {
             if (value.y <= .01f)
             {
-                _endReached?.Invoke();
+                EndReached?.Invoke();
             }
         }
 
