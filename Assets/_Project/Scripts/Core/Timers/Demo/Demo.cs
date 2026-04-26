@@ -74,6 +74,14 @@ namespace Zone8.ImprovedTimers
             _frequencyTimer.Resume();
             _stopWatchTimer.Resume();
         }
+
+        private void OnDestroy()
+        {
+            _countdownTtimer.Dispose();
+            _intervalTimer.Dispose();
+            _frequencyTimer.Dispose();
+            _stopWatchTimer.Dispose();
+        }
     }
 
 }
