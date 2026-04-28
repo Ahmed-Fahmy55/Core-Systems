@@ -4,12 +4,15 @@ using UnityEngine.UI;
 
 namespace Zone8.Selection
 {
+    [RequireComponent(typeof(Button))]
     public class UISubmitButton : SerializedMonoBehaviour
     {
         [SerializeField] private ISelectionHandler _selectionController;
         [SerializeField] private bool _hideButtonOnNoSelection;
 
         private Button _submitButton;
+
+        public bool HideOnNoSelection { get { return _hideButtonOnNoSelection; } set { _hideButtonOnNoSelection = value; } }
 
         private void Awake()
         {
@@ -103,7 +106,7 @@ namespace Zone8.Selection
             }
         }
 
-        private void SetButtonVisibility(bool isVisible)
+        public void SetButtonVisibility(bool isVisible)
         {
             if (_submitButton != null)
             {
