@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Zone8.Fading
 {
     [RequireComponent(typeof(BoxContainer))]
-    public class BoxContainerAnimator : MonoBehaviour, IFader
+    public class BoxContainerFader : MonoBehaviour, IFader
     {
         BoxContainer boxContainer;
 

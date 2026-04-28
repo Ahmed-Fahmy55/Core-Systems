@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Zone8.Fading
 {
     [RequireComponent(typeof(Animator))]
-    public class AnimationAnimator : MonoBehaviour, IFader
+    public class AnimatorFader : MonoBehaviour, IFader
     {
 
         private const string k_Open = "Open";

@@ -6,7 +6,7 @@ using Zone8.Tweening;
 namespace Zone8.Fading
 {
     [RequireComponent(typeof(SequenceActionExecuter))]
-    public class TweenAnimator : MonoBehaviour, IFader
+    public class TweenFader : MonoBehaviour, IFader
     {
         private SequenceActionExecuter _actionExecuter;
         private SequenceActionExecuter ActionExecuter => _actionExecuter ??= GetComponent<SequenceActionExecuter>();
