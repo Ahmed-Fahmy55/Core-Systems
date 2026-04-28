@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6104768116568154841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31c4ded018135934aa2dea8b8439511d, type: 3}
+  m_Name: Sort
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Core.SortingQuestion
+  ID: 2
+  Category: {fileID: 11400000, guid: 270075b17d51f5e42a3d3eda0179618c, type: 2}
+  QuestionText: Sort
+  CorrectFeedback: "True\t"
+  WrongFeedback: False
+  Image: {fileID: 0}
+  DifficultyLevel: 1
+  Answers:
+  - ID: 1
+    AnswerText: 1
+    IsCorrect: 0
+  - ID: 2
+    AnswerText: 2
+    IsCorrect: 0
+  - ID: 3
+    AnswerText: 3
+    IsCorrect: 0
+--- !u!114 &-5382286004537127707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c344b420f22d8468c49da18664854c, type: 3}
+  m_Name: Multiple
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Core.MultipleChoiceQuestion
+  ID: 4
+  Category: {fileID: 11400000, guid: 270075b17d51f5e42a3d3eda0179618c, type: 2}
+  QuestionText: Multiple
+  CorrectFeedback: True
+  WrongFeedback: false
+  Image: {fileID: 0}
+  DifficultyLevel: 1
+  Answers:
+  - ID: 0
+    AnswerText: 0
+    IsCorrect: 0
+  - ID: 1
+    AnswerText: 1
+    IsCorrect: 1
+  - ID: 2
+    AnswerText: 2
+    IsCorrect: 1
+--- !u!114 &-1585178656330536895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69c1f85cd0984284b8dbaafb3bfe514c, type: 3}
+  m_Name: Single
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Core.SingleChoiceQuestion
+  ID: 3
+  Category: {fileID: 11400000, guid: 270075b17d51f5e42a3d3eda0179618c, type: 2}
+  QuestionText: Single
+  CorrectFeedback: Trew
+  WrongFeedback: ddddd
+  Image: {fileID: 0}
+  DifficultyLevel: 1
+  Answers:
+  - ID: 1
+    AnswerText: 1
+    IsCorrect: 1
+  - ID: 2
+    AnswerText: 2
+    IsCorrect: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 134cdc3b6c29f0b4a9095cabf3ce5fed, type: 3}
+  m_Name: New Questions List So
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Runtime.Base.QuestionsListSo
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  Questions:
+  - {fileID: -6104768116568154841}
+  - {fileID: -1585178656330536895}
+  - {fileID: -5382286004537127707}
+  - {fileID: 4295009602938393552}
+--- !u!114 &4295009602938393552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df4f22111084d684794f88cbd9d139cb, type: 3}
+  m_Name: Match
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Core.MatchChoiceQuestion
+  ID: 545
+  Category: {fileID: 0}
+  QuestionText: Match
+  CorrectFeedback: dasd
+  WrongFeedback: awdawd
+  Image: {fileID: 0}
+  DifficultyLevel: 1
+  Answers:
+  - ID: 1
+    AnswerText: 1
+    IsCorrect: 0
+  - ID: 2
+    AnswerText: 2
+    IsCorrect: 0
+  - ID: 3
+    AnswerText: 3
+    IsCorrect: 0
+  - ID: 4
+    AnswerText: 4
+    IsCorrect: 0
+  _correctPairs:
+  - LeftItem:
+      ID: 1
+      AnswerText: 1
+      IsCorrect: 0
+    RightItem:
+      ID: 2
+      AnswerText: 2
+      IsCorrect: 0
+  - LeftItem:
+      ID: 3
+      AnswerText: 3
+      IsCorrect: 0
+    RightItem:
+      ID: 4
+      AnswerText: 4
+      IsCorrect: 0

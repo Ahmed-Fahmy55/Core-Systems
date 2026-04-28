@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1fdbf01db17ed498b346a8bd0a33ed, type: 3}
+  m_Name: New Question Game Config So
+  m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Runtime.Base.QuestionGameConfigSo
+  SelectedTimeMode: 0
+  Time: 30
+  IsFixedScore: 1
+  Score: 10
+  ScoreSettingsList: []
+  FeedbackType:
+    UseConstant: 0
+    Sv: {fileID: 11400000, guid: edd627b8f6c47264082a0d45fd0b61e8, type: 2}
+    ConstValue: 0
+  FeedbackTime: 2
+  QuestionsNumb: 4
+  RandomizeQuestions: 1
+  QuestionsList: {fileID: 11400000, guid: 16c8608cb4d8efe4dae0c282ba129f1c, type: 2}
