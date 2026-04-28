@@ -17,7 +17,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
     public abstract class ConnectionMethodBase
     {
         protected NetworkManager _networkManager;
-        private ProfileManager _profileManager;
+        protected ProfileManager _profileManager;
 
         /// <summary>
         /// Setup the host connection prior to starting the NetworkManager
@@ -53,13 +53,6 @@ namespace Zone8.Multiplayer.ConnectionManagement
             _networkManager.NetworkConfig.ConnectionData = payloadBytes;
         }
 
-        /// Using authentication, this makes sure your session is associated with your account and not your device. This means you could reconnect
-        /// from a different device for example. A playerId is also a bit more permanent than player prefs. In a browser for example,
-        /// player prefs can be cleared as easily as cookies.
-        /// The forked flow here is for debug purposes and to make UGS optional. This way you can study the sample without
-        /// setting up a UGS account. It's recommended to investigate your own initialization and IsSigned flows to see if you need
-        /// those checks on your own and react accordingly. We offer here the option for offline access for debug purposes, but in your own game you
-        /// might want to show an error popup and ask your player to connect to the internet.
         protected string GetPlayerId()
         {
 
@@ -94,10 +87,11 @@ namespace Zone8.Multiplayer.ConnectionManagement
             utp.SetConnectionData(_ipaddress, _port);
         }
 
-        public override Task<(bool success, bool shouldTryAgain)> SetupClientReconnectionAsync()
+        public override async Task<(bool success, bool shouldTryAgain)> SetupClientReconnectionAsync()
         {
             // Nothing to do here
-            return Task.FromResult((true, true));
+            await Awaitable.EndOfFrameAsync();
+            return (true, true);
         }
 
         public override void SetupHostConnection()
@@ -140,7 +134,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             // See https://docs.unity.com/ugs/en-us/manual/mps-sdk/manual/join-session#Reconnect_to_a_session
             var session = await _multiplayerServicesFacade.ReconnectToSessionAsync();
             var success = session != null;
-            Debug.Log(success ? "Successfully reconnected to Session." : "Failed to reconnect to Session.");
+            Logger.Log(success ? "Successfully reconnected to Session." : "Failed to reconnect to Session.");
             return (success, true); // return a success if reconnecting to session returns a session
         }
 

@@ -1,6 +1,6 @@
+using UnityEngine;
 using Zone8.Events;
 using Zone8.UnityServices.Sessions;
-using UnityEngine;
 
 namespace Zone8.Multiplayer.ConnectionManagement
 {
@@ -8,12 +8,12 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// Connection state corresponding to a connected client. When being disconnected, transitions to the
     /// ClientReconnecting state if no reason is given, or to the Offline state.
     /// </summary>
-    internal class ClientConnectedState : OnlineState
+    internal class ClientConnectedState<T> : OnlineState<T> where T : struct, ISessionPlayerData
     {
         private MultiplayerServicesFacade _multiplayerServicesFacade;
 
 
-        public ClientConnectedState(ConnectionManager connectionManager) : base(connectionManager)
+        public ClientConnectedState(ConnectionManager<T> connectionManager) : base(connectionManager)
         {
             _multiplayerServicesFacade = MultiplayerServicesFacade.Instance;
         }

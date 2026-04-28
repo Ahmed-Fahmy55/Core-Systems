@@ -6,14 +6,14 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// Connection state corresponding to when the NetworkManager is shut down. From this state we can transition to the
     /// ClientConnecting sate, if starting as a client, or the StartingHost state, if starting as a host.
     /// </summary>
-    internal class OfflineState : ConnectionState
+    class OfflineState<T> : ConnectionState<T> where T : struct, ISessionPlayerData
     {
         private MultiplayerServicesFacade _multiplayerServicesFacade;
 
 
-        public OfflineState(MultiplayerServicesFacade multiplayerServicesFacade, ConnectionManager connectionManager) : base(connectionManager)
+        public OfflineState(MultiplayerServicesFacade multiplayerServicesFacade, ConnectionManager<T> connectionManager) : base(connectionManager)
         {
-            _multiplayerServicesFacade = MultiplayerServicesFacade.Instance;
+            _multiplayerServicesFacade = multiplayerServicesFacade;
         }
 
         public override void Enter()

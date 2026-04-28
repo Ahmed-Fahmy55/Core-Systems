@@ -1,6 +1,6 @@
-using Zone8.Events;
 using System;
 using UnityEngine;
+using Zone8.Events;
 
 namespace Zone8.Multiplayer.ConnectionManagement
 {
@@ -8,15 +8,15 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// Connection state corresponding to when a client is attempting to connect to a server. Starts the client when
     /// entering. If successful, transitions to the ClientConnected state. If not, transitions to the Offline state.
     /// </summary>
-    class ClientConnectingState : OnlineState
+    internal class ClientConnectingState<T> : OnlineState<T> where T : struct, ISessionPlayerData
     {
         protected ConnectionMethodBase _connectionMethod;
 
-        public ClientConnectingState(ConnectionManager connectionManager) : base(connectionManager)
+        public ClientConnectingState(ConnectionManager<T> connectionManager) : base(connectionManager)
         {
         }
 
-        public ClientConnectingState Configure(ConnectionMethodBase baseConnectionMethod)
+        public ClientConnectingState<T> Configure(ConnectionMethodBase baseConnectionMethod)
         {
             _connectionMethod = baseConnectionMethod;
             return this;
@@ -41,7 +41,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             StartingClientFailed();
         }
 
-        void StartingClientFailed()
+        private void StartingClientFailed()
         {
             var disconnectReason = _connectionManager.NetworkManager.DisconnectReason;
             if (string.IsNullOrEmpty(disconnectReason))

@@ -1,6 +1,6 @@
-using Zone8.Events;
 using System.Collections;
 using UnityEngine;
+using Zone8.Events;
 
 namespace Zone8.Multiplayer.ConnectionManagement
 {
@@ -11,16 +11,16 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// reason first, depending on the reason given, may not try to reconnect again and transition directly to the
     /// Offline state.
     /// </summary>
-    class ClientReconnectingState : ClientConnectingState
+    internal class ClientReconnectingState<T> : ClientConnectingState<T> where T : struct, ISessionPlayerData
     {
 
-        Coroutine _reconnectCoroutine;
-        int _attemptsNumb;
+        private Coroutine _reconnectCoroutine;
+        private int _attemptsNumb;
 
-        const float k_TimeBeforeFirstAttempt = 1;
-        const float k_TimeBetweenAttempts = 5;
+        private const float k_TimeBeforeFirstAttempt = 1;
+        private const float k_TimeBetweenAttempts = 5;
 
-        public ClientReconnectingState(ConnectionManager connectionManager) : base(connectionManager)
+        public ClientReconnectingState(ConnectionManager<T> connectionManager) : base(connectionManager)
         {
         }
 
@@ -88,7 +88,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             }
         }
 
-        IEnumerator ReconnectCoroutine()
+        private IEnumerator ReconnectCoroutine()
         {
             if (_attemptsNumb > 0)
             {

@@ -1,5 +1,5 @@
 {
-    "name": "Unity.BossRoom.ConnectionManagement",
+    "name": "Zone8.ConnectionManagement",
     "rootNamespace": "",
     "references": [
         "Unity.Netcode.Runtime",

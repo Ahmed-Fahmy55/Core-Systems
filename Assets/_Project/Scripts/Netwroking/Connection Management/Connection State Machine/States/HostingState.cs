@@ -9,21 +9,21 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// Connection state corresponding to a listening host. Handles incoming client connections. When shutting down or
     /// being timed out, transitions to the Offline state.
     /// </summary>
-    internal class HostingState : OnlineState
+    internal class HostingState<T> : OnlineState<T> where T : struct, ISessionPlayerData
     {
         private MultiplayerServicesFacade _multiplayerServicesFacade;
 
         // used in ApprovalCheck. This is intended as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
         private const int k_MaxConnectPayload = 1024;
 
-        public HostingState(ConnectionManager connectionManager) : base(connectionManager)
+        public HostingState(ConnectionManager<T> connectionManager) : base(connectionManager)
         {
             _multiplayerServicesFacade = MultiplayerServicesFacade.Instance;
         }
 
         public override void Enter()
         {
-            SessionManager<SessionPlayerData>.Instance.OnSessionStarted();
+            SessionManager<T>.Instance.OnSessionStarted();
 
             if (_multiplayerServicesFacade.CurrentUnitySession != null)
             {
@@ -33,12 +33,12 @@ namespace Zone8.Multiplayer.ConnectionManagement
 
         public override void Exit()
         {
-            SessionManager<SessionPlayerData>.Instance.OnServerEnded();
+            SessionManager<T>.Instance.OnServerEnded();
         }
 
         public override void OnClientConnected(ulong clientId)
         {
-            var playerData = SessionManager<SessionPlayerData>.Instance.GetPlayerData(clientId);
+            var playerData = SessionManager<T>.Instance.GetPlayerData(clientId);
             if (playerData != null)
             {
                 EventBus<ConnectionMessageEvent>.Raise(new ConnectionMessageEvent() { ConnectStatus = ConnectStatus.Success });
@@ -56,15 +56,15 @@ namespace Zone8.Multiplayer.ConnectionManagement
         {
             if (clientId != _connectionManager.NetworkManager.LocalClientId)
             {
-                var playerId = SessionManager<SessionPlayerData>.Instance.GetPlayerId(clientId);
+                var playerId = SessionManager<T>.Instance.GetPlayerId(clientId);
                 if (playerId != null)
                 {
-                    var sessionData = SessionManager<SessionPlayerData>.Instance.GetPlayerData(playerId);
+                    var sessionData = SessionManager<T>.Instance.GetPlayerData(playerId);
                     if (sessionData.HasValue)
                     {
                         EventBus<ConnectionMessageEvent>.Raise(new ConnectionMessageEvent() { ConnectStatus = ConnectStatus.GenericDisconnect });
                     }
-                    SessionManager<SessionPlayerData>.Instance.DisconnectClient(clientId);
+                    SessionManager<T>.Instance.DisconnectClient(clientId);
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
         ///  <param name="response"> Our response to the approval process. In case of connection refusal with custom return message, we delay using the Pending field.
         public override void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            Debug.Log("ApprovalCheck invoked for client " + request.ClientNetworkId);
+            Logger.Log("ApprovalCheck invoked for client " + request.ClientNetworkId);
             var connectionData = request.Payload;
             var clientId = request.ClientNetworkId;
             if (connectionData.Length > k_MaxConnectPayload)
@@ -123,13 +123,16 @@ namespace Zone8.Multiplayer.ConnectionManagement
 
             if (gameReturnStatus == ConnectStatus.Success)
             {
-                SessionManager<SessionPlayerData>.Instance.SetupConnectingPlayerSessionData(clientId, connectionPayload.playerId,
-                    new SessionPlayerData(clientId, true));
+                T data = new T();
+                data.ClientID = clientId;
+                data.IsConnected = true;
+
+                SessionManager<T>.Instance.SetupConnectingPlayerSessionData(clientId, connectionPayload.playerId, data);
 
                 response.Approved = true;
                 return;
             }
-            Debug.Log($"Connection from client {clientId} denied: {gameReturnStatus}");
+            Logger.Log($"Connection from client {clientId} denied: {gameReturnStatus}");
             response.Approved = false;
             response.Reason = JsonUtility.ToJson(gameReturnStatus);
             if (_multiplayerServicesFacade.CurrentUnitySession != null)
@@ -145,7 +148,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
                 return ConnectStatus.ServerFull;
             }
 
-            return SessionManager<SessionPlayerData>.Instance.IsDuplicateConnection(connectionPayload.playerId) ?
+            return SessionManager<T>.Instance.IsDuplicateConnection(connectionPayload.playerId) ?
                 ConnectStatus.LoggedInAgain : ConnectStatus.Success;
         }
     }

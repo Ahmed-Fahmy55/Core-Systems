@@ -3,13 +3,6 @@ using UnityEngine;
 
 namespace Zone8.Multiplayer.ConnectionManagement
 {
-    public interface ISessionPlayerData
-    {
-        bool IsConnected { get; set; }
-        ulong ClientID { get; set; }
-        void Reinitialize();
-    }
-
     /// <summary>
     /// This class uses a unique player ID to bind a player to a session. Once that player connects to a host, the host
     /// associates the current ClientID to the player's unique ID. If the player disconnects and reconnects to the same
@@ -23,7 +16,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// <typeparam name="T"></typeparam>
     public class SessionManager<T> where T : struct, ISessionPlayerData
     {
-        SessionManager()
+        private SessionManager()
         {
             _clientData = new Dictionary<string, T>();
             _clientIDToPlayerId = new Dictionary<ulong, string>();
@@ -42,19 +35,19 @@ namespace Zone8.Multiplayer.ConnectionManagement
             }
         }
 
-        static SessionManager<T> _Instance;
+        private static SessionManager<T> _Instance;
 
         /// <summary>
         /// Maps a given client player id to the data for a given client player.
         /// </summary>
-        Dictionary<string, T> _clientData;
+        private Dictionary<string, T> _clientData;
 
         /// <summary>
         /// Map to allow us to cheaply map from player id to player data.
         /// </summary>
-        Dictionary<ulong, string> _clientIDToPlayerId;
+        private Dictionary<ulong, string> _clientIDToPlayerId;
 
-        bool _hasSessionStarted;
+        private bool _hasSessionStarted;
 
         /// <summary>
         /// Handles client disconnect."
@@ -174,7 +167,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
                 return GetPlayerData(playerId);
             }
 
-            Debug.Log($"No client player ID found mapped to the given client ID: {clientId}");
+            Debug.Log($"No Player Data found to the given client ID: {clientId}");
             return null;
         }
 
@@ -249,7 +242,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             _hasSessionStarted = false;
         }
 
-        void ReinitializePlayersData()
+        private void ReinitializePlayersData()
         {
             foreach (var id in _clientIDToPlayerId.Keys)
             {
@@ -260,7 +253,7 @@ namespace Zone8.Multiplayer.ConnectionManagement
             }
         }
 
-        void ClearDisconnectedPlayersData()
+        private void ClearDisconnectedPlayersData()
         {
             List<ulong> idsToClear = new List<ulong>();
             foreach (var id in _clientIDToPlayerId.Keys)

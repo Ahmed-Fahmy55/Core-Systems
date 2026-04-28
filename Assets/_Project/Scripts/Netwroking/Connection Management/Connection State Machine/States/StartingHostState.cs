@@ -1,7 +1,7 @@
-using Zone8.Events;
 using System;
 using Unity.Netcode;
 using UnityEngine;
+using Zone8.Events;
 
 namespace Zone8.Multiplayer.ConnectionManagement
 {
@@ -9,15 +9,15 @@ namespace Zone8.Multiplayer.ConnectionManagement
     /// Connection state corresponding to a host starting up. Starts the host when entering the state. If successful,
     /// transitions to the Hosting state, if not, transitions back to the Offline state.
     /// </summary>
-    class StartingHostState : OnlineState
+    class StartingHostState<T> : OnlineState<T> where T : struct, ISessionPlayerData
     {
         ConnectionMethodBase _connectionMethod;
 
-        public StartingHostState(ConnectionManager connectionManager) : base(connectionManager)
+        public StartingHostState(ConnectionManager<T> connectionManager) : base(connectionManager)
         {
         }
 
-        public StartingHostState Configure(ConnectionMethodBase baseConnectionMethod)
+        public StartingHostState<T> Configure(ConnectionMethodBase baseConnectionMethod)
         {
             _connectionMethod = baseConnectionMethod;
             return this;
@@ -47,8 +47,11 @@ namespace Zone8.Multiplayer.ConnectionManagement
                 var payload = System.Text.Encoding.UTF8.GetString(connectionData);
                 var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
-                SessionManager<SessionPlayerData>.Instance.SetupConnectingPlayerSessionData(clientId, connectionPayload.playerId,
-                    new SessionPlayerData(clientId, true));
+                T data = new T();
+                data.ClientID = clientId;
+                data.IsConnected = true;
+
+                SessionManager<T>.Instance.SetupConnectingPlayerSessionData(clientId, connectionPayload.playerId, data);
                 response.Approved = true;
             }
         }
