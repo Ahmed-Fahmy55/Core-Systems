@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1fdbf01db17ed498b346a8bd0a33ed, type: 3}
   m_Name: New Question Game Config So
   m_EditorClassIdentifier: Z8.Questions::Zone8.Question.Runtime.Base.QuestionGameConfigSo
-  SelectedTimeMode: 0
-  Time: 30
+  SelectedTimeMode: 2
+  Time: 120
   IsFixedScore: 1
   Score: 10
   ScoreSettingsList: []

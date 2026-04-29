@@ -87,9 +87,10 @@ namespace Zone8.Question.Runtime.UI.Views
                     Logger.LogError("Could not find matching UI elements for pair: " + pair.LeftItem.AnswerText);
                     continue;
                 }
+                _ = leftUI.HighlightAnswer();
+                await rightUI.HighlightAnswer();
 
                 UILine line = CreatLine(leftUI.LinkTargetRight, rightUI.LinkTargetLeft);
-
                 line.color = Color.green;
                 line.Thickness = 6f;
                 _correctLineObjects.Add(line.gameObject);

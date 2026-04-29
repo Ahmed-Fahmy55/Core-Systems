@@ -66,6 +66,17 @@ namespace Zone8.Question.Runtime.Base
             }
             return score;
         }
+        public int GetQuestionScore(QuestionBase question)
+        {
+            if (IsFixedScore)
+            {
+                return Score;
+            }
+            else
+            {
+                return ScoreSettingsList.FirstOrDefault(s => s.difficultyLevel == question.DifficultyLevel).score;
+            }
+        }
     }
 
     [System.Serializable]

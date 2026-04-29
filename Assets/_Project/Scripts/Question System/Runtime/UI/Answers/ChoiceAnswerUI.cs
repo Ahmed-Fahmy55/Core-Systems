@@ -6,7 +6,7 @@ namespace Zone8.Question.Runtime.UI.Answers
 {
     public class ChoiceAnswerUI : AnswerUIBase
     {
-        private TextMeshProUGUI _answerText;
+        protected TextMeshProUGUI _answerText;
 
 
         protected virtual void Awake()

@@ -43,6 +43,7 @@ namespace Zone8.Question.Runtime.UI.Answers
 
         public override async Awaitable HighlightAnswer()
         {
+            await Awaitable.EndOfFrameAsync();
             OnSelect();
         }
     }

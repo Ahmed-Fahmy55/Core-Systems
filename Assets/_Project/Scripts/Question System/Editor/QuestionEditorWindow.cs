@@ -8,7 +8,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Zone8.Question.Runtime.Base; // Adjust if your namespace varies
 
-namespace Bltzo.Question.Editor
+namespace Zone8.Question.Editor
 {
     public class QuestionEditorWindow : EditorWindow
     {

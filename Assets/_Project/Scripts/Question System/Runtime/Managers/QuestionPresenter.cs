@@ -186,9 +186,7 @@ namespace Zone8.Question.Runtime.Managers
             _timer.PauseTimer();
 
             QuestionAnswered?.Invoke(question, answers, isTrue);
-            Logger.Log(isTrue ? question.CorrectFeedback : question.WrongFeedback);
             await ShowFeedback(isTrue);
-
 
             if (_autoUpdateQuestion) _questionModel.UpdateQuestion();
         }

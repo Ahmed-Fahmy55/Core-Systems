@@ -13,8 +13,8 @@ namespace Zone8.Question.Runtime.UI.Views
 
         [SerializeField] private UISubmitButton _submitButton;
 
-        private List<AnswerUIBase> _answers = new();
-        private List<ChoiceAnswerUI> _selectedAnswers = new();
+        private List<SortingAnswerUI> _answers = new();
+        private List<SortingAnswerUI> _selectedAnswers = new();
         public override Type SupportedQuestionType => typeof(SortingQuestion);
 
 
@@ -45,7 +45,10 @@ namespace Zone8.Question.Runtime.UI.Views
 
         protected override async Awaitable ShowFeedbackEffect(bool isTrue)
         {
-            //TODO add some feedback animation for sorting question
+            foreach (var answer in _answers)
+            {
+                await answer.HighlightAnswer(_answers.IndexOf(answer));
+            }
         }
 
         protected override async Awaitable UpdateQuestionAnswers(QuestionBase question)
@@ -64,9 +67,9 @@ namespace Zone8.Question.Runtime.UI.Views
 
             foreach (var answer in shuffledAnswers)
             {
-                var answerUI = GetAnswerUI(answer);
+                var answerUI = (SortingAnswerUI)GetAnswerUI(answer);
+                answerUI.CorrectIndex = Array.IndexOf(question.Answers, answer);
                 _answers.Add(answerUI);
-
                 await answerUI.Fade(true);
             }
 
@@ -93,7 +96,7 @@ namespace Zone8.Question.Runtime.UI.Views
 
         private void OnItemDeselected(ISelectable selectable)
         {
-            if (selectable is not ChoiceAnswerUI answerUI)
+            if (selectable is not SortingAnswerUI answerUI)
                 return;
 
             if (_selectedAnswers.Contains(answerUI)) _selectedAnswers.Remove(answerUI);
@@ -105,7 +108,7 @@ namespace Zone8.Question.Runtime.UI.Views
         /// </summary>
         private void OnItemSelected(ISelectable selectable)
         {
-            if (selectable is not ChoiceAnswerUI selectedAnswer)
+            if (selectable is not SortingAnswerUI selectedAnswer)
                 return;
 
             if (_selectedAnswers.Count == 0)
