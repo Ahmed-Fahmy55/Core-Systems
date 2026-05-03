@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using Zone8.Events;
 
-namespace Zone8.Audio
+namespace Zone8.Audio.Data
 {
     [CreateAssetMenu(menuName = "Audio/SFX Clip")]
     public class SFXClipSo : ScriptableObject

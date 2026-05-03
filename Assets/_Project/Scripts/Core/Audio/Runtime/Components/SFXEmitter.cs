@@ -2,8 +2,9 @@ using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zone8.Audio.Data;
 
-namespace Zone8.Audio
+namespace Zone8.Audio.Components
 {
     [RequireComponent(typeof(AudioSource))]
     public class SFXEmitter : MonoBehaviour

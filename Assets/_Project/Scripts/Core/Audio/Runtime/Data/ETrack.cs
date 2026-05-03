@@ -2,7 +2,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Zone8.Audio
+namespace Zone8.Audio.Data
 {
 
     [CreateAssetMenu(menuName = "Enums/Audio/Track Definition")]

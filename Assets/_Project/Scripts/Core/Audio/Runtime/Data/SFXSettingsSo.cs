@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Zone8.Audio
+namespace Zone8.Audio.Data
 {
 
     [CreateAssetMenu(menuName = "Audio/SFX Settings")]

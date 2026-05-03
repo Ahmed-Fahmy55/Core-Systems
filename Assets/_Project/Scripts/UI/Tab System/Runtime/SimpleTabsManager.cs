@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Zone8.Audio;
+using Zone8.Audio.Data;
 
 namespace Zone8.UI.TabSystem
 {

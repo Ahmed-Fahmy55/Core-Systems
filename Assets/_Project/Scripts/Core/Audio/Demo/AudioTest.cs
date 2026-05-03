@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zone8.Audio;
+using Zone8.Audio.Data;
 
 public class AudioTest : MonoBehaviour
 {

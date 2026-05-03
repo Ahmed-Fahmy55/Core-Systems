@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zone8.Audio.Components;
+using Zone8.Audio.Data;
 using Zone8.Events;
 
 namespace Zone8.Audio
@@ -426,6 +428,11 @@ namespace Zone8.Audio
         private void OnAudioPlayed(AudioPlayEvent data)
         {
             Play(data.Clip, data.Position, data.OnEnd);
+        }
+
+        internal void ControlTrack(ETrack track, ETrackMode unmute)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

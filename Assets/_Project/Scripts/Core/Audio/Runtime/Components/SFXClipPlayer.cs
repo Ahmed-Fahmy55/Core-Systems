@@ -1,8 +1,10 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zone8.Audio.Data;
 using Zone8.Events;
 
-namespace Zone8.Audio
+namespace Zone8.Audio.Components
+
 {
     public class SFXClipPlayer : MonoBehaviour
     {
