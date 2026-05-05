@@ -79,12 +79,12 @@ namespace Zone8.Question.Runtime.UI.Views
 
             foreach (var pair in matchQuestion.CorrectPairs)
             {
-                var leftUI = _answers.FirstOrDefault(a => a.GetAnswer().ID == pair.LeftItem.ID);
-                var rightUI = _answers.FirstOrDefault(a => a.GetAnswer().ID == pair.RightItem.ID);
+                var leftUI = _answers.FirstOrDefault(a => a.GetAnswer().ID == pair.LeftAnswer.ID);
+                var rightUI = _answers.FirstOrDefault(a => a.GetAnswer().ID == pair.RightAnswer.ID);
 
                 if (leftUI == null || rightUI == null)
                 {
-                    Logger.LogError("Could not find matching UI elements for pair: " + pair.LeftItem.AnswerText);
+                    Logger.LogError("Could not find matching UI elements for pair: " + pair.LeftAnswer.AnswerText);
                     continue;
                 }
                 _ = leftUI.HighlightAnswer();
@@ -116,17 +116,17 @@ namespace Zone8.Question.Runtime.UI.Views
 
             for (int i = 0; i < leftItems.Count; i++)
             {
-                var pair = matchChoiceQuestion.CorrectPairs.First(p => p.LeftItem.ID == leftItems[i].ID);
+                var pair = matchChoiceQuestion.CorrectPairs.First(p => p.LeftAnswer.ID == leftItems[i].ID);
 
                 // LEFT side
-                var answerUILeft = GetAnswerUI(pair.LeftItem) as MatchingAnswerUI;
+                var answerUILeft = GetAnswerUI(pair.LeftAnswer) as MatchingAnswerUI;
                 answerUILeft.transform.SetParent(_leftAnswersContainer, false);
                 answerUILeft.IsLeftSide = true;
                 answerUILeft.Pair = pair;
                 _answers.Add(answerUILeft);
 
                 // RIGHT side
-                var answerUIRight = GetAnswerUI(pair.RightItem) as MatchingAnswerUI;
+                var answerUIRight = GetAnswerUI(pair.RightAnswer) as MatchingAnswerUI;
                 answerUIRight.transform.SetParent(_rightAnswersContainer, false);
                 answerUIRight.IsLeftSide = false;
                 answerUIRight.Pair = pair;
@@ -144,14 +144,14 @@ namespace Zone8.Question.Runtime.UI.Views
 
             // Find the associated MatchingPair in _lines
             var pairEntry = _lines.Keys.FirstOrDefault(pair =>
-                pair.LeftItem == answerUI.GetAnswer() || pair.RightItem == answerUI.GetAnswer());
+                pair.LeftAnswer == answerUI.GetAnswer() || pair.RightAnswer == answerUI.GetAnswer());
 
-            if (pairEntry.LeftItem != null && _lines.TryGetValue(pairEntry, out var lineObj))
+            if (pairEntry.LeftAnswer != null && _lines.TryGetValue(pairEntry, out var lineObj))
             {
                 // Deselect the other answer in the pair
-                QuestionAnswer otherAnswer = pairEntry.LeftItem == answerUI.GetAnswer()
-                    ? pairEntry.RightItem
-                    : pairEntry.LeftItem;
+                QuestionAnswer otherAnswer = pairEntry.LeftAnswer == answerUI.GetAnswer()
+                    ? pairEntry.RightAnswer
+                    : pairEntry.LeftAnswer;
 
                 var otherAnswerUI = _answers.FirstOrDefault(a => a.GetAnswer() == otherAnswer);
                 if (otherAnswerUI != null && otherAnswerUI.IsSelected)

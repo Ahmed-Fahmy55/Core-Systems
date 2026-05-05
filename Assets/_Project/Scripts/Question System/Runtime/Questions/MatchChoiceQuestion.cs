@@ -10,24 +10,24 @@ namespace Zone8.Question.Core
     [Serializable]
     public struct MatchingPair : IEquatable<MatchingPair>
     {
-        public QuestionAnswer LeftItem;
-        public QuestionAnswer RightItem;
+        public QuestionAnswer LeftAnswer;
+        public QuestionAnswer RightAnswer;
 
         public MatchingPair(QuestionAnswer leftItem, QuestionAnswer rightItem)
         {
-            LeftItem = leftItem;
-            RightItem = rightItem;
+            LeftAnswer = leftItem;
+            RightAnswer = rightItem;
         }
 
         public bool Equals(MatchingPair other)
         {
-            return (LeftItem.ID == other.LeftItem.ID && RightItem.ID == other.RightItem.ID) ||
-                   (LeftItem.ID == other.RightItem.ID && RightItem.ID == other.LeftItem.ID);
+            return (LeftAnswer.ID == other.LeftAnswer.ID && RightAnswer.ID == other.RightAnswer.ID) ||
+                   (LeftAnswer.ID == other.RightAnswer.ID && RightAnswer.ID == other.LeftAnswer.ID);
         }
 
         public override bool Equals(object obj) => obj is MatchingPair other && Equals(other);
 
-        public override int GetHashCode() => HashCode.Combine(LeftItem.ID, RightItem.ID);
+        public override int GetHashCode() => HashCode.Combine(LeftAnswer.ID, RightAnswer.ID);
     }
 
     public class MatchChoiceQuestion : QuestionBase
@@ -37,8 +37,8 @@ namespace Zone8.Question.Core
         [OnValueChanged(nameof(SyncAnswers))]
         private List<MatchingPair> _correctPairs = new();
 
-        public List<QuestionAnswer> RightColumn => CorrectPairs.Select(p => p.RightItem).ToList();
-        public List<QuestionAnswer> LeftColumn => CorrectPairs.Select(p => p.LeftItem).ToList();
+        public List<QuestionAnswer> RightColumn => CorrectPairs.Select(p => p.RightAnswer).ToList();
+        public List<QuestionAnswer> LeftColumn => CorrectPairs.Select(p => p.LeftAnswer).ToList();
         public List<MatchingPair> CorrectPairs => _correctPairs;
 
         private void OnValidate()
@@ -101,8 +101,8 @@ namespace Zone8.Question.Core
             List<QuestionAnswer> allAnswers = new List<QuestionAnswer>();
             foreach (var pair in CorrectPairs)
             {
-                if (pair.LeftItem != null) allAnswers.Add(pair.LeftItem);
-                if (pair.RightItem != null) allAnswers.Add(pair.RightItem);
+                if (pair.LeftAnswer != null) allAnswers.Add(pair.LeftAnswer);
+                if (pair.RightAnswer != null) allAnswers.Add(pair.RightAnswer);
             }
 
             Answers = allAnswers.ToArray();
