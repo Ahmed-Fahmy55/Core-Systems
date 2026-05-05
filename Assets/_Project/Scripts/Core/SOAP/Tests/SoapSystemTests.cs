@@ -194,7 +194,7 @@ public class AssetVariableRefTests
         SetPrivateField(wrapper, "_directAsset", _testAsset);
 
         Assert.AreEqual(_testAsset, wrapper.Asset);
-        Assert.IsFalse(wrapper.IsNull);
+        Assert.IsFalse(!wrapper.HasValue);
     }
 
     [UnityTest]

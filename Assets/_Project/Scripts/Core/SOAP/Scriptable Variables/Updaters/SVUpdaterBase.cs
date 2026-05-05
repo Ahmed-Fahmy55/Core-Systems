@@ -1,5 +1,4 @@
 using Sirenix.OdinInspector;
-using System;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Zone8.SOAP.AssetVariable;
@@ -21,13 +20,13 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
         protected virtual void Awake()
         {
             GetTarget();
+
             if (_targetComponent == null)
             {
                 Logger.LogError($"No target component of type {typeof(C)} found on {gameObject.name}. Please assign a target component.", this);
                 return;
             }
             _initialValue = SetIntialValue();
-
         }
 
         private void Start()
@@ -45,7 +44,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         private void OnDestroy()
         {
-            if (_variable.IsNull) return;
+            if (!_variable.HasValue) return;
 
             _variable.Asset.OnValueChanged -= UpdateValue;
             _variable.ReleaseAsset();
@@ -53,25 +52,8 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         private void Init()
         {
-            if (_variable.Source == AssetSource.Addressable)
-            {
-                var handle = _variable.LoadAssetAsync();
-                handle.Completed += OnAssetLoaded;
-            }
-            else
-            {
-                if (!_variable.Asset.IsNull)
-                {
-                    if (_updateOnStart) UpdateValue(_variable.Asset.Value);
-                    if (_updateOnValueChange) _variable.Asset.OnValueChanged += UpdateValue;
-                }
-            }
-        }
-
-        private void OnAssetLoaded(AsyncOperationHandle<ScriptableVariable<T>> handle)
-        {
-            if (_updateOnStart) UpdateValue(_variable.Asset.Value);
-            if (_updateOnValueChange) _variable.Asset.OnValueChanged += UpdateValue;
+            var handle = _variable.LoadAssetAsync();
+            handle.Completed += OnAssetLoaded;
         }
 
         protected void UpdateValue(T newValue)
@@ -101,5 +83,17 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         [Button]
         public abstract void ResetTargetValue();
+
+
+        private void OnAssetLoaded(AsyncOperationHandle<ScriptableVariable<T>> handle)
+        {
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Logger.LogError($"Failed to load ScriptableVariable asset for {gameObject.name}. Please check the asset reference.", this);
+                return;
+            }
+            if (_updateOnStart) UpdateValue(_variable.Asset.Value);
+            if (_updateOnValueChange) _variable.Asset.OnValueChanged += UpdateValue;
+        }
     }
 }
