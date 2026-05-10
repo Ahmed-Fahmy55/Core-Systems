@@ -88,13 +88,12 @@ Shader "TransitionsPlus/Spiral"
                 RotateUV(i.uv);
 
                 float2 cellCoords = floor(i.uv * CELL_DIVISIONS);
-            
-                int CELL_DIVISIONS_MINUS_1 = CELL_DIVISIONS;
-                if (CELL_DIVISIONS % 2) {
-                    CELL_DIVISIONS_MINUS_1--;
-                }
 
-                int2 cellDiff = (int2)(cellCoords - CELL_DIVISIONS_MINUS_1 / 2.0);
+                uint cellDiv = (uint)CELL_DIVISIONS;
+                uint cellDivMinus1 = cellDiv - (cellDiv & 1u); // if odd -> minus 1, if even -> unchanged
+
+                float center = (float)(cellDivMinus1 >> 1);
+                int2 cellDiff = (int2)(cellCoords - float2(center, center));
                 float cellIndex = getSpiralIndex(cellDiff.x, cellDiff.y);
 
                 float cellCount = CELL_DIVISIONS * CELL_DIVISIONS;
@@ -102,8 +101,8 @@ Shader "TransitionsPlus/Spiral"
 
                 cellIndex = cellIndex * cellWidth;
 
-                float t0 = _T * (1.0 + cellWidth * SPREAD) - cellIndex; 
-                fixed fade = saturate( t0 / (cellWidth * SPREAD) );
+                float t0 = _T * (1.0 + cellWidth * SPREAD) - cellIndex;
+                fixed fade = saturate(t0 / (cellWidth * SPREAD));
 
                 fixed4 color = ComputeOutputColor(i.uv, i.noiseUV, fade);
 

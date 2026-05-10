@@ -51,7 +51,7 @@ namespace TransitionsPlus {
     public delegate void OnSettingsChanged();
 
     [CreateAssetMenu(fileName = "TransitionProfile", menuName = "Transition Profile", order = 250)]
-    [HelpURL("https://kronnect.com/guides-category/transitions-plus/")]
+    [HelpURL("https://kronnect.com/docs/transitions-plus/")]
     public class TransitionProfile : ScriptableObject {
 
         [NonSerialized]
@@ -60,8 +60,12 @@ namespace TransitionsPlus {
         public TransitionType type = TransitionType.Fade;
 
         public bool invert;
-        [Tooltip("Multiplies progress value by a custom value to adjust animation timing")]
+        [Tooltip("Speed multiplier for the transition. Values > 1 speed up, < 1 slow down")]
         public float timeMultiplier = 1f;
+        [Tooltip("Raw progress value at which the visual transition begins")]
+        [Range(0, 1)] public float progressFrom;
+        [Tooltip("Raw progress value at which the visual transition completes")]
+        [Range(0, 1)] public float progressTo = 1f;
         public ColorMode colorMode = ColorMode.SingleColor;
         public Color color = Color.black;
         public Gradient gradient;
@@ -114,6 +118,36 @@ namespace TransitionsPlus {
 
         public event OnSettingsChanged onSettingsChanged;
 
+#if UNITY_EDITOR
+        static readonly System.Collections.Generic.HashSet<TransitionProfile> pendingSettingsChangedProfiles = new System.Collections.Generic.HashSet<TransitionProfile>();
+        static bool settingsChangedDispatchScheduled;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() {
+            pendingSettingsChangedProfiles.Clear();
+            settingsChangedDispatchScheduled = false;
+            UnityEditor.EditorApplication.delayCall -= DispatchPendingSettingsChanged;
+            UnityEditor.EditorApplication.delayCall -= RepaintAllViewsDelayed;
+        }
+
+        static void DispatchPendingSettingsChanged() {
+            settingsChangedDispatchScheduled = false;
+            foreach (var profile in pendingSettingsChangedProfiles) {
+                if (profile == null) continue;
+                try {
+                    profile.onSettingsChanged?.Invoke();
+                }
+                catch { }
+            }
+            pendingSettingsChangedProfiles.Clear();
+            UnityEditor.EditorApplication.delayCall += RepaintAllViewsDelayed;
+        }
+
+        static void RepaintAllViewsDelayed() {
+            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        }
+#endif
+
         private void OnEnable() {
             ValidateSettings();
         }
@@ -122,13 +156,11 @@ namespace TransitionsPlus {
             ValidateSettings();
             if (onSettingsChanged != null) {
 #if UNITY_EDITOR
-                UnityEditor.EditorApplication.delayCall += () => {
-                    try {
-                        onSettingsChanged();
-                        UnityEditor.EditorApplication.delayCall += () => UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-                    }
-                    catch { }
-                };
+                pendingSettingsChangedProfiles.Add(this);
+                if (!settingsChangedDispatchScheduled) {
+                    settingsChangedDispatchScheduled = true;
+                    UnityEditor.EditorApplication.delayCall += DispatchPendingSettingsChanged;
+                }
 #else
                 onSettingsChanged();
 #endif
@@ -144,6 +176,16 @@ namespace TransitionsPlus {
             cellDivisions = Mathf.Max(1, cellDivisions);
             soundDelay = Mathf.Max(0, soundDelay);
             splits = Mathf.Max(1, splits);
+            progressFrom = Mathf.Clamp01(progressFrom);
+            progressTo = Mathf.Clamp01(progressTo);
+            if (progressTo <= progressFrom) {
+                progressFrom = Mathf.Max(0f, progressTo - 0.001f);
+                if (progressTo <= progressFrom) {
+                    progressFrom = 0f;
+                    progressTo = 0.001f;
+                }
+            }
+            timeMultiplier = Mathf.Max(0.001f, timeMultiplier);
             center.x = Mathf.Clamp(center.x, -1, 2);
             center.y = Mathf.Clamp(center.y, -1, 2);
 

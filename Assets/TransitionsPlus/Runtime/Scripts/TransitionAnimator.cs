@@ -15,11 +15,14 @@ namespace TransitionsPlus {
     }
 
     [ExecuteAlways]
-    [HelpURL("https://kronnect.com/guides-category/transitions-plus/")]
+    [HelpURL("https://kronnect.com/docs/transitions-plus/")]
     [DefaultExecutionOrder(100)]
     public class TransitionAnimator : MonoBehaviour {
 
         // public
+
+        [Tooltip("Show transition canvas while not in Play Mode")]
+        public bool showInEditMode = true;
 
         [Range(0, 1)]
         public float progress;
@@ -143,8 +146,12 @@ namespace TransitionsPlus {
         }
 
         private void OnEnable () {
-            if (playing && progress < 1f && profile != null && profile.duration > 0) {
-                startTime = GetTime() - progress * profile.duration;
+            if (playing && profile != null && profile.duration > 0 && progress < profile.progressTo) {
+                float effectiveDuration = profile.duration;
+                if (profile.type.SupportsTimeMultiplier() && profile.timeMultiplier > 0) {
+                    effectiveDuration /= profile.timeMultiplier;
+                }
+                startTime = GetTime() - progress * effectiveDuration;
             }
         }
 
@@ -229,10 +236,15 @@ namespace TransitionsPlus {
 
             if (!playing || profile == null || !Application.isPlaying) return;
 
-            float t = profile.duration > 0 ? Mathf.Clamp01((GetTime() - startTime) / profile.duration) : 1;
+            float effectiveDuration = profile.duration;
+            if (profile.type.SupportsTimeMultiplier() && profile.timeMultiplier > 0) {
+                effectiveDuration /= profile.timeMultiplier;
+            }
+            float t = effectiveDuration > 0 ? Mathf.Clamp01((GetTime() - startTime) / effectiveDuration) : 1;
             SetProgress(t);
 
-            if (t >= 1) {
+            if (t >= profile.progressTo) {
+                playing = false;
                 enabled = false;
                 bool loadScene = loadSceneAtEnd && !string.IsNullOrEmpty(sceneNameToLoad);
                 if (autoDestroy) {
@@ -285,6 +297,9 @@ namespace TransitionsPlus {
             }
             else {
                 screen = defaultScreen;
+#if UNITY_6000_4_OR_NEWER
+#pragma warning disable UDR0004
+#endif
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.delayCall += () => {
                     try {
@@ -296,7 +311,11 @@ namespace TransitionsPlus {
                     }
                     catch { }
                 };
-#else
+#endif
+#if UNITY_6000_4_OR_NEWER
+#pragma warning restore UDR0004
+#endif
+#if !UNITY_EDITOR
                 UpdateCanvasProperties();
 #endif
             }
@@ -358,7 +377,7 @@ namespace TransitionsPlus {
             screenMat.SetInt(ShaderParams.CellDivisions, profile.cellDivisions);
             screenMat.SetFloat(ShaderParams.Spread, profile.spread);
             screenMat.SetVector(ShaderParams.Center, profile.type.SupportsCenter() ? profile.center : Vector2.zero);
-            screenMat.SetFloat(ShaderParams.TimeMultiplier, profile.timeMultiplier);
+            screenMat.SetFloat(ShaderParams.TimeMultiplier, 1f);
             screenMat.SetTexture(ShaderParams.MaskTex, profile.shapeTexture);
 
             screenMat.shaderKeywords = null;
@@ -506,14 +525,18 @@ namespace TransitionsPlus {
 
         void ToggleCanvas () {
             if (canvas == null) return;
+            if (!Application.isPlaying && !showInEditMode) {
+                canvas.enabled = false;
+                return;
+            }
             if (renderMode == RenderMode.InsideUI && screen != defaultScreen) {
                 canvas.enabled = false;
                 return;
             }
 
             if (profile != null) {
-                bool inProgress = profile.invert ? progress < 1f : progress > 0;
-                if (fadeToCamera && progress >= 1f) inProgress = false;
+                bool inProgress = profile.invert ? progress < profile.progressTo : progress > profile.progressFrom;
+                if (fadeToCamera && progress >= profile.progressTo) inProgress = false;
                 canvas.enabled = inProgress;
             }
         }
@@ -603,8 +626,8 @@ namespace TransitionsPlus {
             progress = t;
 
             if (profile != null) {
-                if (profile.type.SupportsTimeMultiplier()) {
-                    t *= profile.timeMultiplier;
+                if (profile.progressFrom != 0f || profile.progressTo != 1f) {
+                    t = Mathf.InverseLerp(profile.progressFrom, profile.progressTo, t);
                 }
                 if (screenMat == null) {
                     UpdateMaterialProperties();
@@ -614,12 +637,13 @@ namespace TransitionsPlus {
             }
 
             if (fadeToCamera && switchActiveCamera) {
+                float endProgress = profile != null ? profile.progressTo : 1f;
                 if (secondCamera != null) {
                     secondCamera.gameObject.SetActive(true);
-                    secondCamera.enabled = progress >= 1f;
+                    secondCamera.enabled = progress >= endProgress;
                     if (mainCamera != null) {
                         mainCamera.gameObject.SetActive(true);
-                        mainCamera.enabled = progress < 1f;
+                        mainCamera.enabled = progress < endProgress;
                     }
                 }
             }
@@ -697,7 +721,7 @@ namespace TransitionsPlus {
 
         }
 
-        public static TransitionAnimator Start (TransitionType type, float duration = 2f, Color color = default, Gradient gradient = null, Texture2D texture = null, Vector2 center = default, bool keepAspectRatio = false, float rotation = 0, float rotationMultiplier = 0, float toonDotIntensity = 0, int toonGradientIntensity = 1, float noiseIntensity = 0.5f, Texture2D noiseTex = null, Vector2 noiseScale = default, bool invert = false, bool autoDestroy = true, float vignetteIntensity = 0.5f, float contrast = 1f, int splits = 5, int centersCount = 8, int seed = 0, int cellsDivisions = 64, float spread = 16f, float destroyDelay = 1, string sceneNameToLoad = null, LoadSceneMode sceneLoadMode = LoadSceneMode.Single, AudioClip sound = null, bool fadeToCamera = false, Camera mainCamera = null, Camera secondCamera = null, bool switchActiveCamera = true, float timeMultiplier = 1f, bool autoFollow = false, Transform followTarget = null, Texture2D shapeTexture = null, int sortingOrder = int.MinValue, float playDelay = 0, Vector3 followPositionOffset = default, TransitionsPlus.RenderMode renderMode = TransitionsPlus.RenderMode.FullScreen, RawImage customScreen = null, int pixelization = 0, bool randomize = false) {
+        public static TransitionAnimator Start (TransitionType type, float duration = 2f, Color color = default, Gradient gradient = null, Texture2D texture = null, Vector2 center = default, bool keepAspectRatio = false, float rotation = 0, float rotationMultiplier = 0, float toonDotIntensity = 0, int toonGradientIntensity = 1, float noiseIntensity = 0.5f, Texture2D noiseTex = null, Vector2 noiseScale = default, bool invert = false, bool autoDestroy = true, float vignetteIntensity = 0.5f, float contrast = 1f, int splits = 5, int centersCount = 8, int seed = 0, int cellsDivisions = 64, float spread = 16f, float destroyDelay = 1, string sceneNameToLoad = null, LoadSceneMode sceneLoadMode = LoadSceneMode.Single, AudioClip sound = null, bool fadeToCamera = false, Camera mainCamera = null, Camera secondCamera = null, bool switchActiveCamera = true, float timeMultiplier = 1f, bool autoFollow = false, Transform followTarget = null, Texture2D shapeTexture = null, int sortingOrder = int.MinValue, float playDelay = 0, Vector3 followPositionOffset = default, TransitionsPlus.RenderMode renderMode = TransitionsPlus.RenderMode.FullScreen, RawImage customScreen = null, int pixelization = 0, bool randomize = false, float progressFrom = 0f, float progressTo = 1f) {
 
             TransitionProfile profile = ScriptableObject.CreateInstance<TransitionProfile>();
             profile.type = type;
@@ -736,6 +760,8 @@ namespace TransitionsPlus {
             profile.keepAspectRatio = keepAspectRatio;
             profile.timeMultiplier = timeMultiplier;
             profile.shapeTexture = shapeTexture;
+            profile.progressFrom = progressFrom;
+            profile.progressTo = progressTo;
 
             return Start(profile, autoDestroy, destroyDelay, sceneNameToLoad, sceneLoadMode, fadeToCamera, mainCamera, secondCamera, switchActiveCamera, autoFollow, followTarget, sortingOrder, playDelay, followPositionOffset, renderMode, customScreen);
         }

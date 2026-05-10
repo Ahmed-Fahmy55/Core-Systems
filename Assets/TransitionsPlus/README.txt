@@ -24,7 +24,7 @@ Help & Support Forum
 Check the Documentation folder for detailed instructions.
 
 Have any question or issue?
-* Support-Web: https://kronnect.com/support
+* Support-Web: https://kronnect.com/docs/transitions-plus/
 * Support-Discord: https://discord.gg/EH2GMaM
 * Email: contact@kronnect.com
 * Twitter: @Kronnect
@@ -52,6 +52,18 @@ https://assetstore.unity.com/publishers/15018
 
 Version history
 ---------------
+
+5.3
+- [Fix] Removed some warnings in Unity 6.4
+
+5.2
+- Added "Progress From" and "Progress To" options to remap the animation range
+
+5.1.1
+- [Fix] Removed spiral shader console warning
+
+5.1
+- Added "Show In Edit Mode" option to the Transition Animator component
 
 5.0.1
 - [Fix] Fixed brief camera swap delay in Editor while previewing transition in reverse

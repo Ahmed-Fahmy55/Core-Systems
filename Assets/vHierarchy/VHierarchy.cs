@@ -15,6 +15,16 @@ using static VHierarchy.VHierarchyData;
 using static VHierarchy.Libs.VUtils;
 using static VHierarchy.Libs.VGUI;
 
+#if UNITY_6000_3_OR_NEWER
+using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<UnityEngine.EntityId>;
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<UnityEngine.EntityId>;
+#elif UNITY_6000_2_OR_NEWER
+using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#else
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState;
+#endif
+
 
 namespace VHierarchy
 {
@@ -29,7 +39,7 @@ namespace VHierarchy
             if (expandedIds == null)
                 UpdateExpandedIdsList();
 
-            if (EditorUtility.InstanceIDToObject(instanceId) is GameObject go)
+            if (_EditorUtility_InstanceIDToObject(instanceId) is GameObject go)
                 GameObjectRowGUI(go, rowRect);
             else
             {
@@ -88,7 +98,7 @@ namespace VHierarchy
                     {
                         iids = new int[gids.Count];
 
-                        GlobalObjectId.GlobalObjectIdentifiersToInstanceIDsSlow(gids.ToArray(), iids);
+                        _GlobalObjectId_GlobalObjectIdentifiersToInstanceIDsSlow(gids.ToArray(), iids);
 
                     }
                     void mapIidsToDatas()
@@ -131,7 +141,7 @@ namespace VHierarchy
                 if (goData != null) return;
 
                 goData = new GameObjectData();
-                sceneData.goDatasByGlobalId[GlobalObjectId.GetGlobalObjectIdSlow(go.GetInstanceID()).ToString()] = goData;
+                sceneData.goDatasByGlobalId[_GlobalObjectId_GetGlobalObjectIdSlow(go.GetInstanceID()).ToString()] = goData;
                 sceneData.goDatasByInstanceId[go.GetInstanceID()] = goData;
 
             }
@@ -398,7 +408,7 @@ namespace VHierarchy
                 var expandedChildren = new List<GameObject>();
 
                 foreach (var iid in expandedIds)
-                    if (EditorUtility.InstanceIDToObject(iid) is GameObject expandedGo && expandedGo.scene == scene)
+                    if (_EditorUtility_InstanceIDToObject(iid) is GameObject expandedGo && expandedGo.scene == scene)
                         if (expandedGo.transform.parent)
                             expandedChildren.Add(expandedGo);
                         else
@@ -486,7 +496,7 @@ namespace VHierarchy
                 var expandedChildren = new List<GameObject>();
 
                 foreach (var iid in expandedIds)
-                    if (EditorUtility.InstanceIDToObject(iid) is GameObject expandedGo)
+                    if (_EditorUtility_InstanceIDToObject(iid) is GameObject expandedGo)
                         if (expandedGo.transform.parent)
                             expandedChildren.Add(expandedGo);
                         else
@@ -519,7 +529,7 @@ namespace VHierarchy
                 var toCollapse = new List<GameObject>();
 
                 foreach (var iid in expandedIds.ToList())
-                    if (EditorUtility.InstanceIDToObject(iid) is GameObject expandedGo && !parents.Contains(expandedGo) && expandedGo != hoveredGo)
+                    if (_EditorUtility_InstanceIDToObject(iid) is GameObject expandedGo && !parents.Contains(expandedGo) && expandedGo != hoveredGo)
                         toCollapse.Add(expandedGo);
 
 
@@ -592,7 +602,7 @@ namespace VHierarchy
 
         static void UpdateExpandedIdsList()
         {
-            expandedIds = hierarchyWindow?.GetFieldValue("m_SceneHierarchy")?.GetFieldValue("m_TreeViewState")?.GetPropertyValue<List<int>>("expandedIDs") ?? new List<int>();
+            expandedIds = hierarchyWindow?.GetFieldValue("m_SceneHierarchy")?.GetFieldValue<TreeViewState>("m_TreeViewState")?.expandedIDs.ToInts() ?? new List<int>();
 
             EditorApplication.delayCall -= UpdateExpandedIdsList;
             EditorApplication.delayCall += UpdateExpandedIdsList;
@@ -600,11 +610,11 @@ namespace VHierarchy
         }
         static List<int> expandedIds;
 
-        static void SetExpandedWithAnimation(int instanceId, bool expanded) => hierarchyWindow.GetFieldValue("m_SceneHierarchy").GetFieldValue("m_TreeView").InvokeMethod("ChangeFoldingForSingleItem", instanceId, expanded);
-        static void SetExpanded(int instanceId, bool expanded) => hierarchyWindow.InvokeMethod("SetExpanded", instanceId, expanded);
+        static void SetExpandedWithAnimation(int instanceId, bool expanded) => hierarchyWindow.GetFieldValue("m_SceneHierarchy").GetFieldValue("m_TreeView").InvokeMethod("ChangeFoldingForSingleItem", instanceId.ToIdType(), expanded);
+        static void SetExpanded(int instanceId, bool expanded) => hierarchyWindow.InvokeMethod("SetExpanded", instanceId.ToIdType(), expanded);
         static bool IsExpanded(GameObject go) => expandedIds.Contains(go.GetInstanceID());
         static bool IsVisible(GameObject go) => !go.transform.parent || (IsExpanded(go.transform.parent.gameObject) && IsVisible(go.transform.parent.gameObject));
-        static int VisibleRowIndex(int instanceId) => hierarchyWindow.GetFieldValue("m_SceneHierarchy").GetFieldValue("m_TreeView").GetPropertyValue("data").InvokeMethod<int>("GetRow", instanceId);
+        static int VisibleRowIndex(int instanceId) => hierarchyWindow.GetFieldValue("m_SceneHierarchy").GetFieldValue("m_TreeView").GetPropertyValue("data").InvokeMethod<int>("GetRow", instanceId.ToIdType());
 
 
 
@@ -759,7 +769,27 @@ namespace VHierarchy
 
 
 
-        public const string version = "1.0.23";
+
+
+
+#if UNITY_6000_3_OR_NEWER
+        public static EntityId ToIdType(this int id) => id;
+        public static List<int> ToInts(this List<EntityId> ids) => ids.Select(r => (int)r).ToList();
+        public static List<int> GetIdList(this object o, string listName) => o.GetMemberValue<List<EntityId>>(listName)?.ToInts();
+#else
+        public static int ToIdType(this int id) => id;
+        public static List<int> ToInts(this List<int> ids) => ids;
+        public static List<int> GetIdList(this object o, string listName) => o.GetMemberValue<List<int>>(listName);
+#endif
+
+
+
+
+
+
+
+
+        public const string version = "1.0.24";
 
     }
 }

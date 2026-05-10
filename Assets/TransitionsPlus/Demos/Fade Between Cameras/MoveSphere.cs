@@ -8,6 +8,10 @@ namespace TransitionsPlus.Demos {
 
         Vector3 originalPosition;
 
+        void OnEnable() {
+            TransitionsPlusDemos.InputProxy.SetupEventSystem();
+        }
+
         private void Start() {
             originalPosition = transform.position;
         }

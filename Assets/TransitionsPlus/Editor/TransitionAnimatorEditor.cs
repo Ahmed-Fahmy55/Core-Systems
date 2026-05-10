@@ -12,6 +12,7 @@ namespace TransitionsPlus {
     public class TransitionAnimatorEditor : Editor {
 
         SerializedProperty progress;
+        SerializedProperty showInEditMode;
         SerializedProperty autoPlay, playDelay, useUnscaledTime, autoDestroy, destroyDelay, destroyAllTransitions, onTransitionEnd;
         SerializedProperty profile;
         SerializedProperty loadSceneAtEnd, sceneNameToLoad, sceneLoadMode;
@@ -22,6 +23,14 @@ namespace TransitionsPlus {
         TransitionProfile cachedProfile;
         Editor cachedProfileEditor;
         static GUIStyle boxStyle;
+
+#if UNITY_6000_4_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitStatics() {
+            boxStyle = null;
+        }
+#endif
+
         const string MASTER_FOLDER_NAME = "Transition Presets";
         int selectedPresetIndex;
 
@@ -34,6 +43,7 @@ namespace TransitionsPlus {
 
         void OnEnable() {
             progress = serializedObject.FindProperty("progress");
+            showInEditMode = serializedObject.FindProperty("showInEditMode");
 
             autoPlay = serializedObject.FindProperty("autoPlay");
             playDelay = serializedObject.FindProperty("playDelay");
@@ -81,6 +91,7 @@ namespace TransitionsPlus {
 
 
             if (profile.objectReferenceValue != null) {
+                EditorGUILayout.PropertyField(showInEditMode, new GUIContent("Show In Edit Mode"));
                 EditorGUILayout.PropertyField(progress);
                 if (GUILayout.Button("Preview")) {
                     StartPreview();
@@ -324,10 +335,15 @@ namespace TransitionsPlus {
             TransitionProfile profile = animator.profile;
             if (profile == null) return;
 
+            float effectiveDuration = profile.duration;
+            if (profile.type.SupportsTimeMultiplier() && profile.timeMultiplier > 0) {
+                effectiveDuration /= profile.timeMultiplier;
+            }
             float elapsedTime = animator.GetTime() - previewStartTime;
-            float t = elapsedTime / profile.duration;
+            float t = effectiveDuration > 0 ? elapsedTime / effectiveDuration : 1f;
 
-            if (t >= 1.25f) { // give a bit of pause at the end
+            float endThreshold = profile.progressTo + 0.25f;
+            if (t >= endThreshold) {
                 t = 0;
                 previewInProgress = false;
                 if (previewAnimatorWasDisabled) {
@@ -335,7 +351,7 @@ namespace TransitionsPlus {
                 }
             }
 
-            if (previewPendingSound && t >= profile.soundDelay && profile.sound != null) {
+            if (previewPendingSound && elapsedTime >= profile.soundDelay && profile.sound != null) {
                 previewPendingSound = false;
                 PlayClip(profile.sound);
             }

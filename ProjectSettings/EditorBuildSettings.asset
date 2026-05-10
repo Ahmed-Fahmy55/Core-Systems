@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scripts/Question System/Demo/Questions Demo.unity
     guid: bcf45f7d330e6794abfd6028d22bd310
+  - enabled: 1
+    path: Assets/_Project/Scripts/Core/SOAP/Demo/Demo.unity
+    guid: e81f0a80d0c000946bba73bf88f128ae
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9545832e0075c2d4bb279fa3bbd29e59, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}

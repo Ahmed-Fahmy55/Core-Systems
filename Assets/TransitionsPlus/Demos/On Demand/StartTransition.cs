@@ -9,6 +9,10 @@ namespace TransitionsPlusDemos {
 
         public TransitionProfile starTransitionProfile;
 
+        void OnEnable() {
+            InputProxy.SetupEventSystem();
+        }
+
         public void StartFadeTransition() {
             TransitionAnimator.Start(
                 TransitionType.Fade,     // transition type

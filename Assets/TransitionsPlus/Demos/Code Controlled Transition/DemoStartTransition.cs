@@ -7,6 +7,10 @@ namespace TransitionsPlusDemos {
 
         public TransitionAnimator animator;
 
+        void OnEnable() {
+            InputProxy.SetupEventSystem();
+        }
+
         public void Play() {
             animator.profile.invert = false;
             animator.Play();

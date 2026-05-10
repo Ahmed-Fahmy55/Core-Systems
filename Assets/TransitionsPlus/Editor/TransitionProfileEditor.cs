@@ -5,7 +5,7 @@ namespace TransitionsPlus {
 
     [CustomEditor(typeof(TransitionProfile))]
     public class TransitionProfileEditor : Editor {
-        SerializedProperty type, invert, timeMultiplier;
+        SerializedProperty type, invert, timeMultiplier, progressFrom, progressTo;
         SerializedProperty colorMode, color, gradient, gradientMode, shapeTexture;
         SerializedProperty duration;
         SerializedProperty noiseIntensity, vignetteIntensity, texture;
@@ -28,6 +28,8 @@ namespace TransitionsPlus {
                 type = serializedObject.FindProperty("type");
                 invert = serializedObject.FindProperty("invert");
                 timeMultiplier = serializedObject.FindProperty("timeMultiplier");
+                progressFrom = serializedObject.FindProperty("progressFrom");
+                progressTo = serializedObject.FindProperty("progressTo");
 
                 colorMode = serializedObject.FindProperty("colorMode");
                 color = serializedObject.FindProperty("color");
@@ -88,6 +90,11 @@ namespace TransitionsPlus {
             if (transitionType.SupportsTimeMultiplier()) {
                 EditorGUILayout.PropertyField(timeMultiplier);
             }
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Progress Remap", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(progressFrom, new GUIContent("Progress From"));
+            EditorGUILayout.PropertyField(progressTo, new GUIContent("Progress To"));
+            EditorGUILayout.EndVertical();
 
             if (profile.displayingAnimator == null || !profile.displayingAnimator.fadeToCamera) {
                 EditorGUILayout.PropertyField(colorMode);

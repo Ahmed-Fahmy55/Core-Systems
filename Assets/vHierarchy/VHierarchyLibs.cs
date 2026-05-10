@@ -76,60 +76,223 @@ namespace VHierarchy.Libs
 
         #region Reflection
 
-        public const BindingFlags maxBindingFlags = (BindingFlags)62;
 
-        public static List<System.Type> GetSubclasses(this System.Type t) => t.Assembly.GetTypes().Where(type => type.IsSubclassOf(t)).ToList();
+        public static object GetFieldValue(this object o, string fieldName)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetFieldInfo(fieldName) is FieldInfo fieldInfo)
+                return fieldInfo.GetValue(target);
+
+
+            throw new System.Exception($"Field '{fieldName}' not found in type '{type.Name}' and its parent types");
+
+        }
+        public static object GetPropertyValue(this object o, string propertyName)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetPropertyInfo(propertyName) is PropertyInfo propertyInfo)
+                return propertyInfo.GetValue(target);
+
+
+            throw new System.Exception($"Property '{propertyName}' not found in type '{type.Name}' and its parent types");
+
+        }
+        public static object GetMemberValue(this object o, string memberName)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetFieldInfo(memberName) is FieldInfo fieldInfo)
+                return fieldInfo.GetValue(target);
+
+            if (type.GetPropertyInfo(memberName) is PropertyInfo propertyInfo)
+                return propertyInfo.GetValue(target);
+
+
+            throw new System.Exception($"Member '{memberName}' not found in type '{type.Name}' and its parent types");
+
+        }
+
+        public static void SetFieldValue(this object o, string fieldName, object value)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetFieldInfo(fieldName) is FieldInfo fieldInfo)
+                fieldInfo.SetValue(target, value);
+
+
+            else throw new System.Exception($"Field '{fieldName}' not found in type '{type.Name}' and its parent types");
+
+        }
+        public static void SetPropertyValue(this object o, string propertyName, object value)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetPropertyInfo(propertyName) is PropertyInfo propertyInfo)
+                propertyInfo.SetValue(target, value);
+
+
+            else throw new System.Exception($"Property '{propertyName}' not found in type '{type.Name}' and its parent types");
+
+        }
+        public static void SetMemberValue(this object o, string memberName, object value)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetFieldInfo(memberName) is FieldInfo fieldInfo)
+                fieldInfo.SetValue(target, value);
+
+            else if (type.GetPropertyInfo(memberName) is PropertyInfo propertyInfo)
+                propertyInfo.SetValue(target, value);
+
+
+            else throw new System.Exception($"Member '{memberName}' not found in type '{type.Name}' and its parent types");
+
+        }
+
+        public static object InvokeMethod(this object o, string methodName, params object[] parameters) // todo handle null params (can't get their type)
+        {
+            var type = o as Type ?? o.GetType();
+            var target = o is Type ? null : o;
+
+
+            if (type.GetMethodInfo(methodName, parameters.Select(r => r.GetType()).ToArray()) is MethodInfo methodInfo)
+                return methodInfo.Invoke(target, parameters);
+
+
+            throw new System.Exception($"Method '{methodName}' not found in type '{type.Name}', its parent types and interfaces");
+
+        }
+
+
+        public static T GetFieldValue<T>(this object o, string fieldName) => (T)o.GetFieldValue(fieldName);
+        public static T GetPropertyValue<T>(this object o, string propertyName) => (T)o.GetPropertyValue(propertyName);
+        public static T GetMemberValue<T>(this object o, string memberName) => (T)o.GetMemberValue(memberName);
+        public static T InvokeMethod<T>(this object o, string methodName, params object[] parameters) => (T)o.InvokeMethod(methodName, parameters);
+
+
+
+
+        public static FieldInfo GetFieldInfo(this Type type, string fieldName)
+        {
+            if (fieldInfoCache.TryGetValue(type, out var fieldInfosByNames))
+                if (fieldInfosByNames.TryGetValue(fieldName, out var fieldInfo))
+                    return fieldInfo;
+
+
+            if (!fieldInfoCache.ContainsKey(type))
+                fieldInfoCache[type] = new Dictionary<string, FieldInfo>();
+
+            for (var curType = type; curType != null; curType = curType.BaseType)
+                if (curType.GetField(fieldName, maxBindingFlags) is FieldInfo fieldInfo)
+                    return fieldInfoCache[type][fieldName] = fieldInfo;
+
+
+            return fieldInfoCache[type][fieldName] = null;
+
+        }
+        public static PropertyInfo GetPropertyInfo(this Type type, string propertyName)
+        {
+            if (propertyInfoCache.TryGetValue(type, out var propertyInfosByNames))
+                if (propertyInfosByNames.TryGetValue(propertyName, out var propertyInfo))
+                    return propertyInfo;
+
+
+            if (!propertyInfoCache.ContainsKey(type))
+                propertyInfoCache[type] = new Dictionary<string, PropertyInfo>();
+
+            for (var curType = type; curType != null; curType = curType.BaseType)
+                if (curType.GetProperty(propertyName, maxBindingFlags) is PropertyInfo propertyInfo)
+                    return propertyInfoCache[type][propertyName] = propertyInfo;
+
+
+            return propertyInfoCache[type][propertyName] = null;
+
+        }
+        public static MethodInfo GetMethodInfo(this Type type, string methodName, params Type[] argumentTypes)
+        {
+            var methodHash = methodName.GetHashCode() ^ argumentTypes.Aggregate(0, (hash, r) => hash ^= r.GetHashCode());
+
+
+            if (methodInfoCache.TryGetValue(type, out var methodInfosByHashes))
+                if (methodInfosByHashes.TryGetValue(methodHash, out var methodInfo))
+                    return methodInfo;
+
+
+
+            if (!methodInfoCache.ContainsKey(type))
+                methodInfoCache[type] = new Dictionary<int, MethodInfo>();
+
+            for (var curType = type; curType != null; curType = curType.BaseType)
+                if (curType.GetMethod(methodName, maxBindingFlags, null, argumentTypes, null) is MethodInfo methodInfo)
+                    return methodInfoCache[type][methodHash] = methodInfo;
+
+            foreach (var interfaceType in type.GetInterfaces())
+                if (interfaceType.GetMethod(methodName, maxBindingFlags, null, argumentTypes, null) is MethodInfo methodInfo)
+                    return methodInfoCache[type][methodHash] = methodInfo;
+
+
+
+            return methodInfoCache[type][methodHash] = null;
+
+        }
+
+        static Dictionary<Type, Dictionary<string, FieldInfo>> fieldInfoCache = new Dictionary<Type, Dictionary<string, FieldInfo>>();
+        static Dictionary<Type, Dictionary<string, PropertyInfo>> propertyInfoCache = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
+        static Dictionary<Type, Dictionary<int, MethodInfo>> methodInfoCache = new Dictionary<Type, Dictionary<int, MethodInfo>>();
+
+
+
+
+
+
+        public static T GetCustomAttributeCached<T>(this MemberInfo memberInfo) where T : System.Attribute
+        {
+            if (!attributesCache.TryGetValue(memberInfo, out var attributes_byType))
+                attributes_byType = attributesCache[memberInfo] = new Dictionary<Type, System.Attribute>();
+
+            if (!attributes_byType.TryGetValue(typeof(T), out var attribute))
+                attribute = attributes_byType[typeof(T)] = memberInfo.GetCustomAttribute<T>();
+
+            return attribute as T;
+
+        }
+
+        static Dictionary<MemberInfo, Dictionary<Type, System.Attribute>> attributesCache = new Dictionary<MemberInfo, Dictionary<Type, System.Attribute>>();
+
+
+
+
+
+
+        public static List<Type> GetSubclasses(this Type t) => t.Assembly.GetTypes().Where(type => type.IsSubclassOf(t)).ToList();
+
         public static object GetDefaultValue(this FieldInfo f, params object[] constructorVars) => f.GetValue(System.Activator.CreateInstance(((MemberInfo)f).ReflectedType, constructorVars));
         public static object GetDefaultValue(this FieldInfo f) => f.GetValue(System.Activator.CreateInstance(((MemberInfo)f).ReflectedType));
 
-        public static IEnumerable<FieldInfo> GetFieldsWithoutBase(this System.Type t) => t.GetFields().Where(r => !t.BaseType.GetFields().Any(rr => rr.Name == r.Name));
-        public static IEnumerable<PropertyInfo> GetPropertiesWithoutBase(this System.Type t) => t.GetProperties().Where(r => !t.BaseType.GetProperties().Any(rr => rr.Name == r.Name));
+        public static IEnumerable<FieldInfo> GetFieldsWithoutBase(this Type t) => t.GetFields().Where(r => !t.BaseType.GetFields().Any(rr => rr.Name == r.Name));
+        public static IEnumerable<PropertyInfo> GetPropertiesWithoutBase(this Type t) => t.GetProperties().Where(r => !t.BaseType.GetProperties().Any(rr => rr.Name == r.Name));
 
-        public static object GetFieldValue(this object o, string fieldName, int typeHeight = 0)
-        {
-            var t = o.GetType();
-            for (int i = 0; i < typeHeight; i++)
-                t = t.BaseType;
 
-            var fi = t.GetField(fieldName, maxBindingFlags);
+        public const BindingFlags maxBindingFlags = (BindingFlags)62;
 
-            if (fi == null)
-                throw new System.Exception("Field '" + fieldName + "' not found in type '" + t.Name + "'");
 
-            return fi.GetValue(o);
 
-        }
-        public static object GetPropertyValue(this object o, string propertyName, int typeHeight = 0)
-        {
-            var t = o.GetType();
-            for (int i = 0; i < typeHeight; i++)
-                t = t.BaseType;
 
-            var pi = t.GetProperty(propertyName, maxBindingFlags);
 
-            if (pi == null)
-                throw new System.Exception("Property '" + propertyName + "' not found in type '" + t.Name + "'");
-
-            return pi.GetValue(o);
-
-        }
-        public static object InvokeMethod(this object o, string methodName, params object[] parameters)
-        {
-            var signature = parameters.Select(r => r.GetType());
-
-            var type = o is System.Type t ? t : o.GetType();
-
-            var mi = type.GetMethods(maxBindingFlags).FirstOrDefault(r => r.Name == methodName && r.GetParameters().Select(rr => rr.ParameterType).SequenceEqual(signature));
-
-            if (mi == null)
-                throw new System.Exception("Method '" + methodName + "' not found in type '" + type.Name + "'");
-
-            return mi.Invoke(o, parameters);
-
-        }
-        public static T GetFieldValue<T>(this object o, string fieldName, int typeHeight = 0) => (T)o.GetFieldValue(fieldName, typeHeight);
-        public static T GetPropertyValue<T>(this object o, string propertyName, int typeHeight = 0) => (T)o.GetPropertyValue(propertyName, typeHeight);
-        public static T InvokeMethod<T>(this object o, string methodName, params object[] parameters) => (T)o.InvokeMethod(methodName, parameters);
 
 
 
@@ -540,6 +703,97 @@ namespace VHierarchy.Libs
 
             return new Color(r, g, b);
         }
+
+
+        #endregion
+
+        #region Instance/Entity ID mess
+
+
+        public static int _GlobalObjectId_GlobalObjectIdentifierToInstanceIDSlow(GlobalObjectId id)
+        {
+#if UNITY_6000_3_OR_NEWER
+            return GlobalObjectId.GlobalObjectIdentifierToEntityIdSlow(id);
+#else
+            return GlobalObjectId.GlobalObjectIdentifierToInstanceIDSlow(id);
+#endif
+
+        }
+
+        public static void _GlobalObjectId_GlobalObjectIdentifiersToInstanceIDsSlow(GlobalObjectId[] identifiers, int[] outputInstanceIDs)
+        {
+#if UNITY_6000_3_OR_NEWER
+
+            var outputEntityIds = new EntityId[outputInstanceIDs.Length];
+
+            GlobalObjectId.GlobalObjectIdentifiersToEntityIdsSlow(identifiers, outputEntityIds);
+
+            for (int i = 0; i < outputEntityIds.Length; i++)
+                outputInstanceIDs[i] = (int)outputEntityIds[i];
+
+#else
+
+            GlobalObjectId.GlobalObjectIdentifiersToInstanceIDsSlow(identifiers, outputInstanceIDs);
+
+#endif
+
+        }
+
+        public static void _GlobalObjectId_GetGlobalObjectIdsSlow(int[] ids, GlobalObjectId[] outputIdentifiers)
+        {
+#if UNITY_6000_3_OR_NEWER
+            GlobalObjectId.GetGlobalObjectIdsSlow(ids.Select(r => (EntityId)r).ToArray(), outputIdentifiers);
+#else
+            GlobalObjectId.GetGlobalObjectIdsSlow(ids, outputIdentifiers);
+#endif
+
+        }
+
+        public static GlobalObjectId _GlobalObjectId_GetGlobalObjectIdSlow(int id)
+        {
+#if UNITY_6000_3_OR_NEWER
+            return GlobalObjectId.GetGlobalObjectIdSlow((EntityId)id);
+#else
+            return GlobalObjectId.GetGlobalObjectIdSlow(id);
+#endif
+
+        }
+
+
+
+        public static Object _EditorUtility_InstanceIDToObject(int iid)
+        {
+#if UNITY_6000_3_OR_NEWER
+            return EditorUtility.EntityIdToObject(iid);
+#else
+            return EditorUtility.InstanceIDToObject(iid);
+#endif
+        }
+
+        public static string _AssetDatabase_GetAssetPath(int instanceID)
+        {
+#if UNITY_6000_3_OR_NEWER
+            return AssetDatabase.GetAssetPath((EntityId)instanceID);
+#else
+            return AssetDatabase.GetAssetPath(instanceID);
+#endif
+        }
+
+        public static int[] _Selection_instanceIDs
+        {
+            get
+            {
+#if UNITY_6000_3_OR_NEWER
+                return Selection.entityIds.Select(r => (int)r).ToArray();
+#else
+                return Selection.instanceIDs;
+#endif
+            }
+        }
+
+
+
+
 
 
         #endregion
