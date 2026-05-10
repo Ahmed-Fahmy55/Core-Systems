@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 952fab2dcf0989541944d7f01d255d1b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 311565
+  packageName: Clipboard Plus Ultimate | Play Mode Save
+  packageVersion: 1.1.2
+  assetPath: Assets/ClipboardPlusUltimate/Editor/ClipboardEditorWindow.cs
+  uploadId: 752184

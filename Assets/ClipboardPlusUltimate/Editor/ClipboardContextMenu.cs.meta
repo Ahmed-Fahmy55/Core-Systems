@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1fb74824321550a4488c85bc3a3fc4d4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 311565
+  packageName: Clipboard Plus Ultimate | Play Mode Save
+  packageVersion: 1.1.2
+  assetPath: Assets/ClipboardPlusUltimate/Editor/ClipboardContextMenu.cs
+  uploadId: 752184

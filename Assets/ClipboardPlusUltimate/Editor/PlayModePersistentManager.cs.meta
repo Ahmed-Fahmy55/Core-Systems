@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 66026ed8aa9e9b4478d7195aa85e4f4d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 311565
+  packageName: Clipboard Plus Ultimate | Play Mode Save
+  packageVersion: 1.1.2
+  assetPath: Assets/ClipboardPlusUltimate/Editor/PlayModePersistentManager.cs
+  uploadId: 752184
