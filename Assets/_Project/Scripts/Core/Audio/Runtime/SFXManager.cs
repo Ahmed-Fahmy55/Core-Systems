@@ -64,6 +64,7 @@ namespace Zone8.Audio
         private EventBinding<AudioControlEvent> _audioControBinding;
         private EventBinding<TrackControlEvent> _audioTrackBinding;
 
+        public SFXSettingsSo TracksSettings => _tracksSettings;
 
 
         #region Unity Methods
