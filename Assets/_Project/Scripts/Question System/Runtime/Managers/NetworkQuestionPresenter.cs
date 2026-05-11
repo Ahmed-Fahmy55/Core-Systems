@@ -92,7 +92,7 @@ namespace Zone8.Question.Runtime.Managers
         }
 
 
-        private async void OnAllPlayersSubmitted(Dictionary<ulong, PlayerAnswers> playersData)
+        private void OnAllPlayersSubmitted(Dictionary<ulong, PlayerAnswers> playersData)
         {
             _timer.PauseTimer();
             PlayerSubmissionsReached?.Invoke(playersData, _currentQuestion);

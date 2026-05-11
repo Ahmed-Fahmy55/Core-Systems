@@ -4,16 +4,14 @@ using UnityEditor.SceneManagement;
 using UnityEditor.Toolbars;
 using UnityEngine;
 
-public static class Zone8MainToolbarExtender
+public static class MainToolbarExtender
 {
-    // Unity uses this string for the right-click menu label.
     private const string DropdownID = "Zone8/Scene Selector";
-    private const string RefreshID = "Zone8/Refresh Scenes";
+    private const string SliderID = "Zone8/FPS Slider";
 
     [MainToolbarElement(DropdownID)]
     public static MainToolbarElement CreateSceneDropdown()
     {
-        // The first argument here is what shows UPON the button in the toolbar
         var content = new MainToolbarContent("Select Scene", null, "Switch build scenes");
 
         return new MainToolbarDropdown(content, (rect) =>
@@ -43,16 +41,20 @@ public static class Zone8MainToolbarExtender
         });
     }
 
-    [MainToolbarElement(RefreshID)]
-    public static MainToolbarElement CreateRefreshButton()
+    [MainToolbarElement(SliderID)]
+    public static MainToolbarElement CreateFPSSlider()
     {
-        var icon = EditorGUIUtility.IconContent("Refresh").image as Texture2D;
-        var content = new MainToolbarContent(null, icon, "Refresh Scene Toolbar");
+        var content = new MainToolbarContent("FPS Limit", null, "Adjust Application.targetFrameRate");
 
-        return new MainToolbarButton(content, () =>
+        int currentLimit = Application.targetFrameRate;
+        float initialValue = currentLimit <= 0 ? 60f : currentLimit;
+
+        var slider = new MainToolbarSlider(content, initialValue, 10f, 240f, (newValue) =>
         {
-            MainToolbar.Refresh(DropdownID);
-            Debug.Log("Zone8 Scene List Updated");
+            int roundedFPS = Mathf.RoundToInt(newValue);
+            Application.targetFrameRate = roundedFPS;
         });
+
+        return slider;
     }
 }
