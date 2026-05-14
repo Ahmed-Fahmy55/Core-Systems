@@ -56,6 +56,7 @@ namespace Zone8.Tweening
         public bool IsRelative;
 
         [BoxGroup("Technical")]
+        [InfoBox("This wont work with all tweens type")]
         [HorizontalGroup("Technical/Flags")]
         public bool IsFrom;
 
