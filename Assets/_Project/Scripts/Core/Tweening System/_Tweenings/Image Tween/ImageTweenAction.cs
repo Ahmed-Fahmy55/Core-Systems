@@ -43,17 +43,30 @@ namespace Zone8.Tweening
             switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = image.DOColor(_toColor, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = image.DOColor(_toColor, CoreSettings.Duration).From();
+                    else
+                        tween = image.DOColor(_toColor, CoreSettings.Duration);
                     break;
+
                 case EActionType.Fade:
-                    tween = image.DOFade(_toValue, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = image.DOFade(_toValue, CoreSettings.Duration).From();
+                    else
+                        tween = image.DOFade(_toValue, CoreSettings.Duration);
                     break;
+
                 case EActionType.Fill:
-                    tween = image.DOFillAmount(_toValue, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = image.DOFillAmount(_toValue, CoreSettings.Duration).From();
+                    else
+                        tween = image.DOFillAmount(_toValue, CoreSettings.Duration);
                     break;
+
                 case EActionType.GradientColor:
                     tween = image.DOGradientColor(_toGradient, CoreSettings.Duration);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(
                     nameof(_actionType),

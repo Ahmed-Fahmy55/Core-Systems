@@ -15,7 +15,7 @@ namespace Zone8.Tweening
         [SerializeField] private bool _isLocal;
 
         [BoxGroup("Movement Settings", Order = 1)]
-        [SerializeField] Vector3 _value;
+        [SerializeField] Vector3 _toValue;
 
         [BoxGroup("Movement Settings", Order = 1)]
         [Tooltip("If TRUE the tween will smoothly snap all values to integers..")]
@@ -30,15 +30,20 @@ namespace Zone8.Tweening
                 return null;
             }
 
-
             Tween tween;
             if (_isLocal)
             {
-                tween = target.transform.DOLocalMove(_value, CoreSettings.Duration, _snapping);
+                if (CoreSettings.IsFrom)
+                    tween = target.transform.DOLocalMove(_toValue, CoreSettings.Duration, _snapping).From();
+                else
+                    tween = target.transform.DOLocalMove(_toValue, CoreSettings.Duration, _snapping);
             }
             else
             {
-                tween = target.transform.DOMove(_value, CoreSettings.Duration, _snapping);
+                if (CoreSettings.IsFrom)
+                    tween = target.transform.DOMove(_toValue, CoreSettings.Duration, _snapping).From();
+                else
+                    tween = target.transform.DOMove(_toValue, CoreSettings.Duration, _snapping);
             }
 
             CoreSettings.Apply(tween);

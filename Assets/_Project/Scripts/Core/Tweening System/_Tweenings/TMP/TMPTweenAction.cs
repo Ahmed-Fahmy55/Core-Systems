@@ -51,10 +51,16 @@ namespace Zone8.Tweening
             switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = tmp.DOColor(_toColor, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = tmp.DOColor(_toColor, CoreSettings.Duration).From();
+                    else
+                        tween = tmp.DOColor(_toColor, CoreSettings.Duration);
                     break;
                 case EActionType.Fade:
-                    tween = tmp.DOFade(_toValue, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = tmp.DOFade(_toValue, CoreSettings.Duration).From();
+                    else
+                        tween = tmp.DOFade(_toValue, CoreSettings.Duration);
                     break;
                 case EActionType.Scale:
                     tween = tmp.DOScale(_toScaleValue, CoreSettings.Duration);

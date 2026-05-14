@@ -12,7 +12,7 @@ namespace Zone8.Tweening
         [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Movement Settings", Order = 1)]
-        [SerializeField] Vector2 _value;
+        [SerializeField] Vector2 _toValue;
 
         [BoxGroup("Movement Settings", Order = 1)]
         [Tooltip("If TRUE the tween will smoothly snap all values to integers.")]
@@ -32,9 +32,13 @@ namespace Zone8.Tweening
                 return null;
             }
 
-            Tween tween;
-            tween = rectTransform.DOAnchorPos(_value, CoreSettings.Duration, _snapping);
+            var tween = rectTransform.DOAnchorPos(_toValue, CoreSettings.Duration, _snapping);
+
+            if (CoreSettings.IsFrom)
+                tween.From();
+
             CoreSettings.Apply(tween);
+
             return tween;
         }
     }

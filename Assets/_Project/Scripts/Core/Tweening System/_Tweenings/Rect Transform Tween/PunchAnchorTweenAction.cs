@@ -13,7 +13,7 @@ namespace Zone8.Tweening
         [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Punch Settings", Order = 1)]
-        [SerializeField] Vector2 _value;
+        [SerializeField] Vector2 _toValue;
 
         [BoxGroup("Punch Settings", Order = 1)]
         [Tooltip("Indicates how much the punch will vibrate.")]
@@ -41,8 +41,11 @@ namespace Zone8.Tweening
                 return null;
             }
 
-            Tween tween;
-            tween = rectTransform.DOPunchAnchorPos(_value, CoreSettings.Duration, _vibration, _elasticity, _snapping);
+            var tween = rectTransform.DOPunchAnchorPos(_toValue, CoreSettings.Duration, _vibration, _elasticity, _snapping);
+
+            if (CoreSettings.IsFrom)
+                tween.From();
+
             CoreSettings.Apply(tween);
 
             return tween;

@@ -13,7 +13,7 @@ namespace Zone8.Tweening
         [SerializeField] ETransformType _shakehType;
 
         [BoxGroup("Shake Settings", Order = 1)]
-        [SerializeField] Vector3 _value;
+        [SerializeField] Vector3 _toValue;
 
         [BoxGroup("Shake Settings", Order = 1)]
         [Tooltip("Indicates how much the punch will vibrate.")]
@@ -48,13 +48,22 @@ namespace Zone8.Tweening
             switch (_shakehType)
             {
                 case ETransformType.Position:
-                    tween = target.transform.DOShakePosition(CoreSettings.Duration, _value, _vibration, _randomness, _snapping, _fadeout, _randomnessMode);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOShakePosition(CoreSettings.Duration, _toValue, _vibration, _randomness, _snapping, _fadeout, _randomnessMode).From();
+                    else
+                        tween = target.transform.DOShakePosition(CoreSettings.Duration, _toValue, _vibration, _randomness, _snapping, _fadeout, _randomnessMode);
                     break;
                 case ETransformType.Rotation:
-                    tween = target.transform.DOShakeRotation(CoreSettings.Duration, _value, _vibration, _randomness, _fadeout, _randomnessMode);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOShakeRotation(CoreSettings.Duration, _toValue, _vibration, _randomness, _fadeout, _randomnessMode).From();
+                    else
+                        tween = target.transform.DOShakeRotation(CoreSettings.Duration, _toValue, _vibration, _randomness, _fadeout, _randomnessMode);
                     break;
                 case ETransformType.Scale:
-                    tween = target.transform.DOShakeScale(CoreSettings.Duration, _value, _vibration, _randomness, _fadeout, _randomnessMode);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOShakeScale(CoreSettings.Duration, _toValue, _vibration, _randomness, _fadeout, _randomnessMode).From();
+                    else
+                        tween = target.transform.DOShakeScale(CoreSettings.Duration, _toValue, _vibration, _randomness, _fadeout, _randomnessMode);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(

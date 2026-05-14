@@ -14,7 +14,7 @@ namespace Zone8.Tweening
 
 
         [BoxGroup("Jump Settings", Order = 1)]
-        [SerializeField] Vector2 _value;
+        [SerializeField] Vector2 _toValue;
 
         [BoxGroup("Jump Settings", Order = 1)]
         [SerializeField] float _jumpPower;
@@ -40,8 +40,7 @@ namespace Zone8.Tweening
                 return null;
             }
 
-            Tween tween;
-            tween = rectTransform.DOJumpAnchorPos(_value, _jumpPower, _jumpsNumb, CoreSettings.Duration, _snapping);
+            var tween = rectTransform.DOJumpAnchorPos(_toValue, _jumpPower, _jumpsNumb, CoreSettings.Duration, _snapping);
             CoreSettings.Apply(tween);
 
             return tween;

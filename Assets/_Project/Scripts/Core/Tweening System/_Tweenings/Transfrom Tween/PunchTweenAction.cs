@@ -14,7 +14,7 @@ namespace Zone8.Tweening
         [SerializeField] ETransformType _punchType;
 
         [BoxGroup("Punch Settings", Order = 1)]
-        [SerializeField] Vector3 _value;
+        [SerializeField] Vector3 _toValue;
 
         [BoxGroup("Punch Settings", Order = 1)]
         [Tooltip("Indicates how much the punch will vibrate.")]
@@ -35,13 +35,22 @@ namespace Zone8.Tweening
             switch (_punchType)
             {
                 case ETransformType.Position:
-                    tween = target.transform.DOPunchPosition(_value, CoreSettings.Duration, _vibration, _elasticity, _snapping);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOPunchPosition(_toValue, CoreSettings.Duration, _vibration, _elasticity, _snapping).From();
+                    else
+                        tween = target.transform.DOPunchPosition(_toValue, CoreSettings.Duration, _vibration, _elasticity, _snapping);
                     break;
                 case ETransformType.Rotation:
-                    tween = target.transform.DOPunchRotation(_value, CoreSettings.Duration, _vibration, _elasticity);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOPunchRotation(_toValue, CoreSettings.Duration, _vibration, _elasticity).From();
+                    else
+                        tween = target.transform.DOPunchRotation(_toValue, CoreSettings.Duration, _vibration, _elasticity);
                     break;
                 case ETransformType.Scale:
-                    tween = target.transform.DOPunchScale(_value, CoreSettings.Duration, _vibration, _elasticity);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOPunchScale(_toValue, CoreSettings.Duration, _vibration, _elasticity).From();
+                    else
+                        tween = target.transform.DOPunchScale(_toValue, CoreSettings.Duration, _vibration, _elasticity);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(

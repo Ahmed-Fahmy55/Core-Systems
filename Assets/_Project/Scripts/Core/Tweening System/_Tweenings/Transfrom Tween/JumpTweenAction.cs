@@ -13,7 +13,7 @@ namespace Zone8.Tweening
         [SerializeField] private bool _isLocal;
 
         [BoxGroup("Jump Settings", Order = 1)]
-        [SerializeField] Vector3 _value;
+        [SerializeField] Vector3 _toValue;
 
         [BoxGroup("Jump Settings", Order = 1)]
         [Tooltip(" Power of the jump (the max height of the jump is represented by this plus the final Y offset.")]
@@ -39,11 +39,11 @@ namespace Zone8.Tweening
             Tween tween;
             if (_isLocal)
             {
-                tween = target.transform.DOLocalJump(_value, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
+                tween = target.transform.DOLocalJump(_toValue, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
             }
             else
             {
-                tween = target.transform.DOJump(_value, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
+                tween = target.transform.DOJump(_toValue, _jumpPower, _jumpNumbs, CoreSettings.Duration, _snapping);
             }
 
             CoreSettings.Apply(tween);

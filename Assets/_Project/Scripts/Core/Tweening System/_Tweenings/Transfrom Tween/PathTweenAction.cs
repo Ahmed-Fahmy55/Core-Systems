@@ -45,11 +45,17 @@ namespace Zone8.Tweening
             Tween tween;
             if (_isLocal)
             {
-                tween = target.transform.DOLocalPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor);
+                if (CoreSettings.IsFrom)
+                    tween = target.transform.DOLocalPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor).From();
+                else
+                    tween = target.transform.DOLocalPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor);
             }
             else
             {
-                tween = target.transform.DOPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor);
+                if (CoreSettings.IsFrom)
+                    tween = target.transform.DOPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor).From();
+                else
+                    tween = target.transform.DOPath(_wayPoints, CoreSettings.Duration, _pathType, _pathMode, _resolution, _gizomColor);
             }
 
             CoreSettings.Apply(tween);
