@@ -40,7 +40,7 @@ namespace Zone8.Question.Runtime.UI.Views
             _selectionController.ItemDeselected -= OnItemDeselected;
         }
 
-        public override async Awaitable CleanQuestion()
+        public override async Awaitable FadeOut()
         {
             foreach (var line in _lines.Values)
             {
@@ -67,6 +67,7 @@ namespace Zone8.Question.Runtime.UI.Views
                 answerUI2.Pool?.Release(answerUI2);
             }
             _selectionController.ResetSelection();
+            await base.FadeOut();
         }
 
         protected override async Awaitable ShowFeedbackEffect(bool isTrue)

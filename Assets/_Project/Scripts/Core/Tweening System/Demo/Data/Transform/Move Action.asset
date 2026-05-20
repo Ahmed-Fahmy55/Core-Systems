@@ -57,6 +57,9 @@ MonoBehaviour:
     - Name: IsRelative
       Entry: 5
       Data: false
+    - Name: IsFrom
+      Entry: 5
+      Data: false
     - Name: UpdateType
       Entry: 3
       Data: 0
@@ -69,18 +72,18 @@ MonoBehaviour:
     - Name: _isLocal
       Entry: 5
       Data: true
-    - Name: _value
+    - Name: _toValue
       Entry: 7
       Data: UnityEngine.Vector3, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
     - Name: 
       Entry: 4
       Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.5
+    - Name: 
+      Entry: 4
+      Data: 0
     - Name: 
       Entry: 8
       Data: 

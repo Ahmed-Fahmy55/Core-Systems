@@ -66,8 +66,6 @@ namespace Zone8.Question.Runtime.UI.Views
 
         #region === Properties ===
 
-        public SelectionController SelectionController => _selectionController ??= GetComponent<SelectionController>();
-
         public abstract Type SupportedQuestionType { get; }
 
         #endregion
@@ -88,11 +86,11 @@ namespace Zone8.Question.Runtime.UI.Views
         /// </summary>
         protected virtual void Awake()
         {
+            _selectionController = GetComponent<SelectionController>();
             _canvasGroup = GetComponent<CanvasGroup>();
-            _answersPool = new ObjectPool<AnswerUIBase>(
-                CreateAnswer, OnGetAnswer, OnReleaseAnswer);
+            _answersPool = new ObjectPool<AnswerUIBase>(CreateAnswer, OnGetAnswer, OnReleaseAnswer);
 
-            SelectionController.SelectionCompleted += OnQuestionAnswered;
+            _selectionController.SelectionCompleted += OnQuestionAnswered;
         }
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace Zone8.Question.Runtime.UI.Views
         public override void OnDestroy()
         {
             base.OnDestroy();
-            SelectionController.SelectionCompleted -= OnQuestionAnswered;
+            _selectionController.SelectionCompleted -= OnQuestionAnswered;
         }
 
         #endregion
@@ -112,29 +110,38 @@ namespace Zone8.Question.Runtime.UI.Views
         /// Updates the UI when a new question is presented.
         /// Clears previous data, resets selection state, and repopulates answer elements.
         /// </summary>
-        public virtual async Awaitable OnQuestionUpdated(QuestionBase question)
+        public virtual async Awaitable UpdateQuestion(QuestionBase question)
         {
             ResetSelectionControllerRpc();
             _playerAnswersDic.Clear();
 
-            UpdateQuestion(question);
+            UpdateQuestionData(question);
             await UpdateQuestionAnswers(question);
+            _canvasGroup.blocksRaycasts = true;
         }
 
         /// <summary>
         /// Locks the UI to prevent user interaction.
         /// </summary>
-        public virtual void LockUI() => _canvasGroup.blocksRaycasts = false;
+        public virtual async Awaitable FadIn()
+        {
+            _canvasGroup.alpha = 1;
+            await Awaitable.EndOfFrameAsync();
+        }
 
         /// <summary>
         /// Unlocks the UI, allowing player interaction.
         /// </summary>
-        public virtual void UnlockUI() => _canvasGroup.blocksRaycasts = true;
+        public virtual async Awaitable FadeOut()
+        {
+            _canvasGroup.alpha = 0;
+            await Awaitable.EndOfFrameAsync();
+        }
 
         /// <summary>
         /// Updates the visible question text and image.
         /// </summary>
-        protected virtual void UpdateQuestion(QuestionBase question)
+        protected virtual void UpdateQuestionData(QuestionBase question)
         {
             _currentQuestion = question;
             _questionText.text = question.QuestionText;
@@ -159,6 +166,8 @@ namespace Zone8.Question.Runtime.UI.Views
         /// </summary>
         public virtual void OnQuestionAnswered(List<ISelectable> selected)
         {
+            _canvasGroup.blocksRaycasts = false;
+
             QuestionAnswer[] questionAnswers = null;
 
             if (selected != null && selected.Count > 0)
@@ -182,7 +191,7 @@ namespace Zone8.Question.Runtime.UI.Views
         {
             AnswerUIBase answerUI = _answersPool.Get();
             answerUI.Init(answer, _answersPool);
-            SelectionController.AddSelectable(answerUI);
+            _selectionController.AddSelectable(answerUI);
             return answerUI;
         }
 
@@ -234,7 +243,7 @@ namespace Zone8.Question.Runtime.UI.Views
         /// Resets selection controller state across all clients.
         /// </summary>
         [Rpc(SendTo.Everyone)]
-        private void ResetSelectionControllerRpc() => SelectionController.ResetSelection();
+        private void ResetSelectionControllerRpc() => _selectionController.ResetSelection();
 
         /// <summary>
         /// Creates a serializable PlayerAnswers struct for network transmission.
@@ -267,7 +276,6 @@ namespace Zone8.Question.Runtime.UI.Views
             }
         }
 
-        public abstract Awaitable CleanQuestion();
         protected abstract Awaitable UpdateQuestionAnswers(QuestionBase question);
         protected abstract Awaitable ShowFeedbackEffect(bool isTrue);
 

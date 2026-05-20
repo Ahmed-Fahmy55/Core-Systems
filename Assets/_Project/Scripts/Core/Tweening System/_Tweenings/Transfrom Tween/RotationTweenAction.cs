@@ -46,22 +46,30 @@ namespace Zone8.Tweening
             Tween tween;
             if (isLookAt)
             {
-                tween = target.transform.DOLookAt(value, CoreSettings.Duration, axisConstraint, up);
+                if (CoreSettings.IsFrom)
+                    tween = target.transform.DOLookAt(value, CoreSettings.Duration, axisConstraint, up).From();
+                else
+                    tween = target.transform.DOLookAt(value, CoreSettings.Duration, axisConstraint, up);
             }
             else
             {
                 if (isLocal)
                 {
-                    tween = target.transform.DOLocalRotate(value, CoreSettings.Duration, rotateMode);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DOLocalRotate(value, CoreSettings.Duration, rotateMode).From();
+                    else
+                        tween = target.transform.DOLocalRotate(value, CoreSettings.Duration, rotateMode);
                 }
                 else
                 {
-                    tween = target.transform.DORotate(value, CoreSettings.Duration, rotateMode);
+                    if (CoreSettings.IsFrom)
+                        tween = target.transform.DORotate(value, CoreSettings.Duration, rotateMode).From();
+                    else
+                        tween = target.transform.DORotate(value, CoreSettings.Duration, rotateMode);
                 }
             }
 
             CoreSettings.Apply(tween);
-
             return tween;
         }
     }

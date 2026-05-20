@@ -56,6 +56,11 @@ namespace Zone8.Tweening
         public bool IsRelative;
 
         [BoxGroup("Technical")]
+        [InfoBox("This wont work with all tweens type")]
+        [HorizontalGroup("Technical/Flags")]
+        public bool IsFrom;
+
+        [BoxGroup("Technical")]
         [HorizontalGroup("Technical/Final")]
         public UpdateType UpdateType;
 
@@ -63,17 +68,17 @@ namespace Zone8.Tweening
         [HorizontalGroup("Technical/Final")]
         public bool AutoKill;
 
-        public void Apply(Tween t)
+        public void Apply(Tween tween)
         {
-            t.SetDelay(Delay)
+            tween.SetDelay(Delay)
              .SetUpdate(UpdateType, IsIndependentUpdate)
              .SetAutoKill(AutoKill)
              .SetRelative(IsRelative);
 
-            if (CustomEase) t.SetEase(EaseCurve);
-            else t.SetEase(Ease);
+            if (CustomEase) tween.SetEase(EaseCurve);
+            else tween.SetEase(Ease);
 
-            if (Loop) t.SetLoops(LoopCount, LoopType);
+            if (Loop) tween.SetLoops(LoopCount, LoopType);
         }
     }
 }

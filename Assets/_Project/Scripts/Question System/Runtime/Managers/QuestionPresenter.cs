@@ -7,7 +7,6 @@ using Zone8.Multiplayer.Utilities;
 using Zone8.Question.Runtime.Base;
 using Zone8.Question.Runtime.Messages;
 using Zone8.Question.Runtime.UI.Views;
-using Zone8.Selection;
 using Zone8.SOAP.AssetVariable;
 
 namespace Zone8.Question.Runtime.Managers
@@ -25,14 +24,13 @@ namespace Zone8.Question.Runtime.Managers
         [SerializeField] protected bool _autoUpdateQuestion = true;
 
         [Header("Questions View")]
-        [SerializeField] protected QuestionViewBase[] _questionUis;
+        [SerializeField] protected QuestionViewBase[] _questionViews;
 
         [Header("UI Refs")]
         [SerializeField] protected NetworkTimer _timer;
-        [SerializeField] protected UISubmitButton _submitButton;
 
         protected AssetVariableRef<QuestionGameConfigSo> _gameConfigSo;
-        protected Dictionary<Type, QuestionViewBase> _questionUiMap;
+        protected Dictionary<Type, QuestionViewBase> _questionViewsMap;
         protected QuestionModel _questionModel;
         protected QuestionViewBase _currentQuestionView;
         protected EventBinding<QuestionsFinished> _examFinishd;
@@ -65,35 +63,25 @@ namespace Zone8.Question.Runtime.Managers
         protected virtual void Start()
         {
             _gameConfigSo = _questionModel.Config;
-
-            if (_gameConfigSo.Source == AssetSource.Addressable)
+            var handle = _gameConfigSo.LoadAssetAsync();
+            handle.Completed += op =>
             {
-                var handle = _gameConfigSo.LoadAssetAsync();
-                handle.Completed += op =>
+                if (op.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
                 {
-                    if (op.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
-                    {
-                        if (_gameConfigSo.Asset.SelectedTimeMode == ETimeMode.NoTimeLimit) _timer.HideUI();
-                    }
-                    else
-                    {
-                        Logger.LogError("Failed to load QuestionGameConfigSo addressable asset.");
-                    }
-                };
-            }
-            else
-            {
-                if (_gameConfigSo.Asset.SelectedTimeMode == ETimeMode.NoTimeLimit) _timer.HideUI();
-            }
+                    if (_gameConfigSo.Asset.SelectedTimeMode == ETimeMode.NoTimeLimit) _timer.HideUI();
+                }
+                else
+                {
+                    Logger.LogError("Failed to load QuestionGameConfigSo addressable asset.");
+                }
+            };
 
-
-            _questionUiMap = new();
-            foreach (QuestionViewBase questionUi in _questionUis)
+            _questionViewsMap = new();
+            foreach (QuestionViewBase questionUi in _questionViews)
             {
-                _questionUiMap.Add(questionUi.SupportedQuestionType, questionUi);
+                _questionViewsMap.Add(questionUi.SupportedQuestionType, questionUi);
             }
         }
-
         #endregion
 
 
@@ -106,7 +94,7 @@ namespace Zone8.Question.Runtime.Managers
 
         private void SubscribeToQuestionUiEvents(bool subscribe)
         {
-            foreach (var ui in _questionUis)
+            foreach (var ui in _questionViews)
             {
                 if (ui == null) continue;
                 if (subscribe)
@@ -116,15 +104,6 @@ namespace Zone8.Question.Runtime.Managers
             }
         }
 
-        protected async Awaitable ShowQuestionUi(QuestionViewBase questionUi, QuestionBase question)
-        {
-            _currentQuestionView = questionUi;
-            _currentQuestionView.LockUI();
-            questionUi.gameObject.SetActive(true);
-            await questionUi.OnQuestionUpdated(question);
-            _submitButton.SetSelectionController(questionUi.SelectionController);
-            _currentQuestionView?.UnlockUI();
-        }
 
         protected void UpdateQuestionTimer()
         {
@@ -156,18 +135,7 @@ namespace Zone8.Question.Runtime.Managers
         {
             try
             {
-                await HideActiveQuestionViewAsync();
-
-
-                if (_questionUiMap.TryGetValue(question.GetType(), out var ui) && ui != null)
-                {
-                    await ShowQuestionUi(ui, question);
-                }
-                else
-                {
-                    Logger.LogError($"No UI found for question type: {question.GetType()}");
-                    return;
-                }
+                await UpdateViews(question);
 
                 UpdateQuestionTimer();
                 QuestionUpdated?.Invoke();
@@ -176,13 +144,31 @@ namespace Zone8.Question.Runtime.Managers
             {
                 Logger.LogError(e);
             }
+        }
 
+        protected async Awaitable UpdateViews(QuestionBase question)
+        {
+            if (_currentQuestionView != null)
+            {
+                await _currentQuestionView.FadeOut();
+            }
+
+            if (_questionViewsMap.TryGetValue(question.GetType(), out var view) && view != null)
+            {
+                _currentQuestionView = view;
+                await view.FadIn();
+                await view.UpdateQuestion(question);
+            }
+            else
+            {
+                Logger.LogError($"No UI found for question type: {question.GetType()}");
+                return;
+            }
         }
 
         protected virtual async void OnQuestionAnswered(QuestionBase question, QuestionAnswer[] answers, bool isTrue)
         {
-            _currentQuestionView?.LockUI();
-            _submitButton.SetButtonVisibility(false);
+            _currentQuestionView?.FadIn();
             _timer.PauseTimer();
 
             QuestionAnswered?.Invoke(question, answers, isTrue);
@@ -221,15 +207,6 @@ namespace Zone8.Question.Runtime.Managers
             QuestionsFinished?.Invoke();
         }
 
-        protected virtual async Awaitable HideActiveQuestionViewAsync()
-        {
-            if (_currentQuestionView != null)
-            {
-                _currentQuestionView.LockUI();
-                await _currentQuestionView?.CleanQuestion();
-                _currentQuestionView.gameObject.SetActive(false);
-            }
-        }
 
         #endregion
     }

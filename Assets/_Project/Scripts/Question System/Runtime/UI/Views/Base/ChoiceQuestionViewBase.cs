@@ -37,7 +37,9 @@ namespace Zone8.Question.Runtime.UI.Views
             }
         }
 
-        public override async Awaitable CleanQuestion()
+
+
+        public override async Awaitable FadeOut()
         {
             for (int i = _answers.Count - 1; i >= 0; i--)
             {
@@ -45,6 +47,8 @@ namespace Zone8.Question.Runtime.UI.Views
                 await answerUI.Fade(false);
                 answerUI.Pool?.Release(answerUI);
             }
+
+            await base.FadeOut();
         }
     }
 }

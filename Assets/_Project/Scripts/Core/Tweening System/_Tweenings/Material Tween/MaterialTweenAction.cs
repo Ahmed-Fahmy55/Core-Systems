@@ -92,25 +92,43 @@ namespace Zone8.Tweening
             switch (_actionType)
             {
                 case EActionType.Color:
-                    tween = material.DOColor(_toColor, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOColor(_toColor, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOColor(_toColor, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Fade:
-                    tween = material.DOFade(_toValue, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOFade(_toValue, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOFade(_toValue, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Float:
-                    tween = material.DOFloat(_toValue, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOFloat(_toValue, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOFloat(_toValue, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Gradient:
                     tween = material.DOGradientColor(_toGradient, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Offset:
-                    tween = material.DOOffset(_toOffset, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOOffset(_toOffset, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOOffset(_toOffset, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Tiling:
-                    tween = material.DOTiling(_toTiling, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOTiling(_toTiling, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOTiling(_toTiling, _targetProperty, CoreSettings.Duration);
                     break;
                 case EActionType.Vector:
-                    tween = material.DOVector(_toVector, _targetProperty, CoreSettings.Duration);
+                    if (CoreSettings.IsFrom)
+                        tween = material.DOVector(_toVector, _targetProperty, CoreSettings.Duration).From();
+                    else
+                        tween = material.DOVector(_toVector, _targetProperty, CoreSettings.Duration);
                     break;
 
                 default:

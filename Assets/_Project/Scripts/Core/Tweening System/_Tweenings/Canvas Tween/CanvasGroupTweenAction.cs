@@ -12,7 +12,7 @@ namespace Zone8.Tweening
         /////////////////////////////////////////////////////
 
         [BoxGroup("Canvas Group Settings", Order = 1)]
-        [SerializeField] private float _endValue;
+        [SerializeField] private float _toValue;
 
         public Tween Act(GameObject target)
         {
@@ -28,8 +28,11 @@ namespace Zone8.Tweening
                 return null;
             }
 
-            Tween tween;
-            tween = canvasGroup.DOFade(_endValue, CoreSettings.Duration);
+            var tween = canvasGroup.DOFade(_toValue, CoreSettings.Duration);
+
+            if (CoreSettings.IsFrom)
+                tween.From();
+
             CoreSettings.Apply(tween);
             return tween;
         }

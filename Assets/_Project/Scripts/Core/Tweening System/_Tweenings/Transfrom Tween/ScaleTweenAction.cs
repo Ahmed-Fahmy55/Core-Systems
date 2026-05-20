@@ -12,7 +12,7 @@ namespace Zone8.Tweening
         [field: SerializeField] public CoreTweenSettings CoreSettings { get; set; }
 
         [BoxGroup("Scale Settings", Order = 1)]
-        [SerializeField] Vector3 _value;
+        [SerializeField] Vector3 _toValue;
 
 
         public Tween Act(GameObject target)
@@ -23,9 +23,9 @@ namespace Zone8.Tweening
                 return null;
             }
 
-            Tween tween;
-            tween = target.transform.DOScale(_value, CoreSettings.Duration);
-
+            var tween = target.transform.DOScale(_toValue, CoreSettings.Duration);
+            if (CoreSettings.IsFrom)
+                tween.From();
             CoreSettings.Apply(tween);
 
             return tween;
