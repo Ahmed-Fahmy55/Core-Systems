@@ -28,11 +28,10 @@ namespace Zone8.Question.Runtime.Managers
             _resetGameBind = new EventBinding<ResetGameEvent>(OnGameReset);
             EventBus<ResetGameEvent>.Register(_resetGameBind);
         }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-
-            if (IsServer && !IsHost) _submitButton.gameObject.SetActive(false);
 
             //Late spawn handling for clients to sync with current question
             if (!IsHost && IsClient)
@@ -55,7 +54,7 @@ namespace Zone8.Question.Runtime.Managers
         protected override void OnEnable()
         {
             base.OnEnable();
-            foreach (var ui in _questionUis)
+            foreach (var ui in _questionViews)
             {
                 if (ui == null) continue;
                 ui.PlayerSubmissionsReached += OnAllPlayersSubmitted;
@@ -65,7 +64,7 @@ namespace Zone8.Question.Runtime.Managers
         protected override void OnDisable()
         {
             base.OnDisable();
-            foreach (var ui in _questionUis)
+            foreach (var ui in _questionViews)
             {
                 if (ui == null) continue;
                 ui.PlayerSubmissionsReached -= OnAllPlayersSubmitted;
@@ -84,8 +83,7 @@ namespace Zone8.Question.Runtime.Managers
 
         protected override void OnQuestionAnswered(QuestionBase question, QuestionAnswer[] answers, bool isTrue)
         {
-            _currentQuestionView?.LockUI();
-            _submitButton.SetButtonVisibility(false);
+            _currentQuestionView?.FadIn();
             _hasAnswerd = true;
             _isAnswerTrue = isTrue;
             QuestionAnswered?.Invoke(question, answers, isTrue);
@@ -133,12 +131,6 @@ namespace Zone8.Question.Runtime.Managers
             }
         }
 
-        private void OnGameReset()
-        {
-            _questionModel.UpdateAvialbeQuestions();
-            _currentQuestionView?.CleanQuestion();
-        }
-
         private async Awaitable RunUiSequenceAsync(QuestionBase question)
         {
             await UpdateUI(question);
@@ -147,16 +139,7 @@ namespace Zone8.Question.Runtime.Managers
 
         private async Awaitable UpdateUI(QuestionBase question)
         {
-            await HideActiveQuestionViewAsync();
-            if (_questionUiMap.TryGetValue(question.GetType(), out var ui) && ui != null)
-            {
-                await ShowQuestionUi(ui, question);
-            }
-            else
-            {
-                Logger.LogError($"No UI found for question type: {question.GetType()}");
-                return;
-            }
+            await UpdateViews(question);
         }
 
         [Rpc(SendTo.Server)]
@@ -170,6 +153,11 @@ namespace Zone8.Question.Runtime.Managers
                 QuestionUpdated?.Invoke();
                 _clientsReadyCount = 0;
             }
+        }
+
+        private void OnGameReset()
+        {
+            _questionModel.UpdateAvialbeQuestions();
         }
     }
 }

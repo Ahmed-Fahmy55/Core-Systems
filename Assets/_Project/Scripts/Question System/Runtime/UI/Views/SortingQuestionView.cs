@@ -1,38 +1,92 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Zone8.Question.Core;
 using Zone8.Question.Runtime.Base;
 using Zone8.Question.Runtime.UI.Answers;
 using Zone8.Selection;
+using Zone8.Utilities;
 
 namespace Zone8.Question.Runtime.UI.Views
 {
     public class SortingQuestionView : QuestionViewBase
     {
 
-        [SerializeField] private UISubmitButton _submitButton;
-
         private List<SortingAnswerUI> _answers = new();
-        private List<SortingAnswerUI> _selectedAnswers = new();
         public override Type SupportedQuestionType => typeof(SortingQuestion);
 
+        private LayoutGroupFreezer _layoutFreezer;
+
+        private Vector3[] _slotLocalPositions;
+        private Vector2[] _slotAnchoredPositions;
 
         protected override void Awake()
         {
             base.Awake();
-            _selectionController.ItemSelected += OnItemSelected;
-            _selectionController.ItemDeselected += OnItemDeselected;
+            _layoutFreezer = _answersContainer.GetComponent<LayoutGroupFreezer>();
         }
 
-        public override void OnDestroy()
+        public void NotifyDragging(SortingAnswerUI draggedItem)
         {
-            base.OnDestroy();
-            _selectionController.ItemSelected -= OnItemSelected;
-            _selectionController.ItemDeselected -= OnItemDeselected;
+            float draggedY = draggedItem.transform.position.y;
+            int currentVisualIndex = -1;
+
+            for (int i = 0; i < _answers.Count; i++)
+            {
+                Vector3 worldTargetPos = _layoutFreezer.transform.TransformPoint(_slotLocalPositions[i]);
+
+                if (i == 0 && draggedY > worldTargetPos.y)
+                {
+                    currentVisualIndex = 0;
+                    break;
+                }
+                if (i == _answers.Count - 1 && draggedY < worldTargetPos.y)
+                {
+                    currentVisualIndex = _answers.Count - 1;
+                    break;
+                }
+                if (i < _answers.Count - 1)
+                {
+                    Vector3 worldNextPos = _layoutFreezer.transform.TransformPoint(_slotLocalPositions[i + 1]);
+
+                    if (draggedY <= worldTargetPos.y && draggedY >= worldNextPos.y)
+                    {
+                        currentVisualIndex = (Mathf.Abs(draggedY - worldTargetPos.y) < Mathf.Abs(draggedY - worldNextPos.y)) ? i : i + 1;
+                        break;
+                    }
+                }
+            }
+
+            if (currentVisualIndex != -1)
+            {
+                int oldIndex = _answers.IndexOf(draggedItem);
+                if (oldIndex != currentVisualIndex && oldIndex != -1)
+                {
+                    _answers.RemoveAt(oldIndex);
+                    _answers.Insert(currentVisualIndex, draggedItem);
+
+                    AnimateRearrangedItems(draggedItem);
+                }
+            }
         }
 
-        public override async Awaitable CleanQuestion()
+        public void NotifyStoppedDragging(SortingAnswerUI draggedItem)
+        {
+            int finalIndex = _answers.IndexOf(draggedItem);
+            if (finalIndex != -1)
+            {
+                Vector2 targetAnchoredPos = _slotAnchoredPositions[finalIndex];
+                draggedItem.RectTransform.DOKill(true);
+                draggedItem.RectTransform.DOAnchorPos(targetAnchoredPos, 0.2f).SetEase(Ease.OutBack);
+            }
+        }
+
+
+        public float GetCanvasScale() => GetComponentInParent<Canvas>().scaleFactor;
+
+        public override async Awaitable FadeOut()
         {
             for (int i = _answers.Count - 1; i >= 0; i--)
             {
@@ -41,6 +95,8 @@ namespace Zone8.Question.Runtime.UI.Views
                 answerUI.Pool?.Release(answerUI);
             }
             _selectionController.ResetSelection();
+
+            await base.FadeOut();
         }
 
         protected override async Awaitable ShowFeedbackEffect(bool isTrue)
@@ -57,24 +113,38 @@ namespace Zone8.Question.Runtime.UI.Views
 
             if (question is not SortingQuestion sortingQuestion)
             {
-                Logger.LogError("Question is not a Sorting QUestion");
+                Logger.LogError("Question is not a Sorting Question");
                 return;
             }
 
-            // Create a shuffled copy of the answers
             var shuffledAnswers = new List<QuestionAnswer>(question.Answers);
             shuffledAnswers.Shuffle();
+
+            if (_layoutFreezer != null)
+                _layoutFreezer.SetLayoutEnabled(true);
 
             foreach (var answer in shuffledAnswers)
             {
                 var answerUI = (SortingAnswerUI)GetAnswerUI(answer);
+                answerUI.Initialize(this);
                 answerUI.CorrectIndex = Array.IndexOf(question.Answers, answer);
                 _answers.Add(answerUI);
                 await answerUI.Fade(true);
             }
 
-            _submitButton.SetButtonVisibility(true);
-            _submitButton.HideOnNoSelection = false;
+            RectTransform containerRect = _answersContainer.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(containerRect);
+
+            _slotLocalPositions = new Vector3[_answers.Count];
+            _slotAnchoredPositions = new Vector2[_answers.Count];
+            for (int i = 0; i < _answers.Count; i++)
+            {
+                _slotLocalPositions[i] = _answers[i].RectTransform.localPosition;
+                _slotAnchoredPositions[i] = _answers[i].RectTransform.anchoredPosition;
+            }
+
+            if (_layoutFreezer != null)
+                _layoutFreezer.SetLayoutEnabled(false);
         }
 
         public override void OnQuestionAnswered(List<ISelectable> selected)
@@ -88,54 +158,18 @@ namespace Zone8.Question.Runtime.UI.Views
 
             selected = allSelectables;
 
-            _submitButton.SetButtonVisibility(false);
-            _submitButton.HideOnNoSelection = true;
-
             base.OnQuestionAnswered(selected);
         }
-
-        private void OnItemDeselected(ISelectable selectable)
+        private void AnimateRearrangedItems(SortingAnswerUI draggedItem)
         {
-            if (selectable is not SortingAnswerUI answerUI)
-                return;
-
-            if (_selectedAnswers.Contains(answerUI)) _selectedAnswers.Remove(answerUI);
-        }
-
-        /// <summary>
-        /// Handles selection of SortingAnswerUI items for swapping.
-        /// When two answers are selected, swaps their positions visually and in the answer list.
-        /// </summary>
-        private void OnItemSelected(ISelectable selectable)
-        {
-            if (selectable is not SortingAnswerUI selectedAnswer)
-                return;
-
-            if (_selectedAnswers.Count == 0)
+            for (int i = 0; i < _answers.Count; i++)
             {
-                _selectedAnswers.Add(selectedAnswer);
-                return;
-            }
+                if (_answers[i] == draggedItem) continue;
 
-            if (_selectedAnswers.Count == 1)
-            {
-                _selectedAnswers.Add(selectedAnswer);
+                Vector2 targetAnchoredPos = _slotAnchoredPositions[i];
 
-                // Get the RectTransforms of the selected answers
-                var firstTransform = _selectedAnswers[0].transform as RectTransform;
-                var secondTransform = _selectedAnswers[1].transform as RectTransform;
-
-                // Swap their sibling indices
-                int firstIndex = firstTransform.GetSiblingIndex();
-                int secondIndex = secondTransform.GetSiblingIndex();
-
-                (_answers[firstIndex], _answers[secondIndex]) = (_answers[secondIndex], _answers[firstIndex]);
-
-                firstTransform.SetSiblingIndex(secondIndex);
-                secondTransform.SetSiblingIndex(firstIndex);
-
-                _selectedAnswers.Clear();
-                _selectionController.ResetSelection();
+                _answers[i].RectTransform.DOKill(true);
+                _answers[i].RectTransform.DOAnchorPos(targetAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
             }
         }
     }

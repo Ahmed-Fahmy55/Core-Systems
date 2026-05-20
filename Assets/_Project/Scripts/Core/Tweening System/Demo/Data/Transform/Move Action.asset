@@ -59,7 +59,7 @@ MonoBehaviour:
       Data: false
     - Name: IsFrom
       Entry: 5
-      Data: true
+      Data: false
     - Name: UpdateType
       Entry: 3
       Data: 0
