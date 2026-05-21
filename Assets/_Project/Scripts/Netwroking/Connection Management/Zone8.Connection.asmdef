@@ -17,7 +17,8 @@
         "Events",
         "Unity.TextMeshPro",
         "Michsky.UI.Heat.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
