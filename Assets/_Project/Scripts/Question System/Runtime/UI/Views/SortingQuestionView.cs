@@ -132,8 +132,10 @@ namespace Zone8.Question.Runtime.UI.Views
                 await answerUI.Fade(true);
             }
 
+            await Awaitable.NextFrameAsync();
             RectTransform containerRect = _answersContainer.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(containerRect);
+            await Awaitable.NextFrameAsync();
 
             _slotLocalPositions = new Vector3[_answers.Count];
             _slotAnchoredPositions = new Vector2[_answers.Count];
@@ -142,7 +144,6 @@ namespace Zone8.Question.Runtime.UI.Views
                 _slotLocalPositions[i] = _answers[i].RectTransform.localPosition;
                 _slotAnchoredPositions[i] = _answers[i].RectTransform.anchoredPosition;
             }
-
             if (_layoutFreezer != null)
                 _layoutFreezer.SetLayoutEnabled(false);
         }
