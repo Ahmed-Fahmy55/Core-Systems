@@ -21,10 +21,12 @@ namespace Zone8.Question.Runtime.UI.Views
 
         private Vector3[] _slotLocalPositions;
         private Vector2[] _slotAnchoredPositions;
+        private Canvas _canvas;
 
         protected override void Awake()
         {
             base.Awake();
+            _canvas = GetComponentInParent<Canvas>();
             _layoutFreezer = _answersContainer.GetComponent<LayoutGroupFreezer>();
         }
 
@@ -84,7 +86,7 @@ namespace Zone8.Question.Runtime.UI.Views
         }
 
 
-        public float GetCanvasScale() => GetComponentInParent<Canvas>().scaleFactor;
+        public float GetCanvasScale() => _canvas.scaleFactor;
 
         public override async Awaitable FadeOut()
         {

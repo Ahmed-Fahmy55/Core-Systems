@@ -83,7 +83,6 @@ namespace Zone8.Question.Runtime.Managers
 
         protected override void OnQuestionAnswered(QuestionBase question, QuestionAnswer[] answers, bool isTrue)
         {
-            _currentQuestionView?.FadIn();
             _hasAnswerd = true;
             _isAnswerTrue = isTrue;
             QuestionAnswered?.Invoke(question, answers, isTrue);

@@ -115,6 +115,7 @@ namespace Zone8.Question.Runtime.UI.Views
             ResetSelectionControllerRpc();
             _playerAnswersDic.Clear();
 
+            _canvasGroup.blocksRaycasts = false;
             UpdateQuestionData(question);
             await UpdateQuestionAnswers(question);
             _canvasGroup.blocksRaycasts = true;

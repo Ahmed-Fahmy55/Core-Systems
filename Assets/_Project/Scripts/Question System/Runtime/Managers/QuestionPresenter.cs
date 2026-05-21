@@ -168,9 +168,7 @@ namespace Zone8.Question.Runtime.Managers
 
         protected virtual async void OnQuestionAnswered(QuestionBase question, QuestionAnswer[] answers, bool isTrue)
         {
-            _currentQuestionView?.FadIn();
             _timer.PauseTimer();
-
             QuestionAnswered?.Invoke(question, answers, isTrue);
             await ShowFeedback(isTrue);
 
