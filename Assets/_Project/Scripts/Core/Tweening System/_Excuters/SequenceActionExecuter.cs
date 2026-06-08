@@ -36,7 +36,7 @@ namespace Zone8.Tweening
         [ListDrawerSettings(ShowIndexLabels = true)]
         public List<InsertData> InsertTweens = new List<InsertData>();
 
-        [SerializeField] private bool _playOnStart = true;
+        [SerializeField] private bool _playOnStart;
         [SerializeField] private bool _restartOnPlay = true;
         [SerializeField] bool _overrideSequenceSettings = false;
 
@@ -47,6 +47,7 @@ namespace Zone8.Tweening
 
         private void Start()
         {
+            Canvas.ForceUpdateCanvases();
             BuildSequence();
             if (_playOnStart) Play();
         }
@@ -54,11 +55,14 @@ namespace Zone8.Tweening
         [Button(ButtonSizes.Large), GUIColor(0, 1, 0)]
         public void Play()
         {
-            if (Sequence == null || !Sequence.IsActive()) BuildSequence();
+            if (Sequence == null || !Sequence.IsActive())
+            {
+
+                BuildSequence();
+            }
 
             if (_restartOnPlay) Sequence.Restart();
-            else Sequence.Play();
-
+            else Sequence.PlayForward();
         }
 
         [Button(ButtonSizes.Large), GUIColor(0, 1, 0)]
@@ -76,7 +80,6 @@ namespace Zone8.Tweening
 
             Sequence = DOTween.Sequence();
 
-            sequenceSettings.Apply(Sequence);
 
             foreach (var data in SequenceTweens)
             {
@@ -104,6 +107,8 @@ namespace Zone8.Tweening
                 Sequence.Insert(data.StartTime, data.Action.Act(data.Target));
             }
 
+            Sequence.SetAutoKill(false);
+            if (_overrideSequenceSettings) sequenceSettings.Apply(Sequence);
             Sequence.Pause();
         }
 
@@ -118,6 +123,5 @@ namespace Zone8.Tweening
         {
             Sequence?.Kill();
         }
-
     }
 }

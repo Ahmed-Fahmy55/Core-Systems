@@ -14,12 +14,14 @@ namespace Zone8.Fading
 
         public async Awaitable FadeIn(Action onComplete = null)
         {
+            await Awaitable.EndOfFrameAsync();
             ActionExecuter.Play();
             await Awaitable.WaitForSecondsAsync(ActionExecuter.Sequence.Duration());
         }
 
         public async Awaitable FadeOut(Action onComplete = null)
         {
+            await Awaitable.EndOfFrameAsync();
             ActionExecuter.PlayBack();
             await Awaitable.WaitForSecondsAsync(ActionExecuter.Sequence.Duration());
         }
