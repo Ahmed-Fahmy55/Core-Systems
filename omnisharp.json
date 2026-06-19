@@ -1,0 +1,14 @@
+{
+  "FormattingOptions": {
+    "enableEditorConfigSupport": true,
+    "OrganizeImports": true
+  },
+  "RoslynExtensionsOptions": {
+    "enableAnalyzersSupport": true,
+    "enableDecompilationSupport": true,
+    "analyzeOpenDocumentsOnly": false
+  },
+  "msbuild": {
+    "enabled": true
+  }
+}
