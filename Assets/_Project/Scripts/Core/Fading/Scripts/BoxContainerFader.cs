@@ -1,29 +1,29 @@
 using Michsky.UI.Heat;
-using System;
 using UnityEngine;
+
 namespace Zone8.Fading
 {
     [RequireComponent(typeof(BoxContainer))]
     public class BoxContainerFader : MonoBehaviour, IFader
     {
-        BoxContainer boxContainer;
+        private BoxContainer _boxContainer;
 
         private void Awake()
         {
-            boxContainer = GetComponent<BoxContainer>();
-            boxContainer.enabled = false;
+            _boxContainer = GetComponent<BoxContainer>();
+            _boxContainer.enabled = false;
         }
 
-        public async Awaitable FadeIn(Action onComplete = null)
+        public async Awaitable FadeIn()
         {
-            boxContainer.enabled = true;
-            await Awaitable.WaitForSecondsAsync(boxContainer.cachedItems.Count * boxContainer.itemCooldown);
+            _boxContainer.enabled = true;
+            await Awaitable.WaitForSecondsAsync(_boxContainer.cachedItems.Count * _boxContainer.itemCooldown);
         }
 
-        public async Awaitable FadeOut(Action onComplete = null)
+        public async Awaitable FadeOut()
         {
-            boxContainer.enabled = false;
-            await Awaitable.WaitForSecondsAsync(boxContainer.cachedItems.Count * boxContainer.itemCooldown);
+            _boxContainer.enabled = false;
+            await Awaitable.WaitForSecondsAsync(_boxContainer.cachedItems.Count * _boxContainer.itemCooldown);
         }
     }
 }

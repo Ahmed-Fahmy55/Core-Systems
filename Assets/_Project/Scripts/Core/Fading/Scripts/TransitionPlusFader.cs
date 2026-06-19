@@ -1,5 +1,4 @@
 using Sirenix.OdinInspector;
-using System;
 using TransitionsPlus;
 using UnityEngine;
 
@@ -16,44 +15,38 @@ namespace Zone8.Fading
         }
 
         [Button]
-        public async Awaitable FadeIn(Action onComplete = null)
+        public async Awaitable FadeIn()
         {
-            await Fade(false, onComplete);
+            await Fade(isFadingOut: false);
         }
 
         [Button]
-        public async Awaitable FadeOut(Action onComplete = null)
+        public async Awaitable FadeOut()
         {
-            await Fade(true, onComplete);
+            await Fade(isFadingOut: true);
         }
 
-        private async Awaitable Fade(bool isFadingOut, Action onComplete = null)
+        private async Awaitable Fade(bool isFadingOut)
         {
             if (_transitionAnimator == null)
             {
                 Debug.LogError("TransitionAnimator is not assigned.");
                 return;
             }
+
             _transitionAnimator.gameObject.SetActive(true);
             _transitionAnimator.profile.invert = isFadingOut;
 
-            bool _isfinished = false;
+            bool isFinished = false;
             _transitionAnimator.onTransitionEnd.RemoveAllListeners();
-            _transitionAnimator.onTransitionEnd.AddListener(() =>
-            {
-                _isfinished = true;
-            });
-
+            _transitionAnimator.onTransitionEnd.AddListener(() => isFinished = true);
             _transitionAnimator.Play();
 
-            while (!_isfinished)
-            {
+            while (!isFinished)
                 await Awaitable.NextFrameAsync();
-            }
-            onComplete?.Invoke();
-            if (isFadingOut) _transitionAnimator.gameObject.SetActive(false);
-            if (!isFadingOut && _hideOnFadeIn) _transitionAnimator.gameObject.SetActive(false);
 
+            if (isFadingOut || _hideOnFadeIn)
+                _transitionAnimator.gameObject.SetActive(false);
         }
     }
 }

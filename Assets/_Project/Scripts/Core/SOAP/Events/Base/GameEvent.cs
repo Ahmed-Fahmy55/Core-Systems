@@ -28,9 +28,9 @@ namespace Zone8.SOAP.Events
         }
     }
 
-    public struct Unit
+    public readonly struct Unit
     {
-        public static Unit Default => Default;
+        public static Unit Default => default;
     }
 
     [CreateAssetMenu(menuName = "SOAP/Events/Game Event")]

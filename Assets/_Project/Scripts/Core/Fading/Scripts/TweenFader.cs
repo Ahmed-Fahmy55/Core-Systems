@@ -1,5 +1,4 @@
 using DG.Tweening;
-using System;
 using UnityEngine;
 using Zone8.Tweening;
 
@@ -11,15 +10,14 @@ namespace Zone8.Fading
         private SequenceActionExecuter _actionExecuter;
         private SequenceActionExecuter ActionExecuter => _actionExecuter ??= GetComponent<SequenceActionExecuter>();
 
-
-        public async Awaitable FadeIn(Action onComplete = null)
+        public async Awaitable FadeIn()
         {
             await Awaitable.EndOfFrameAsync();
             ActionExecuter.Play();
             await Awaitable.WaitForSecondsAsync(ActionExecuter.Sequence.Duration());
         }
 
-        public async Awaitable FadeOut(Action onComplete = null)
+        public async Awaitable FadeOut()
         {
             await Awaitable.EndOfFrameAsync();
             ActionExecuter.PlayBack();

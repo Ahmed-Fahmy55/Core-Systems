@@ -9,6 +9,8 @@ namespace Zone8.ImprovedTimers
         public bool IsRunning { get; private set; }
 
         protected float _initialTime;
+        private bool _isRegistered;
+        private bool _disposed;
 
         public float Progress => Mathf.Clamp(CurrentTime / _initialTime, 0, 1);
 
@@ -23,29 +25,35 @@ namespace Zone8.ImprovedTimers
         public void Start()
         {
             CurrentTime = _initialTime;
-            if (!IsRunning)
-            {
-                IsRunning = true;
-                TimerManager.RegisterTimer(this);
-                OnTimerStart.Invoke();
-            }
+            if (IsRunning) return;
+
+            IsRunning = true;
+            Register();
+            OnTimerStart.Invoke();
         }
 
         public void Stop()
         {
-            if (IsRunning)
-            {
-                IsRunning = false;
-                TimerManager.DeregisterTimer(this);
-                OnTimerStop.Invoke();
-            }
+            if (!IsRunning) return;
+
+            IsRunning = false;
+            Deregister();
+            OnTimerStop.Invoke();
+        }
+
+        // Pause/Resume are a matched pair — they temporarily halt ticking without
+        // removing the timer from the manager.  Resume also works after Stop() since
+        // it re-registers if needed, making the pair safe regardless of call order.
+        public void Pause() => IsRunning = false;
+
+        public void Resume()
+        {
+            IsRunning = true;
+            Register();
         }
 
         public abstract void Tick();
         public abstract bool IsFinished { get; }
-
-        public void Resume() => IsRunning = true;
-        public void Pause() => IsRunning = false;
 
         public virtual void Reset() => CurrentTime = _initialTime;
 
@@ -55,15 +63,22 @@ namespace Zone8.ImprovedTimers
             Reset();
         }
 
-        bool disposed;
-
-        ~Timer()
+        private void Register()
         {
-            Dispose(false);
+            if (_isRegistered) return;
+            _isRegistered = true;
+            TimerManager.RegisterTimer(this);
         }
 
-        // Call Dispose to ensure deregistration of the timer from the TimerManager
-        // when the consumer is done with the timer or being destroyed
+        private void Deregister()
+        {
+            if (!_isRegistered) return;
+            _isRegistered = false;
+            TimerManager.DeregisterTimer(this);
+        }
+
+        ~Timer() => Dispose(false);
+
         public void Dispose()
         {
             Dispose(true);
@@ -72,14 +87,12 @@ namespace Zone8.ImprovedTimers
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed) return;
+            if (_disposed) return;
 
             if (disposing)
-            {
-                TimerManager.DeregisterTimer(this);
-            }
+                Deregister();
 
-            disposed = true;
+            _disposed = true;
         }
     }
 }

@@ -15,13 +15,15 @@ namespace Zone8.SOAP.RuntimeSet
 
         public void Add(T item)
         {
-            if (!Items.Contains(item)) Items.Add(item);
+            if (Items.Contains(item)) return;
+            Items.Add(item);
             OnItemAdded?.Invoke(item);
         }
 
         public void Remove(T item)
         {
-            if (Items.Contains(item)) Items.Remove(item);
+            if (!Items.Contains(item)) return;
+            Items.Remove(item);
             OnItemRemoved?.Invoke(item);
         }
     }

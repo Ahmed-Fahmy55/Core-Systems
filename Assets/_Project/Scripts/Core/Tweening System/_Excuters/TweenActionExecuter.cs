@@ -28,7 +28,7 @@ namespace Zone8.Tweening
         [Button]
         public void PlayBack()
         {
-            _tween.Complete();
+            _tween?.Complete();
             _tween?.PlayBackwards();
         }
 

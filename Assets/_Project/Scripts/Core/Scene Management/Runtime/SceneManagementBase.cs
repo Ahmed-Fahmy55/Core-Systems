@@ -160,37 +160,34 @@ namespace Zone8.SceneManagement
         {
             _isLoading = true;
 
-            await StartLoadingEffect();
-
-            if (group.GetAddressablesScenesCount() != 0)
+            try
             {
-                if (!await DownloadSceneGroupDependencies(group, dependancyProgressor))
-                {
-                    await EndLoadingEffect();
-                    _isLoading = false;
-                    return;
-                }
-            }
+                await StartLoadingEffect();
 
-            if (relatedBundles != null && relatedBundles.Length > 0)
+                if (group.GetAddressablesScenesCount() != 0
+                    && !await DownloadSceneGroupDependencies(group, dependancyProgressor))
+                    return;
+
+                if (relatedBundles is { Length: > 0 }
+                    && !await DownloadBundles(relatedBundles, dependancyProgressor))
+                    return;
+
+                await _sceneLoadHandler.UnloadScenes();
+                ClearHandles();
+                await Resources.UnloadUnusedAssets();
+
+                await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgresseor);
+                _currentSceneGroup = group.GroupName;
+            }
+            catch (Exception ex)
             {
-                if (!await DownloadBundles(relatedBundles, dependancyProgressor))
-                {
-                    await EndLoadingEffect();
-                    _isLoading = false;
-                    return;
-                }
+                Logger.LogError($"[SceneManagement] Failed to load scene group '{group.GroupName}': {ex}");
             }
-
-            await _sceneLoadHandler.UnloadScenes();
-            ClearHandles();
-            await Resources.UnloadUnusedAssets();
-
-            await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgresseor);
-            await EndLoadingEffect();
-
-            _currentSceneGroup = group.GroupName;
-            _isLoading = false;
+            finally
+            {
+                await EndLoadingEffect();
+                _isLoading = false;
+            }
         }
 
         protected virtual async Awaitable<bool> DownloadSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor)

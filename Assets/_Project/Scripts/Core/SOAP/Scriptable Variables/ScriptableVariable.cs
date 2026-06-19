@@ -1,12 +1,13 @@
 using Sirenix.OdinInspector;
 using System;
-using System.Data.SqlTypes;
 using UnityEngine;
-
-
 
 namespace Zone8.SOAP.ScriptableVariable
 {
+    public interface INullable
+    {
+        bool IsNull { get; }
+    }
 
     [InlineEditor]
     public class ScriptableVariable<T> : ScriptableObject, INullable
@@ -91,7 +92,7 @@ namespace Zone8.SOAP.ScriptableVariable
                     return ConstValue == null;
                 }
 
-                return Sv.IsNull;
+                return Sv == null || Sv.IsNull;
             }
         }
     }
