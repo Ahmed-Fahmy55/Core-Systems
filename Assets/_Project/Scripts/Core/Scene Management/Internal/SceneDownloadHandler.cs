@@ -78,23 +78,19 @@ namespace Zone8.SceneManagement
             }
         }
 
-        public async Awaitable<bool> DownloadsSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor = null)
+        public async Awaitable<bool> DownloadSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor = null)
         {
             foreach (var sceneData in group.Scenes)
             {
                 if (!sceneData.IsAddressable) continue;
 
-                EventBus<BundleDownloadingEvent>.Raise(new()
-                {
-                    Description = $"Preparing: {group.GroupName.DisplayName}",
-                    Progressor = progressor,
-                    State = EDwonloadingState.Preparing,
-                });
+                string address = sceneData.Scene.Address;
+                EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Preparing(group.GroupName, address));
 
                 // Optimization: Don't check size if we already hold the handle
-                if (_managedHandles.ContainsKey(sceneData.Scene.Address)) continue;
+                if (_managedHandles.ContainsKey(address)) continue;
 
-                AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(sceneData.Scene.Address);
+                AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(address);
                 await sizeHandle.Task;
 
                 try
@@ -105,14 +101,10 @@ namespace Zone8.SceneManagement
                         {
                             progressor?.Init(sizeHandle.Result / (1024 * 1024));
 
-                            EventBus<BundleDownloadingEvent>.Raise(new()
-                            {
-                                Description = $"Downloading: {group.GroupName.DisplayName}",
-                                Progressor = progressor,
-                                State = EDwonloadingState.Downloading,
-                            });
+                            EventBus<BundleDownloadEvent>.Raise(
+                                BundleDownloadEvent.Downloading(group.GroupName, address, sizeHandle.Result));
 
-                            bool success = await DownloadDependenciesWithDynamicTimeoutAsync(sceneData.Scene.Address, progressor);
+                            bool success = await DownloadDependenciesWithDynamicTimeoutAsync(address, group.GroupName, progressor);
                             if (!success) return false;
                         }
                     }
@@ -130,6 +122,8 @@ namespace Zone8.SceneManagement
         {
             if (_managedHandles.ContainsKey(label)) return true;
 
+            EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Preparing(null, label));
+
             AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(label);
             await sizeHandle.Task;
 
@@ -141,13 +135,10 @@ namespace Zone8.SceneManagement
                     {
                         progressor?.Init(sizeHandle.Result / (1024 * 1024));
 
-                        EventBus<BundleDownloadingEvent>.Raise(new()
-                        {
-                            Description = $"Downloading: {label}",
-                            Progressor = progressor,
-                            State = EDwonloadingState.Downloading,
-                        });
-                        return await DownloadDependenciesWithDynamicTimeoutAsync(label, progressor);
+                        EventBus<BundleDownloadEvent>.Raise(
+                            BundleDownloadEvent.Downloading(null, label, sizeHandle.Result));
+
+                        return await DownloadDependenciesWithDynamicTimeoutAsync(label, null, progressor);
                     }
                     return true;
                 }
@@ -163,7 +154,7 @@ namespace Zone8.SceneManagement
 
         #region Private Methods
 
-        private async Awaitable<bool> DownloadDependenciesWithDynamicTimeoutAsync(string address, IAddressableProgressor progressor = null)
+        private async Awaitable<bool> DownloadDependenciesWithDynamicTimeoutAsync(string address, ESceneGroup owningGroup, IAddressableProgressor progressor = null)
         {
             int attempt = 0;
             bool isDownloaded = false;
@@ -199,28 +190,19 @@ namespace Zone8.SceneManagement
                     if (handle.Status == AsyncOperationStatus.Succeeded)
                     {
                         isDownloaded = true;
-                        // BUG FIX: Store the handle to maintain ref-count
+                        // Store the handle to maintain ref-count and prevent redundant re-loads
                         if (_managedHandles.ContainsKey(address)) Addressables.Release(_managedHandles[address]);
                         _managedHandles[address] = handle;
 
-                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-                        {
-                            Description = $"Success donwloading bundle: {address}",
-                            State = EDwonloadingState.Finished,
-                            Progressor = progressor,
-                        });
+                        EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Completed(owningGroup, address));
                     }
                     else
                     {
                         // Clean up failed handle so we can retry
                         Addressables.Release(handle);
 
-                        EventBus<BundleDownloadingEvent>.Raise(new BundleDownloadingEvent()
-                        {
-                            Description = $"Failed downloading bundle: {address}",
-                            Progressor = progressor,
-                            State = EDwonloadingState.Failiure,
-                        });
+                        EventBus<BundleDownloadEvent>.Raise(
+                            BundleDownloadEvent.Failed(owningGroup, address, $"Download failed (attempt {attempt}/{_maxRetries})."));
                     }
                 }
                 catch (Exception ex)

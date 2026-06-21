@@ -8,18 +8,18 @@ namespace Zone8.SceneManagement
     {
         [SerializeField] private ProgressBar _progressBar;
 
-        private EventBinding<BundleDownloadingEvent> _bundleDownloadBinding;
+        private EventBinding<BundleDownloadEvent> _bundleDownloadBinding;
         private long _currentDownloadSize;
 
         private void Awake()
         {
-            _bundleDownloadBinding = new EventBinding<BundleDownloadingEvent>(OnBundleDownloading);
-            EventBus<BundleDownloadingEvent>.Register(_bundleDownloadBinding);
+            _bundleDownloadBinding = new EventBinding<BundleDownloadEvent>(OnBundleDownload);
+            EventBus<BundleDownloadEvent>.Register(_bundleDownloadBinding);
         }
 
         private void OnDestroy()
         {
-            EventBus<BundleDownloadingEvent>.Deregister(_bundleDownloadBinding);
+            EventBus<BundleDownloadEvent>.Deregister(_bundleDownloadBinding);
         }
 
         private void Start()
@@ -41,23 +41,23 @@ namespace Zone8.SceneManagement
             }
         }
 
-        private void OnBundleDownloading(BundleDownloadingEvent data)
+        private void OnBundleDownload(BundleDownloadEvent data)
         {
-            if (data.Progressor != (IAddressableProgressor)this) return;
-
-            switch (data.State)
+            // The bar value itself is driven directly through IAddressableProgressor.Progress;
+            // this handler only reacts to discrete phase changes for show/hide.
+            switch (data.Phase)
             {
-                case EDwonloadingState.Downloading:
+                case EDownloadPhase.Downloading:
                     _progressBar.SetValue(0);
                     gameObject.SetActive(true);
                     break;
 
-                case EDwonloadingState.Finished:
+                case EDownloadPhase.Completed:
                     _progressBar.SetValue(1);
                     gameObject.SetActive(false);
                     break;
 
-                case EDwonloadingState.Failiure:
+                case EDownloadPhase.Failed:
                     gameObject.SetActive(false);
                     break;
             }

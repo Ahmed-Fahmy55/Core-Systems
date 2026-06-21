@@ -91,7 +91,7 @@ namespace Zone8.SceneManagement
         [TableColumnWidth(100)]
         [ReadOnly]
         [LabelText("Is Addressable")]
-        public bool IsAddressable => Scene.State == SceneReferenceState.Addressable ? true : false;
+        public bool IsAddressable => Scene.State == SceneReferenceState.Addressable;
     }
 
     /// <summary>

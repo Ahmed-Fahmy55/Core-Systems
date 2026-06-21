@@ -11,7 +11,7 @@ namespace Zone8.SceneManagement
     /// Base class for managing scene loading, dependencies, and bundles.
     /// Provides functionality for loading, unloading, and tracking progress of scene groups.
     /// </summary>
-    public abstract class SceneManagementBase : SerializedMonoBehaviour, IProgress<float>
+    public abstract class SceneManagementBase : SerializedMonoBehaviour, IProgress<float>, ISceneManager
     {
         #region Members
 
@@ -95,9 +95,9 @@ namespace Zone8.SceneManagement
             _sceneDownloadHandler.ReleaseHandles();
         }
 
-        public void ClearHandle(string lable)
+        public void ClearHandle(string label)
         {
-            _sceneDownloadHandler.ReleaseHandle(lable);
+            _sceneDownloadHandler.ReleaseHandle(label);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Zone8.SceneManagement
         /// <param name="loadProgressor">Progress reporter for scene loading.</param>
         /// <param name="downloadingProgressor">Progress reporter for bundle downloading.</param>
         [Button("Load SceneGroup")]
-        public virtual void Load(ESceneGroup groupName, string[] relatedBundles = null,
+        public virtual async Awaitable Load(ESceneGroup groupName, string[] relatedBundles = null,
             IProgress<float> loadProgressor = null, IAddressableProgressor downloadingProgressor = null)
         {
             if (_isLoading) return;
@@ -119,10 +119,10 @@ namespace Zone8.SceneManagement
                 return;
             }
 
-            loadProgressor = loadProgressor == null ? this : loadProgressor;
-            downloadingProgressor = downloadingProgressor == null ? _addressableProgressor : downloadingProgressor;
+            loadProgressor ??= this;
+            downloadingProgressor ??= _addressableProgressor;
 
-            LoadSceneGroup(targetSceneGroup, relatedBundles, loadProgressor, downloadingProgressor);
+            await LoadSceneGroup(targetSceneGroup, relatedBundles, loadProgressor, downloadingProgressor);
         }
 
 
@@ -147,41 +147,58 @@ namespace Zone8.SceneManagement
             return true;
         }
 
-        public virtual void ReloadCurrentSceneGroup()
-        {
-            Load(_currentSceneGroup);
-        }
+        public virtual Awaitable ReloadCurrentSceneGroup() => Load(_currentSceneGroup);
         #endregion
 
         #region Private Members
 
-        protected virtual async void LoadSceneGroup(SceneGroup group, string[] relatedBundles, IProgress<float> sceneLoadProgresseor,
-                                          IAddressableProgressor dependancyProgressor)
+        protected virtual async Awaitable LoadSceneGroup(SceneGroup group, string[] relatedBundles,
+            IProgress<float> sceneLoadProgressor, IAddressableProgressor dependencyProgressor)
         {
             _isLoading = true;
+            RaiseTransition(group.GroupName, ESceneTransitionPhase.Started);
 
             try
             {
                 await StartLoadingEffect();
 
-                if (group.GetAddressablesScenesCount() != 0
-                    && !await DownloadSceneGroupDependencies(group, dependancyProgressor))
-                    return;
+                bool hasAddressableScenes = group.GetAddressablesScenesCount() != 0;
+                bool hasRelatedBundles = relatedBundles is { Length: > 0 };
 
-                if (relatedBundles is { Length: > 0 }
-                    && !await DownloadBundles(relatedBundles, dependancyProgressor))
-                    return;
+                if (hasAddressableScenes || hasRelatedBundles)
+                {
+                    RaiseTransition(group.GroupName, ESceneTransitionPhase.Downloading);
 
+                    if (hasAddressableScenes
+                        && !await _sceneDownloadHandler.DownloadSceneGroupDependencies(group, dependencyProgressor))
+                    {
+                        RaiseTransition(group.GroupName, ESceneTransitionPhase.Failed, "Failed to download scene group dependencies.");
+                        return;
+                    }
+
+                    if (hasRelatedBundles
+                        && !await DownloadBundles(relatedBundles, dependencyProgressor))
+                    {
+                        RaiseTransition(group.GroupName, ESceneTransitionPhase.Failed, "Failed to download related bundles.");
+                        return;
+                    }
+                }
+
+                RaiseTransition(group.GroupName, ESceneTransitionPhase.Unloading);
                 await _sceneLoadHandler.UnloadScenes();
                 ClearHandles();
                 await Resources.UnloadUnusedAssets();
 
-                await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgresseor);
+                RaiseTransition(group.GroupName, ESceneTransitionPhase.Loading);
+                await _sceneLoadHandler.LoadSceneGroup(group, sceneLoadProgressor);
                 _currentSceneGroup = group.GroupName;
+
+                RaiseTransition(group.GroupName, ESceneTransitionPhase.Completed);
             }
             catch (Exception ex)
             {
                 Logger.LogError($"[SceneManagement] Failed to load scene group '{group.GroupName}': {ex}");
+                RaiseTransition(group.GroupName, ESceneTransitionPhase.Failed, ex.Message);
             }
             finally
             {
@@ -190,13 +207,9 @@ namespace Zone8.SceneManagement
             }
         }
 
-        protected virtual async Awaitable<bool> DownloadSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor)
+        static void RaiseTransition(ESceneGroup group, ESceneTransitionPhase phase, string error = null)
         {
-            if (!await _sceneDownloadHandler.DownloadsSceneGroupDependencies(group, progressor))
-            {
-                return false;
-            }
-            return true;
+            EventBus<SceneTransitionEvent>.Raise(new SceneTransitionEvent(group, phase, error));
         }
 
         protected bool IsGroupRegistered(ESceneGroup group)

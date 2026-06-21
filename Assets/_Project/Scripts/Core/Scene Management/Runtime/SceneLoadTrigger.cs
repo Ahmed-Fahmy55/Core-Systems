@@ -9,26 +9,22 @@ namespace Zone8.SceneManagement
         [SerializeField] private ScriptableVariableRef<ESceneGroup> _sceneToLoad;
         [SerializeField] private bool _loadOnStart;
 
-        private SceneManagementManager _sceneManager;
+        private ISceneManager _sceneManager;
 
         private void Awake()
         {
-            _sceneManager = FindAnyObjectByType<SceneManagementManager>();
+            _sceneManager = FindAnyObjectByType<SceneManagementBase>();
         }
 
         private void Start()
         {
-            if (_loadOnStart)
-            {
-                Load();
-            }
+            if (_loadOnStart) Load();
         }
 
         [Button]
         public void Load()
         {
-            if (!_sceneToLoad.IsNull) _sceneManager.Load(_sceneToLoad.Value);
+            if (!_sceneToLoad.IsNull) _sceneManager?.Load(_sceneToLoad.Value);
         }
     }
-
 }

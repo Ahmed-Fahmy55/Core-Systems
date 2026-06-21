@@ -53,12 +53,7 @@ namespace Zone8.SceneManagement
             _activeSceneGroup = group;
 
             // Notify that the scene group loading has started
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Loading,
-                Progressor = progressor
-            });
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent(group, ESceneLoadStatus.Loading));
 
             var totalScenesToLoad = _activeSceneGroup.Scenes.Count;
             var operationGroup = new AsyncOperationGroup(totalScenesToLoad);
@@ -69,42 +64,35 @@ namespace Zone8.SceneManagement
                 var sceneData = group.Scenes[i];
 
                 // Notify that the individual scene loading has started
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
-                {
-                    SceneData = sceneData,
-                    LoadStatues = ESceneLoadStatus.Loading,
-                    Progressor = progressor
-                });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneData, ESceneLoadStatus.Loading));
 
                 if (sceneData.Scene.State == SceneReferenceState.Regular)
                 {
                     var operation = SceneManager.LoadSceneAsync(sceneData.Path, LoadSceneMode.Additive);
                     operationGroup.Operations.Add(operation);
-                    operation.completed += handle => OnSceneLoad(handle, sceneData, progressor);
+                    operation.completed += handle => OnSceneLoad(handle, sceneData);
                 }
                 else if (sceneData.Scene.State == SceneReferenceState.Addressable)
                 {
                     var sceneHandle = Addressables.LoadSceneAsync(sceneData.Scene.Address, LoadSceneMode.Additive);
                     _loadedGroupHandles.Handles.Add(sceneHandle);
-                    sceneHandle.Completed += handle => OnSceneLoad(handle, sceneData, progressor);
+                    sceneHandle.Completed += handle => OnSceneLoad(handle, sceneData);
                 }
             }
 
-            // Wait for all scenes to finish loading
-            //TODO Optimise progress algorithm to not rely on a fixed weight distribution between regular and addressable scenes
-            float loadingScenesProgress = 0;
+            // Wait for all scenes to finish loading — weighted by scene count so mixed groups report correctly
             while (!operationGroup.IsDone || !_loadedGroupHandles.IsDone)
             {
-                loadingScenesProgress = operationGroup.Progress + _loadedGroupHandles.Progress;
+                int regularCount = operationGroup.Operations.Count;
+                int addressableCount = _loadedGroupHandles.Handles.Count;
+                int totalCount = regularCount + addressableCount;
 
-                if (operationGroup.Operations.Count > 0 && _loadedGroupHandles.Handles.Count > 0)
+                if (totalCount > 0)
                 {
-                    progressor?.Report(loadingScenesProgress / 2);
+                    float weighted = (operationGroup.Progress * regularCount + _loadedGroupHandles.Progress * addressableCount) / totalCount;
+                    progressor?.Report(weighted);
                 }
-                else
-                {
-                    progressor?.Report(loadingScenesProgress);
-                }
+
                 await Awaitable.NextFrameAsync();
             }
 
@@ -128,12 +116,7 @@ namespace Zone8.SceneManagement
                 await SceneManager.UnloadSceneAsync(tempScene);
             }
 
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                SceneGroup = group,
-                LoadStatues = ESceneLoadStatus.Completed,
-                Progressor = progressor
-            });
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent(group, ESceneLoadStatus.Completed));
         }
 
         /// <summary>
@@ -142,10 +125,8 @@ namespace Zone8.SceneManagement
         /// <returns>An awaitable task that completes when all scenes are unloaded.</returns>
         public async Awaitable UnloadScenes()
         {
-            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent()
-            {
-                LoadStatues = ESceneLoadStatus.Unloading,
-            });
+            // _activeSceneGroup is the group currently in memory (default on the first ever load).
+            EventBus<SceneGroupLoadEvent>.Raise(new SceneGroupLoadEvent(_activeSceneGroup, ESceneLoadStatus.Unloading));
 
             var scenes = new List<string>();
             int sceneCount = SceneManager.sceneCount;
@@ -211,26 +192,15 @@ namespace Zone8.SceneManagement
         /// </summary>
         /// <param name="handle">The handle of the completed operation.</param>
         /// <param name="sceneName">The data of the loaded scene.</param>
-        /// <param name="progressor">Optional progress reporter.</param>
-        private void OnSceneLoad(AsyncOperationHandle<SceneInstance> handle, SceneData sceneName, IProgress<float> progressor)
+        private void OnSceneLoad(AsyncOperationHandle<SceneInstance> handle, SceneData sceneName)
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
-                {
-                    SceneData = sceneName,
-                    LoadStatues = ESceneLoadStatus.Completed,
-                    Progressor = progressor
-                });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Completed));
             }
             else
             {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
-                {
-                    SceneData = sceneName,
-                    LoadStatues = ESceneLoadStatus.Error,
-                    Progressor = progressor
-                });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Failed));
                 Logger.LogError($"Failed to load addressable scene: {sceneName.Path}");
             }
         }
@@ -239,29 +209,17 @@ namespace Zone8.SceneManagement
         /// Handles the completion of a regular scene load operation.
         /// </summary>
         /// <param name="sceneName">The data of the loaded scene.</param>
-        /// <param name="progressor">Optional progress reporter.</param>
-        private void OnSceneLoad(AsyncOperation handle, SceneData sceneName, IProgress<float> progressor)
+        private void OnSceneLoad(AsyncOperation handle, SceneData sceneName)
         {
             if (handle.isDone)
             {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
-                {
-                    SceneData = sceneName,
-                    LoadStatues = ESceneLoadStatus.Completed,
-                    Progressor = progressor
-                });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Completed));
             }
             else
             {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent()
-                {
-                    SceneData = sceneName,
-                    LoadStatues = ESceneLoadStatus.Error,
-                    Progressor = progressor
-                });
+                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Failed));
                 Logger.LogError($"Failed to load scene: {sceneName.Path}");
             }
-
         }
 
         #endregion
