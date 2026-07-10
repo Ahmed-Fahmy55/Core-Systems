@@ -12,7 +12,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
             _targetComponent.text = _initialValue;
         }
 
-        protected override string SetIntialValue()
+        protected override string SetInitialValue()
         {
             return _targetComponent.text;
         }

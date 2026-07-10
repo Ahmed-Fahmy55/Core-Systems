@@ -28,7 +28,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
             _targetComponent.sprite = _initialValue;
         }
 
-        protected override Sprite SetIntialValue()
+        protected override Sprite SetInitialValue()
         {
             return _targetComponent.sprite;
         }

@@ -10,7 +10,8 @@ namespace Zone8.SOAP.RuntimeSet
         public event Action<T> OnItemAdded;
         public event Action<T> OnItemRemoved;
 
-        [ShowInInspector]
+        // NonSerialized: runtime registrations must never persist into the asset
+        [ShowInInspector, NonSerialized]
         public List<T> Items = new();
 
         public void Add(T item)

@@ -217,12 +217,18 @@ public class AssetVariableRefTests
     #region Addressable Source Tests
 
     [UnityTest]
-    public IEnumerator LoadAssetAsync_Addressable_ThrowsIfRefIsNull()
+    public IEnumerator LoadAssetAsync_Addressable_FailsGracefullyIfRefIsNull()
     {
         var wrapper = new AssetVariableRef<GameObject> { Source = AssetSource.Addressable };
 
-        // Testing exception in UnityTest requires a try-catch or Assert.Throws
-        Assert.Throws<System.InvalidOperationException>(() => wrapper.LoadAssetAsync());
+        // A missing reference must not throw — it logs an error and returns a failed handle
+        LogAssert.ignoreFailingMessages = true;
+        var handle = wrapper.LoadAssetAsync();
+        LogAssert.ignoreFailingMessages = false;
+
+        Assert.IsTrue(handle.IsDone);
+        Assert.AreEqual(AsyncOperationStatus.Failed, handle.Status);
+        Assert.IsNull(handle.Result);
         yield return null;
     }
 

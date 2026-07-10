@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Zone8.SOAP.ScriptableVariable
@@ -17,19 +18,20 @@ namespace Zone8.SOAP.ScriptableVariable
         [SerializeField]
         private T _value;
 
-
         public T Value
         {
-            get
-            {
-                return _value;
-            }
+            get => _value;
             set
             {
+                if (EqualityComparer<T>.Default.Equals(_value, value)) return;
+
                 _value = value;
                 OnValueChanged?.Invoke(_value);
             }
         }
+
+        /// <summary>Raises <see cref="OnValueChanged"/> with the current value even though nothing changed.</summary>
+        public void ForceNotify() => OnValueChanged?.Invoke(_value);
 
         public bool IsNull
         {
@@ -41,6 +43,40 @@ namespace Zone8.SOAP.ScriptableVariable
                 return _value == null;
             }
         }
+
+#if UNITY_EDITOR
+        // Play-mode writes to a ScriptableObject asset would otherwise persist in the
+        // editor: snapshot the value when play begins and restore it when play ends.
+        [NonSerialized] private T _valueBeforePlay;
+        [NonSerialized] private bool _captured;
+
+        private void OnEnable()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+            // Assets loaded during play (Addressables/Resources) miss EnteredPlayMode
+            if (Application.isPlaying && !_captured)
+            {
+                _valueBeforePlay = _value;
+                _captured = true;
+            }
+        }
+
+        private void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
+        {
+            if (state == UnityEditor.PlayModeStateChange.EnteredPlayMode && !_captured)
+            {
+                _valueBeforePlay = _value;
+                _captured = true;
+            }
+            else if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode && _captured)
+            {
+                _value = _valueBeforePlay;
+                _captured = false;
+            }
+        }
+#endif
     }
 
 
@@ -66,10 +102,10 @@ namespace Zone8.SOAP.ScriptableVariable
                 if (UseConstant)
                     return ConstValue;
 
-                else if (Sv != null)
+                if (Sv != null)
                     return Sv.Value;
 
-                return default(T);
+                return default;
             }
             set
             {
@@ -96,5 +132,4 @@ namespace Zone8.SOAP.ScriptableVariable
             }
         }
     }
-
 }

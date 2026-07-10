@@ -17,7 +17,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
             _targetComponent.color = _initialValue;
         }
 
-        protected override Color SetIntialValue()
+        protected override Color SetInitialValue()
         {
             return _targetComponent.color;
         }

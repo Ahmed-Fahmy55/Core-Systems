@@ -26,7 +26,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
                 Logger.LogError($"No target component of type {typeof(C)} found on {gameObject.name}. Please assign a target component.", this);
                 return;
             }
-            _initialValue = SetIntialValue();
+            _initialValue = SetInitialValue();
         }
 
         private void Start()
@@ -44,9 +44,10 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         private void OnDestroy()
         {
-            if (!_variable.HasValue) return;
+            if (_variable.HasValue)
+                _variable.Asset.OnValueChanged -= UpdateValue;
 
-            _variable.Asset.OnValueChanged -= UpdateValue;
+            // Always release — a load still in flight would otherwise leak its handle
             _variable.ReleaseAsset();
         }
 
@@ -77,7 +78,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
 
         protected abstract void HideTarget();
 
-        protected abstract T SetIntialValue();
+        protected abstract T SetInitialValue();
 
         protected abstract void UpdateTargetValue(T newValue);
 

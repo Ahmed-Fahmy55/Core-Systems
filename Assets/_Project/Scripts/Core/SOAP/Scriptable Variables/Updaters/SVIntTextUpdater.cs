@@ -11,7 +11,7 @@ namespace Zone8.SOAP.ScriptableVariable.Updaters
             _targetComponent.text = _initialValue.ToString();
         }
 
-        protected override int SetIntialValue()
+        protected override int SetInitialValue()
         {
             if (string.IsNullOrEmpty(_targetComponent.text))
                 return 0;
