@@ -9,55 +9,44 @@ using Zone8.Events;
 
 namespace Zone8.SceneManagement
 {
+    /// <summary>
+    /// Downloads addressable dependencies (scene-group scenes and standalone bundles) with a
+    /// stall-detecting retry policy, and keeps the resulting handles alive so downloaded assets
+    /// stay in memory instead of being redundantly re-loaded.
+    /// </summary>
     public class SceneDownloadHandler
     {
         #region Members
 
-        private float _progressCheckInterval = 1f;
-        private int _maxRetries = 2;
-        private float _maxIdleTimeInSeconds = 30f;
+        private readonly float _progressCheckInterval;
+        private readonly int _maxRetries;
+        private readonly float _maxIdleTimeInSeconds;
 
         // CRITICAL: Tracks handles to keep assets in RAM while playing.
         // This prevents the "climbing memory" by preventing redundant re-loads.
-        private Dictionary<string, AsyncOperationHandle> _managedHandles = new();
+        private readonly Dictionary<string, AsyncOperationHandle> _managedHandles = new();
 
         #endregion
 
-        #region Constructors
-
-        public SceneDownloadHandler(float progressCheckInterval, int maxRetries, float maxIdleTime)
+        public SceneDownloadHandler(float progressCheckInterval = 1f, int maxRetries = 2, float maxIdleTime = 30f)
         {
             _progressCheckInterval = progressCheckInterval;
             _maxRetries = maxRetries;
             _maxIdleTimeInSeconds = maxIdleTime;
         }
 
-        public SceneDownloadHandler()
-        {
-            _progressCheckInterval = 1;
-            _maxRetries = 2;
-            _maxIdleTimeInSeconds = 30;
-        }
-
-        #endregion
-
         #region Public API
 
-        public void SetRetryPolicy(int maxRetries, float timeout)
-        {
-            _maxRetries = maxRetries;
-            _maxIdleTimeInSeconds = timeout;
-        }
-
         /// <summary>
-        /// Call this when returning to the Main Menu or changing SceneGroups 
+        /// Call this when returning to the Main Menu or changing SceneGroups
         /// to finally release memory.
         /// </summary>
         public void ReleaseHandles()
         {
             foreach (var handle in _managedHandles.Values)
             {
-                if (handle.IsValid()) Addressables.Release(handle);
+                if (handle.IsValid())
+                    Addressables.Release(handle);
             }
             _managedHandles.Clear();
         }
@@ -78,83 +67,79 @@ namespace Zone8.SceneManagement
             }
         }
 
+        /// <summary>Downloads the dependencies of every addressable scene in the group.</summary>
         public async Awaitable<bool> DownloadSceneGroupDependencies(SceneGroup group, IAddressableProgressor progressor = null)
         {
             foreach (var sceneData in group.Scenes)
             {
-                if (!sceneData.IsAddressable) continue;
+                if (!sceneData.IsAddressable)
+                    continue;
 
-                string address = sceneData.Scene.Address;
-                EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Preparing(group.GroupName, address));
-
-                // Optimization: Don't check size if we already hold the handle
-                if (_managedHandles.ContainsKey(address)) continue;
-
-                AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(address);
-                await sizeHandle.Task;
-
-                try
-                {
-                    if (sizeHandle.Status == AsyncOperationStatus.Succeeded)
-                    {
-                        if (sizeHandle.Result > 0)
-                        {
-                            progressor?.Init(sizeHandle.Result / (1024 * 1024));
-
-                            EventBus<BundleDownloadEvent>.Raise(
-                                BundleDownloadEvent.Downloading(group.GroupName, address, sizeHandle.Result));
-
-                            bool success = await DownloadDependenciesWithDynamicTimeoutAsync(address, group.GroupName, progressor);
-                            if (!success) return false;
-                        }
-                    }
-                    else return false;
-                }
-                finally
-                {
-                    if (sizeHandle.IsValid()) Addressables.Release(sizeHandle);
-                }
+                if (!await EnsureDownloadedAsync(sceneData.Scene.Address, group.GroupName, progressor))
+                    return false;
             }
             return true;
         }
 
-        public async Awaitable<bool> DownloadBundle(string label, IAddressableProgressor progressor = null)
-        {
-            if (_managedHandles.ContainsKey(label)) return true;
-
-            EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Preparing(null, label));
-
-            AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(label);
-            await sizeHandle.Task;
-
-            try
-            {
-                if (sizeHandle.Status == AsyncOperationStatus.Succeeded)
-                {
-                    if (sizeHandle.Result > 0)
-                    {
-                        progressor?.Init(sizeHandle.Result / (1024 * 1024));
-
-                        EventBus<BundleDownloadEvent>.Raise(
-                            BundleDownloadEvent.Downloading(null, label, sizeHandle.Result));
-
-                        return await DownloadDependenciesWithDynamicTimeoutAsync(label, null, progressor);
-                    }
-                    return true;
-                }
-                return false;
-            }
-            finally
-            {
-                if (sizeHandle.IsValid()) Addressables.Release(sizeHandle);
-            }
-        }
+        /// <summary>Downloads a standalone bundle by label.</summary>
+        public Awaitable<bool> DownloadBundle(string label, IAddressableProgressor progressor = null)
+            => EnsureDownloadedAsync(label, null, progressor);
 
         #endregion
 
         #region Private Methods
 
-        private async Awaitable<bool> DownloadDependenciesWithDynamicTimeoutAsync(string address, ESceneGroup owningGroup, IAddressableProgressor progressor = null)
+        /// <summary>
+        /// Shared download flow for scene dependencies and standalone bundles:
+        /// skip if already held, check remote size, then download with retry.
+        /// </summary>
+        private async Awaitable<bool> EnsureDownloadedAsync(string address, ESceneGroup owningGroup, IAddressableProgressor progressor)
+        {
+            if (_managedHandles.ContainsKey(address))
+            {
+                EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Completed(owningGroup, address));
+                return true;
+            }
+
+            EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Preparing(owningGroup, address));
+
+            AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(address);
+            await sizeHandle.Task;
+
+            try
+            {
+                if (sizeHandle.Status != AsyncOperationStatus.Succeeded)
+                {
+                    EventBus<BundleDownloadEvent>.Raise(
+                        BundleDownloadEvent.Failed(owningGroup, address, sizeHandle.Status.ToString()));
+                    return false;
+                }
+
+                if (sizeHandle.Result <= 0)
+                {
+                    // nothing to download: already cached locally
+                    EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Completed(owningGroup, address));
+                    return true;
+                }
+
+                progressor?.Init(sizeHandle.Result / (1024 * 1024));
+                EventBus<BundleDownloadEvent>.Raise(
+                    BundleDownloadEvent.Downloading(owningGroup, address, sizeHandle.Result));
+
+                return await DownloadWithRetryAsync(address, owningGroup, progressor);
+            }
+            finally
+            {
+                if (sizeHandle.IsValid())
+                    Addressables.Release(sizeHandle);
+            }
+        }
+
+        /// <summary>
+        /// Downloads dependencies for an address, retrying when the download fails or stalls
+        /// (no progress for <see cref="_maxIdleTimeInSeconds"/>).
+        /// </summary>
+        private async Awaitable<bool> DownloadWithRetryAsync(string address, ESceneGroup owningGroup, IAddressableProgressor progressor)
         {
             int attempt = 0;
             bool isDownloaded = false;
@@ -180,7 +165,8 @@ namespace Zone8.SceneManagement
                         else
                         {
                             idleTime += _progressCheckInterval;
-                            if (idleTime >= _maxIdleTimeInSeconds) break;
+                            if (idleTime >= _maxIdleTimeInSeconds)
+                                break;
                         }
 
                         progressor?.Progress(currentProgress);
@@ -191,7 +177,8 @@ namespace Zone8.SceneManagement
                     {
                         isDownloaded = true;
                         // Store the handle to maintain ref-count and prevent redundant re-loads
-                        if (_managedHandles.ContainsKey(address)) Addressables.Release(_managedHandles[address]);
+                        if (_managedHandles.TryGetValue(address, out var previous))
+                            Addressables.Release(previous);
                         _managedHandles[address] = handle;
 
                         EventBus<BundleDownloadEvent>.Raise(BundleDownloadEvent.Completed(owningGroup, address));
@@ -208,7 +195,8 @@ namespace Zone8.SceneManagement
                 catch (Exception ex)
                 {
                     Logger.LogError($"[SceneDownloadHandler] {ex.Message}");
-                    if (handle.IsValid()) Addressables.Release(handle);
+                    if (handle.IsValid())
+                        Addressables.Release(handle);
                 }
             }
             return isDownloaded;
@@ -227,7 +215,6 @@ namespace Zone8.SceneManagement
 
         public AsyncOperationHandleGroup(int initialCapacity)
         {
-
             Handles = new List<AsyncOperationHandle<SceneInstance>>(initialCapacity);
         }
     }

@@ -13,7 +13,7 @@ namespace Zone8.SceneManagement
 
         private void Awake()
         {
-            _sceneManager = FindAnyObjectByType<SceneManagementBase>();
+            _sceneManager = FindAnyObjectByType<SceneManagementManager>();
         }
 
         private void Start()

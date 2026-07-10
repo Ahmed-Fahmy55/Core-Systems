@@ -24,7 +24,7 @@ namespace Zone8.SceneManagement
         /// </summary>
         private readonly AsyncOperationHandleGroup _loadedGroupHandles = new(10);
 
-        private bool _keepPersistant;
+        private readonly bool _keepPersistant;
 
         private const string k_tempEmptySceneName = "TempEmptyScene";
         /// <summary>
@@ -69,8 +69,16 @@ namespace Zone8.SceneManagement
                 if (sceneData.Scene.State == SceneReferenceState.Regular)
                 {
                     var operation = SceneManager.LoadSceneAsync(sceneData.Path, LoadSceneMode.Additive);
+                    if (operation == null)
+                    {
+                        // LoadSceneAsync returns null when the scene isn't in the build settings
+                        EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneData, ESceneLoadStatus.Failed));
+                        Logger.LogError($"Failed to start loading scene (not in build settings?): {sceneData.Path}");
+                        continue;
+                    }
                     operationGroup.Operations.Add(operation);
-                    operation.completed += handle => OnSceneLoad(handle, sceneData);
+                    operation.completed += _ =>
+                        EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneData, ESceneLoadStatus.Completed));
                 }
                 else if (sceneData.Scene.State == SceneReferenceState.Addressable)
                 {
@@ -202,23 +210,6 @@ namespace Zone8.SceneManagement
             {
                 EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Failed));
                 Logger.LogError($"Failed to load addressable scene: {sceneName.Path}");
-            }
-        }
-
-        /// <summary>
-        /// Handles the completion of a regular scene load operation.
-        /// </summary>
-        /// <param name="sceneName">The data of the loaded scene.</param>
-        private void OnSceneLoad(AsyncOperation handle, SceneData sceneName)
-        {
-            if (handle.isDone)
-            {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Completed));
-            }
-            else
-            {
-                EventBus<SceneLoadEvent>.Raise(new SceneLoadEvent(sceneName, ESceneLoadStatus.Failed));
-                Logger.LogError($"Failed to load scene: {sceneName.Path}");
             }
         }
 

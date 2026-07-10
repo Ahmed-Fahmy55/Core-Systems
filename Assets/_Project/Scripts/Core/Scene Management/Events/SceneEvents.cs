@@ -115,7 +115,7 @@ namespace Zone8.SceneManagement
         /// <summary>Populated only when <see cref="Phase"/> is <see cref="EDownloadPhase.Failed"/>.</summary>
         public readonly string Error;
 
-        BundleDownloadEvent(ESceneGroup group, string label, EDownloadPhase phase, long totalBytes, string error)
+        private BundleDownloadEvent(ESceneGroup group, string label, EDownloadPhase phase, long totalBytes, string error)
         {
             Group = group;
             Label = label;
