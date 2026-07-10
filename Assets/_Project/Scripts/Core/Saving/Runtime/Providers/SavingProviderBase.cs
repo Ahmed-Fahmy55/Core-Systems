@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Zone8.Saving.Interfaces;
 
@@ -32,6 +33,20 @@ namespace Zone8.Saving.Runtime.Providers
         public abstract void Save(string saveFile, Dictionary<string, object> state);
 
         public abstract string GetPathFromSaveFile(string saveFile);
+
+        /// <summary>
+        /// Writes through a temp file so a crash mid-write can never corrupt an existing save.
+        /// </summary>
+        protected static void WriteAtomic(string path, string contents)
+        {
+            string tmp = path + ".tmp";
+            File.WriteAllText(tmp, contents);
+
+            if (File.Exists(path))
+                File.Replace(tmp, path, null);
+            else
+                File.Move(tmp, path);
+        }
 
 
         private void CaptureState(Dictionary<string, object> state)

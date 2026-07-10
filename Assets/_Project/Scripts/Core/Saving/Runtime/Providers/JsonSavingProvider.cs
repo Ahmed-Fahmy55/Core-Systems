@@ -11,7 +11,7 @@ namespace Zone8.Saving.Runtime.Providers
         public override void Save(string saveFile, Dictionary<string, object> state)
         {
             string json = JsonConvert.SerializeObject(state, GetSettings());
-            File.WriteAllText(GetPathFromSaveFile(saveFile), json);
+            WriteAtomic(GetPathFromSaveFile(saveFile), json);
         }
 
         public override Dictionary<string, object> Load(string saveFile)
@@ -19,9 +19,18 @@ namespace Zone8.Saving.Runtime.Providers
             string path = GetPathFromSaveFile(saveFile);
             if (!File.Exists(path)) return new Dictionary<string, object>();
 
-            string json = File.ReadAllText(path);
-
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(json, GetSettings());
+            try
+            {
+                string json = File.ReadAllText(path);
+                return JsonConvert.DeserializeObject<Dictionary<string, object>>(json, GetSettings())
+                       ?? new Dictionary<string, object>();
+            }
+            catch (JsonException ex)
+            {
+                // A corrupt save must not crash the game — treat it as empty
+                Logger.LogError($"[JsonSavingProvider] Save file '{path}' is corrupt and will be ignored: {ex.Message}");
+                return new Dictionary<string, object>();
+            }
         }
 
         public override void Delete(string saveFile)

@@ -12,9 +12,8 @@ namespace Zone8.Saving.Runtime.Providers
     {
         public override void Save(string saveFile, Dictionary<string, object> state)
         {
-            string path = GetPathFromSaveFile(saveFile);
             string json = JsonConvert.SerializeObject(state, GetSettings());
-            File.WriteAllBytes(path, Encoding.UTF8.GetBytes(json));
+            WriteAtomic(GetPathFromSaveFile(saveFile), json);
         }
 
         public override Dictionary<string, object> Load(string saveFile)
@@ -22,9 +21,18 @@ namespace Zone8.Saving.Runtime.Providers
             string path = GetPathFromSaveFile(saveFile);
             if (!File.Exists(path)) return new Dictionary<string, object>();
 
-            string json = Encoding.UTF8.GetString(File.ReadAllBytes(path));
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(json, GetSettings())
-                   ?? new Dictionary<string, object>();
+            try
+            {
+                string json = Encoding.UTF8.GetString(File.ReadAllBytes(path));
+                return JsonConvert.DeserializeObject<Dictionary<string, object>>(json, GetSettings())
+                       ?? new Dictionary<string, object>();
+            }
+            catch (JsonException ex)
+            {
+                // A corrupt save must not crash the game — treat it as empty
+                Logger.LogError($"[BinariSavingProvider] Save file '{path}' is corrupt and will be ignored: {ex.Message}");
+                return new Dictionary<string, object>();
+            }
         }
 
         public override string GetPathFromSaveFile(string saveFile) =>
