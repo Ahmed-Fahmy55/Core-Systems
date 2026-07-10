@@ -77,7 +77,7 @@ namespace Zone8.Audio.Components
 
         public void Resume()
         {
-            if (!_audioSource.isPlaying)
+            if (IsPaused)
             {
                 _audioSource.UnPause();
                 IsPaused = false;

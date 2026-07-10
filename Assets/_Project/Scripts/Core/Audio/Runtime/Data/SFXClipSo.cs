@@ -66,15 +66,15 @@ namespace Zone8.Audio.Data
 
         [HorizontalGroup("Pitch Settings/Row2", Width = 0.5f)]
         [ShowIf(nameof(RandomizePitch))]
-        [Range(-3f, 0f)]
+        [Range(-3f, 3f)]
         [GUIColor(0.9f, 0.8f, 1f)]
-        public float MinPitch;
+        public float MinPitch = 0.9f;
 
-        [HorizontalGroup("Pitch Settings/Row2", Width = 0.5f),]
+        [HorizontalGroup("Pitch Settings/Row2", Width = 0.5f)]
         [ShowIf(nameof(RandomizePitch))]
-        [Range(-3f, 0f)]
+        [Range(-3f, 3f)]
         [GUIColor(0.9f, 0.8f, 1f)]
-        public float MaxPitch;
+        public float MaxPitch = 1.1f;
 
         [TitleGroup("3D Sound Settings", "Spatial Controls", TitleAlignments.Centered, HorizontalLine = true)]
         [HorizontalGroup("3D Sound Settings/Row1", Width = 0.5f)]

@@ -22,6 +22,12 @@ namespace Zone8.Audio.Components
 
         private void Start()
         {
+            if (_sfxManager == null)
+            {
+                Logger.LogError($"[TrackSliderUI] No SFXManager found in scene — '{name}' cannot read track volume.", this);
+                return;
+            }
+
             _slider.value = _sfxManager.TracksSettings.GetTrackVolume(_track);
         }
 

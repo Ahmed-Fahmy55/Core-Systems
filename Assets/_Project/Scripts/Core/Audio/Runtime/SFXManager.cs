@@ -125,7 +125,7 @@ namespace Zone8.Audio
             SFXEmitter soundEmitter = _soundEmitterPool.Get();
             soundEmitter.Initialize(clip, _soundEmitterPool);
             soundEmitter.transform.position = position;
-            soundEmitter.transform.parent = transform;
+            soundEmitter.transform.SetParent(transform);
             soundEmitter.Play(onEnd);
 
             if (!_activeSounds.TryGetValue(clip.ClipTrack, out var clipMap))
@@ -309,7 +309,8 @@ namespace Zone8.Audio
 
         private void OnReturnedToPool(SFXEmitter soundEmitter)
         {
-            if (_activeSounds.Count == 0)
+            // Emitters released before ever being initialized (e.g. pre-warm) carry no clip
+            if (soundEmitter.Clip == null)
             {
                 soundEmitter.gameObject.SetActive(false);
                 return;
@@ -429,11 +430,6 @@ namespace Zone8.Audio
         private void OnAudioPlayed(AudioPlayEvent data)
         {
             Play(data.Clip, data.Position, data.OnEnd);
-        }
-
-        internal void ControlTrack(ETrack track, ETrackMode unmute)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
