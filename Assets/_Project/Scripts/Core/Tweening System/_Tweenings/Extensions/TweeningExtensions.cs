@@ -69,19 +69,17 @@ namespace Zone8.Tweening
             // Set the full text
             textComponent.text = toText;
 
-            // Calculate the delay between each character reveal
             int characterCount = textComponent.text.Length;
-            float delayPerCharacter = duration / characterCount;
-
-            // Create a sequence to animate each character
-            Sequence sequence = DOTween.Sequence();
-
-            for (int i = 0; i < characterCount; i++)
+            if (characterCount == 0)
             {
-                sequence.Append(DOTween.To(() => textComponent.maxVisibleCharacters,
-                    x => textComponent.maxVisibleCharacters = x, i, delayPerCharacter));
+                textComponent.maxVisibleCharacters = int.MaxValue;
+                return DOTween.Sequence(); // empty text: nothing to reveal
             }
-            return sequence;
+
+            // A single linear tween reveals every character, including the last one
+            return DOTween.To(() => textComponent.maxVisibleCharacters,
+                x => textComponent.maxVisibleCharacters = x, characterCount, duration)
+                .SetEase(Ease.Linear);
         }
 
         // ... existing methods ...

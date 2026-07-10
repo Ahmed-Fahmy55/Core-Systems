@@ -22,7 +22,7 @@ namespace Zone8.Tweening
         [Button]
         public void Act()
         {
-            _tween = action?.Act(gameObject);
+            _tween = action?.Act(_target != null ? _target : gameObject);
         }
 
         [Button]
@@ -36,6 +36,11 @@ namespace Zone8.Tweening
         public void Restart()
         {
             _tween?.Restart();
+        }
+
+        private void OnDestroy()
+        {
+            _tween?.Kill();
         }
     }
 }
