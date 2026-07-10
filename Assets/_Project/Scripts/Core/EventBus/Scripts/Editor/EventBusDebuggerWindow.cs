@@ -32,12 +32,10 @@ namespace Zone8.Events.Editor
 
                 if (getBindingsMethod != null)
                 {
-                    var bindings = getBindingsMethod.Invoke(null, null) as IEnumerable<IEventBinding<IEvent>>;
-                    if (bindings == null)
-                    {
-                        UnityEngine.Debug.LogWarning($"No bindings found for EventBus<{eventType.Name}>");
+                    // IEventBinding<T> is invariant, so the concrete IEventBinding<SomeEvent>[]
+                    // can only be enumerated through the non-generic interface.
+                    if (getBindingsMethod.Invoke(null, null) is not System.Collections.IEnumerable bindings)
                         continue;
-                    }
 
                     foreach (var binding in bindings)
                     {

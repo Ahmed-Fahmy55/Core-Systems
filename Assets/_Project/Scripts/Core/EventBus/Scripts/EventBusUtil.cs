@@ -11,8 +11,8 @@ namespace Zone8.Events
     /// </summary>
     public static class EventBusUtil
     {
-        public static IReadOnlyList<Type> EventTypes { get; set; }
-        public static IReadOnlyList<Type> EventBusTypes { get; set; }
+        public static IReadOnlyList<Type> EventTypes { get; private set; }
+        public static IReadOnlyList<Type> EventBusTypes { get; private set; }
 
 #if UNITY_EDITOR
         public static PlayModeStateChange PlayModeState { get; set; }
@@ -66,9 +66,9 @@ namespace Zone8.Events
             {
                 var busType = typedef.MakeGenericType(eventType);
                 eventBusTypes.Add(busType);
-                Debug.Log($"Initialized EventBus<{eventType.Name}>");
             }
 
+            Debug.Log($"[EventBus] Initialized {eventBusTypes.Count} event buses.");
             return eventBusTypes;
         }
 
@@ -77,7 +77,10 @@ namespace Zone8.Events
         /// </summary>
         public static void ClearAllBuses()
         {
-            Debug.Log("Clearing all buses...");
+            // Nothing to clear if runtime initialization never ran (e.g. leaving play mode
+            // after a domain reload, or edit-mode tooling calling in early).
+            if (EventBusTypes == null) return;
+
             for (int i = 0; i < EventBusTypes.Count; i++)
             {
                 var busType = EventBusTypes[i];
