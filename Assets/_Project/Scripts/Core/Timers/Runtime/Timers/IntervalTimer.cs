@@ -15,6 +15,13 @@ namespace Zone8.ImprovedTimers
 
         public IntervalTimer(float totalTime, float intervalSeconds) : base(totalTime)
         {
+            if (intervalSeconds <= 0)
+            {
+                // A non-positive interval would spin the threshold loop in Tick forever.
+                Logger.LogError($"[IntervalTimer] intervalSeconds must be positive, got {intervalSeconds}. Falling back to the total time.");
+                intervalSeconds = Mathf.Max(totalTime, 0.01f);
+            }
+
             _interval = intervalSeconds;
             _nextInterval = totalTime - _interval;
         }

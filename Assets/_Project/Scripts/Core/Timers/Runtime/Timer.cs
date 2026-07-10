@@ -12,7 +12,8 @@ namespace Zone8.ImprovedTimers
         private bool _isRegistered;
         private bool _disposed;
 
-        public float Progress => Mathf.Clamp(CurrentTime / _initialTime, 0, 1);
+        /// <summary>Normalized 0..1 progress. Always 0 for timers without a duration (stopwatch, frequency).</summary>
+        public float Progress => _initialTime <= 0 ? 0 : Mathf.Clamp01(CurrentTime / _initialTime);
 
         public Action OnTimerStart = delegate { };
         public Action OnTimerStop = delegate { };

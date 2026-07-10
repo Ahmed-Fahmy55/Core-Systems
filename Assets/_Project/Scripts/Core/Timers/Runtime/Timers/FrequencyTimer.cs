@@ -21,15 +21,15 @@ namespace Zone8.ImprovedTimers
 
         public override void Tick()
         {
-            if (IsRunning && CurrentTime >= _timeThreshold)
+            if (!IsRunning) return;
+
+            CurrentTime += Time.deltaTime;
+
+            // Fire every elapsed tick, so frequencies above the frame rate don't lose ticks
+            while (IsRunning && CurrentTime >= _timeThreshold)
             {
                 CurrentTime -= _timeThreshold;
                 OnTick.Invoke();
-            }
-
-            if (IsRunning && CurrentTime < _timeThreshold)
-            {
-                CurrentTime += Time.deltaTime;
             }
         }
 
@@ -48,6 +48,12 @@ namespace Zone8.ImprovedTimers
 
         void CalculateTimeThreshold(int ticksPerSecond)
         {
+            if (ticksPerSecond <= 0)
+            {
+                Logger.LogError($"[FrequencyTimer] ticksPerSecond must be positive, got {ticksPerSecond}. Falling back to 1.");
+                ticksPerSecond = 1;
+            }
+
             TicksPerSecond = ticksPerSecond;
             _timeThreshold = 1f / TicksPerSecond;
         }

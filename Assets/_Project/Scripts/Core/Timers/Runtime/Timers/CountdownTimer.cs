@@ -18,6 +18,7 @@ namespace Zone8.ImprovedTimers
 
             if (IsRunning && CurrentTime <= 0)
             {
+                CurrentTime = 0;
                 Stop();
             }
         }
