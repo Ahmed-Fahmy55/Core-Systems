@@ -44,8 +44,10 @@ namespace Zone8.Selection
         {
             if (selectable != null && _selectables.Remove(selectable))
             {
-                UnsubscribeFromSelectable(selectable);
+                // Deselect while still subscribed so OnItemRequestedDeselect can
+                // remove it from the selected list and raise the public events.
                 if (_selectedItems.Contains(selectable)) selectable.Deselect();
+                UnsubscribeFromSelectable(selectable);
             }
         }
 

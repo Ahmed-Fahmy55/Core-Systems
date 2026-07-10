@@ -13,6 +13,8 @@ namespace Zone8.Selection
 
         public void Select()
         {
+            if (IsSelected) return;
+
             IsSelected = true;
             OnSelect();
             ItemSelected?.Invoke(this);
@@ -20,6 +22,8 @@ namespace Zone8.Selection
 
         public void Deselect()
         {
+            if (!IsSelected) return;
+
             IsSelected = false;
             OnDeselect();
             ItemDeselected?.Invoke(this);

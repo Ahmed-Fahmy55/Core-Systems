@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace Zone8.Selection
 {
+    [RequireComponent(typeof(Button))]
     public class SelectableButton : UISelectableBase
     {
         Button _button;
