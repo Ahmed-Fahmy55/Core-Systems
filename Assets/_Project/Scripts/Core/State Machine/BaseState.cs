@@ -1,13 +1,11 @@
-
 namespace Zone8.StateMachine
 {
+    /// <summary>A single state owned by a <see cref="StateMachine"/>.</summary>
     public abstract class BaseState
     {
+        protected readonly StateMachine _context;
 
-        protected StateMachine _context;
-
-
-        public BaseState(StateMachine stateMachine)
+        protected BaseState(StateMachine stateMachine)
         {
             _context = stateMachine;
         }
@@ -17,6 +15,5 @@ namespace Zone8.StateMachine
         public abstract void OnStateStay();
 
         public abstract void OnStateExit();
-
     }
 }
