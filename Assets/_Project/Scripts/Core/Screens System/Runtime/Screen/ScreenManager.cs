@@ -68,19 +68,8 @@ namespace Zone8.Screens
                 return;
             }
 
-            _screenRequestQueue.Enqueue(new ScreenRequest
-            {
-                Screen = targetScreen,
-                HideCurrent = hideCurrent,
-                AutoHide = autoHide,
-                SecondsToHide = secondsToHide,
-                OnPreviousHidden = OnActiveScreenHide,
-                OnAutoHidden = OnAutoHidden,
-                OnNewShown = OnNewScreenShow
-            });
-
-            if (!_isProcessingQueue)
-                _ = ProcessQueue();
+            ShowScreen(targetScreen, hideCurrent, autoHide, secondsToHide,
+                OnActiveScreenHide, OnNewScreenShow, OnAutoHidden);
         }
 
         public void ShowScreenSO(EScreen screen)

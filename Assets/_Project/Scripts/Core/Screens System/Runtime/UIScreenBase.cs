@@ -3,17 +3,18 @@ using Zone8.Fading;
 
 namespace Zone8.Screens
 {
-    [RequireComponent(typeof(CanvasGroup), typeof(IFader))]
+    [RequireComponent(typeof(CanvasGroup))]
     public abstract class UIScreenBase : MonoBehaviour, IUIScreen
     {
         private CanvasGroup _canvasGroup;
-        private IFader _animator;
+        private IFader _fader;
         private CanvasGroup CanvasGroup => _canvasGroup ??= GetComponent<CanvasGroup>();
-
 
         private void Awake()
         {
-            _animator = GetComponent<IFader>();
+            // RequireComponent can't enforce interfaces, so the fader stays optional:
+            // without one the screen still works, it just snaps instead of fading.
+            _fader = GetComponent<IFader>();
             _canvasGroup = GetComponent<CanvasGroup>();
         }
 
@@ -21,14 +22,14 @@ namespace Zone8.Screens
         {
             transform.SetAsLastSibling();
             gameObject.SetActive(true);
-            await _animator.FadeIn();
+            if (_fader != null) await _fader.FadeIn();
             SetInteraction(true);
         }
 
         public virtual async Awaitable Hide()
         {
             SetInteraction(false);
-            await _animator.FadeOut();
+            if (_fader != null) await _fader.FadeOut();
             gameObject.SetActive(false);
         }
 

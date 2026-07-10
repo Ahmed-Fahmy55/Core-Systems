@@ -37,6 +37,10 @@ namespace Zone8.Screens
 
         #region Public API
 
+        // Stack state is always mutated BEFORE awaiting the show/hide animation —
+        // otherwise two overlapping calls (e.g. double-click) both pass the guards
+        // and the same popup is shown or hidden twice.
+
         [Button]
         public async Awaitable ShowPopup(PopupSO popupSO)
         {
@@ -46,16 +50,16 @@ namespace Zone8.Screens
                 return;
             }
 
-            var instance = GetOrCreateInstance(popupSO);
-
             if (_popupsStack.Contains(popupSO))
                 return;
 
-            if (_popupsStack.Count == 0)
-                ToogleBG(true);
+            var instance = GetOrCreateInstance(popupSO);
 
-            await instance.Show();
+            if (_popupsStack.Count == 0)
+                ToggleBG(true);
+
             _popupsStack.Push(popupSO);
+            await instance.Show();
         }
 
         [Button]
@@ -66,32 +70,34 @@ namespace Zone8.Screens
 
             var popupSO = _popupsStack.Pop();
             var instance = _popupsDic[popupSO];
-            await instance.Hide();
 
             if (_popupsStack.Count == 0)
-                ToogleBG(false);
+                ToggleBG(false);
+
+            await instance.Hide();
         }
 
         [Button]
         public async Awaitable ClosePopup(PopupSO popupSO)
         {
-            if (!_popupsDic.TryGetValue(popupSO, out var instance))
+            if (popupSO == null || !_popupsDic.TryGetValue(popupSO, out var instance))
                 return;
 
-            if (_popupsStack.Contains(popupSO))
-            {
-                await instance.Hide();
-                RemoveFromStack(popupSO);
+            if (!_popupsStack.Contains(popupSO))
+                return;
 
-                if (_popupsStack.Count == 0)
-                    ToogleBG(false);
-            }
+            RemoveFromStack(popupSO);
+
+            if (_popupsStack.Count == 0)
+                ToggleBG(false);
+
+            await instance.Hide();
         }
 
         #endregion
 
         #region Internal
-        private void ToogleBG(bool show)
+        private void ToggleBG(bool show)
         {
             if (_bgImage == null) return;
             if (show)
@@ -136,11 +142,11 @@ namespace Zone8.Screens
         {
             if (args.Show)
             {
-                ShowPopup(args.Popup);
+                _ = ShowPopup(args.Popup);
             }
             else
             {
-                ClosePopup(args.Popup);
+                _ = ClosePopup(args.Popup);
             }
         }
 
