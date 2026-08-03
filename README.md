@@ -50,49 +50,12 @@ Core Systems is the fix. Three rules govern everything in here:
 
 ---
 
-## Architecture at a glance
-
-<!-- TODO: replace with a real diagram or a short code sample showing the EventBus API in use.
-     A 15-line "here's how two systems talk without knowing about each other" snippet
-     is the single most persuasive thing you can put in this README. -->
-
-```csharp
-// Example: publishing and subscribing without a direct reference
-// TODO: paste your actual EventBus usage here
-```
-
----
-
-## Getting started
-
-<!-- TODO: fill in the real steps. Something like: -->
-
-1. Clone the repo and open in Unity <!-- version -->.
-2. <!-- Which sample scene should someone open first? -->
-3. <!-- Which modules can be deleted safely if unused? -->
-
----
-
-## Used in
-
-These systems back my shipped and personal work:
-
-- **Zone-8** — top-down stealth game
-- **Memory Glitch** — card-matching puzzle with shader-driven effects
-- <!-- TODO: add the client projects you're allowed to name -->
-
----
 
 ## Third-party dependencies
 
 This project builds on several Unity Asset Store packages. **These are not mine and are not covered by this repository's license** — you'll need your own licenses to use them:
 
 <!-- TODO: confirm and trim this list, and see the licensing note below -->
-Odin Inspector · Heat – Complete Modern UI · Transitions Plus · Editor Console Pro · vFolders · vHierarchy · Clipboard Plus Ultimate · Selection History · Live Script Reload · TextMesh Pro · Addressables · Netcode for GameObjects
-
+Odin Inspector · Transitions Plus · Editor Console Pro · vFolders · vHierarchy · Clipboard Plus Ultimate · Selection History · Live Script Reload ·
 ---
 
-## License
-
-<!-- TODO: add a license. MIT is the usual choice for a portfolio repo.
-     Note this only covers YOUR code in Assets/_Project — not the third-party packages above. -->
